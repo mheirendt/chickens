@@ -342,7 +342,7 @@
         [cell addChild:count];
     }
     else if (index == 9){
-        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
+        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
@@ -462,7 +462,7 @@
         [cell addChild:count];
     }
     else if (index == 13){
-        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
+        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
@@ -539,13 +539,44 @@
         
         [cell addChild:desc];
         
-        CCLabelTTF* count = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %@", [person1 valueForKey:@"perfect"]] fontName:@"HelveticaNeue" fontSize:22];
+        CCLabelTTF* count = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %@", [person1 valueForKey:@"closecall"]] fontName:@"HelveticaNeue" fontSize:22];
         count.anchorPoint = CGPointZero;
         count.positionType = CCPositionTypeNormalized;
         count.position = ccp(7.f,.2f);
         
         [cell addChild:count];
     }
+    else if (index == 16){
+        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
+        icon.anchorPoint = CGPointZero;
+        cell.contentSize = icon.contentSize;
+        [cell addChild:icon];
+        
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Refueled"] fontName:@"HelveticaNeue" fontSize:18];
+        lbl.anchorPoint = CGPointZero;
+        lbl.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        lbl.position = ccp(1.3f,.5f);
+        
+        [cell addChild:lbl];
+        
+        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Complete the swipe sequence in time"] fontName:@"HelveticaNeue" fontSize:14];
+        desc.anchorPoint = CGPointZero;
+        desc.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        desc.position = ccp(1.3f,.1f);
+        
+        [cell addChild:desc];
+        
+        CCLabelTTF* count = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %@", [person1 valueForKey:@"gascomplete"]] fontName:@"HelveticaNeue" fontSize:22];
+        count.anchorPoint = CGPointZero;
+        count.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        count.position = ccp(7.f,.2f);
+        
+        [cell addChild:count];
+    }
+
     }
 
     
@@ -558,7 +589,7 @@
 
 - (NSUInteger) tableViewNumberOfRows:(CCTableView*) tableView
 {
-    return 16;
+    return 17;
 }
 
 // -----------------------------------------------------------------

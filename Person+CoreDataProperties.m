@@ -41,5 +41,6 @@
 @dynamic nukewallet;
 @dynamic betterodds;
 @dynamic frequentflyer;
+@dynamic gascomplete;
 
 @end

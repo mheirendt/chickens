@@ -15,7 +15,36 @@
 
 // -----------------------------------------------------------------
 
-@implementation Store
+@implementation Store{
+    //If purchase method is 1 Gold is being used
+    //If purchase method is 2 Cash is being used
+    int purchaseMethod1;
+    int purchaseMethod2;
+    
+    CCLabelTTF *toggleLabel;
+    CCButton *toggleGold;
+    CCButton *toggleCash;
+    
+    CCLabelTTF *toggleLabel2;
+    CCButton *toggleGold2;
+    CCButton *toggleCash2;
+    
+    CCLabelTTF *bladeCost;
+    CCLabelTTF *nukeCost;
+    
+    CCLabelTTF *flyingCost;
+    CCLabelTTF *bonusCost;
+    
+    CCButton *bladeWallet;
+    CCButton *bladeWalletGold;
+    
+    CCButton *nukeWallet;
+    CCButton *nukeWalletGold;
+    
+    CCButton *flying;
+    CCButton *bonus;
+    CCButton *bonusGold;
+}
 
 // -----------------------------------------------------------------
 
@@ -31,6 +60,54 @@
     // class initalization goes here
     
     return self;
+}
+-(void)showGold{
+    purchaseMethod1 = 1;
+    [toggleLabel setString:@"Purchase With Cash"];
+    toggleGold.visible = false;
+    toggleCash.visible = true;
+    [bladeCost setString:@"75 Eggs"];
+    [nukeCost setString:@"75 Eggs"];
+    toggleGold.visible = false;
+    toggleCash.visible = true;
+    bladeWallet.visible = false;
+    bladeWalletGold.visible = true;
+    nukeWallet.visible = false;
+    nukeWalletGold.visible = true;
+}
+-(void)showCash{
+    purchaseMethod1 = 2;
+    [toggleLabel setString:@"Purchase With Gold"];
+    toggleGold.visible = true;
+    toggleCash.visible = false;
+    [bladeCost setString:@"$0.99"];
+    [nukeCost setString:@"$0.99"];
+    toggleGold.visible = true;
+    toggleCash.visible = false;
+    bladeWallet.visible = true;
+    bladeWalletGold.visible = false;
+    nukeWallet.visible = true;
+    nukeWalletGold.visible = false;
+}
+-(void)showGold2{
+    [toggleLabel2 setString:@"Purchase With Cash"];
+    [flyingCost setString:@"N/A"];
+    [bonusCost setString:@"200 Eggs"];
+    toggleGold2.visible = false;
+    toggleCash2.visible = true;
+    bonus.visible = false;
+    bonusGold.visible = true;
+    flying.enabled = false;
+}
+-(void)showCash2{
+    [toggleLabel2 setString:@"Purchase With Gold"];
+    [flyingCost setString:@"$1.99"];
+    [bonusCost setString:@"$1.99"];
+    toggleCash2.visible = false;
+    toggleGold2.visible = true;
+    bonus.visible = true;
+    bonusGold.visible = false;
+    flying.enabled = true;
 }
 -(void)backPressed{
     [[CCDirector sharedDirector] popScene];
@@ -166,6 +243,8 @@
     [self addChild:scrollView];
 }
 - (void)didLoadFromCCB{
+    purchaseMethod1 = 2;
+    purchaseMethod2 = 2;
     [self setupScrollViewPagingTest];
 }
 
@@ -187,11 +266,19 @@
             lbl.position = ccp((x + 0.5f)/w, (0.85f));
             [node addChild:lbl];
             
-            CCButton *bladeWallet = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            bladeWallet = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
             bladeWallet.positionType = CCPositionTypeNormalized;
             bladeWallet.position = ccp((x + .35f)/w, .6f);
             [bladeWallet setTarget:self selector:@selector(bladeWalletPurchased)];
             [node addChild:bladeWallet];
+            
+            bladeWalletGold = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGold.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGoldPressed.png"] disabledSpriteFrame:nil];
+            bladeWalletGold.positionType = CCPositionTypeNormalized;
+            bladeWalletGold.position = ccp((x + .35f)/w, .6f);
+            [bladeWalletGold setTarget:self selector:@selector(bladeWalletPurchased)];
+            bladeWalletGold.visible = false;
+            [node addChild:bladeWalletGold];
+            
             
             CCLabelTTF *bladeDesc = [CCLabelTTF labelWithString:@"Purchasing this item allows you to hold 20 pitchforks as opposed to 10." fontName:@"Helvetica" fontSize:14.f dimensions:CGSizeMake(180, 100)];
             bladeDesc.positionType = CCPositionTypeNormalized;
@@ -199,17 +286,24 @@
             bladeDesc.anchorPoint = ccp(0,1);
             [node addChild:bladeDesc];
             
-            CCLabelTTF *bladeCost = [CCLabelTTF labelWithString:@"$0.99  or   75 Eggs" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
+            bladeCost = [CCLabelTTF labelWithString:@"$0.99" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
             bladeCost.positionType = CCPositionTypeNormalized;
             bladeCost.position = ccp((x+.13f)/w, .53f);
             bladeCost.anchorPoint = ccp(0,.5f);
             [node addChild:bladeCost];
             
-            CCButton *nukeWallet = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            nukeWallet = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
             nukeWallet.positionType = CCPositionTypeNormalized;
             nukeWallet.position = ccp((x + .35f)/w, .3f);
             [nukeWallet setTarget:self selector:@selector(nukeWalletPurchased)];
             [node addChild:nukeWallet];
+            
+            nukeWalletGold = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGold.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGoldPressed.png"] disabledSpriteFrame:nil];
+            nukeWalletGold.positionType = CCPositionTypeNormalized;
+            nukeWalletGold.position = ccp((x + .35f)/w, .3f);
+            [nukeWalletGold setTarget:self selector:@selector(nukeWalletPurchased)];
+            nukeWalletGold.visible = false;
+            [node addChild:nukeWalletGold];
             
             CCLabelTTF *nukeDesc = [CCLabelTTF labelWithString:@"Purchasing this item allows you to hold 20 nukes as opposed to 10." fontName:@"Helvetica" fontSize:14.f dimensions:CGSizeMake(220, 100)];
             nukeDesc.positionType = CCPositionTypeNormalized;
@@ -217,7 +311,7 @@
             nukeDesc.anchorPoint = ccp(0,1);
             [node addChild:nukeDesc];
             
-            CCLabelTTF *nukeCost = [CCLabelTTF labelWithString:@"$0.99  or   75 Eggs" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
+            nukeCost = [CCLabelTTF labelWithString:@"$0.99" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
 
             nukeCost.positionType = CCPositionTypeNormalized;
             nukeCost.position = ccp((x+.13f)/w, .23f);
@@ -228,6 +322,27 @@
             icon.positionType = CCPositionTypeNormalized;
             icon.position = ccp((x+.87f)/w,.75f);
             [node addChild:icon];
+            
+            toggleGold = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGold.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGoldPressed.png"] disabledSpriteFrame:nil];
+            [toggleGold setTarget:self selector:@selector(showGold)];
+            toggleGold.positionType = CCPositionTypeNormalized;
+            toggleGold.position = ccp((x + .06f)/w,.88f);
+            [node addChild:toggleGold];
+            
+            toggleCash = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            [toggleCash setTarget:self selector:@selector(showCash)];
+            toggleCash.visible = false;
+            toggleCash.positionType = CCPositionTypeNormalized;
+            toggleCash.position = ccp((x + .06f)/w,.88f);
+            [node addChild:toggleCash];
+            
+            
+            toggleLabel = [CCLabelTTF labelWithString:@"Purchase With Gold" fontName:@"Helvetica" fontSize:12.f dimensions:CGSizeMake(toggleCash.contentSize.width + 20, 100)];
+            toggleLabel.anchorPoint = ccp(0,1);
+            toggleLabel.positionType = CCPositionTypeNormalized;
+            toggleLabel.position = ccp((x + toggleCash.position.x)/w,toggleCash.position.y - .08);
+            [node addChild:toggleLabel];
+            
         }
         else if (x == 1){
             CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Better Odds"] fontName:@"HelveticaNeue-Light" fontSize:38];
@@ -235,11 +350,12 @@
             lbl.position = ccp((x + 0.5f)/w, (0.85f));
             [node addChild:lbl];
             
-            CCButton *flying = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            flying = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
             flying.positionType = CCPositionTypeNormalized;
             flying.position = ccp((x + .35f)/w, .6f);
             [flying setTarget:self selector:@selector(frequentFlyerPurchased)];
             [node addChild:flying];
+            
             
             CCLabelTTF *flyingDesc = [CCLabelTTF labelWithString:@"Purchasing this item improves your odds per round of receiving a golden egg from 25% to 50%." fontName:@"Helvetica" fontSize:14.f dimensions:CGSizeMake(180, 100)];
             flyingDesc.positionType = CCPositionTypeNormalized;
@@ -247,17 +363,24 @@
             flyingDesc.anchorPoint = ccp(0,1);
             [node addChild:flyingDesc];
             
-            CCLabelTTF *flyingCost = [CCLabelTTF labelWithString:@"$1.99" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
+            flyingCost = [CCLabelTTF labelWithString:@"$1.99" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
             flyingCost.positionType = CCPositionTypeNormalized;
             flyingCost.position = ccp((x+.13f)/w, .53f);
             flyingCost.anchorPoint = ccp(0,.5f);
             [node addChild:flyingCost];
             
-            CCButton *bonus = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            bonus = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
             bonus.positionType = CCPositionTypeNormalized;
             bonus.position = ccp((x + .35f)/w, .3f);
             [bonus setTarget:self selector:@selector(bonusOddsPurchased)];
             [node addChild:bonus];
+            
+            bonusGold = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGold.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGoldPressed.png"] disabledSpriteFrame:nil];
+            bonusGold.positionType = CCPositionTypeNormalized;
+            bonusGold.position = ccp((x + .35f)/w, .3f);
+            [bonusGold setTarget:self selector:@selector(bonusOddsPurchased)];
+            bonusGold.visible = false;
+            [node addChild:bonusGold];
             
             CCLabelTTF *bonusDesc = [CCLabelTTF labelWithString:@"Purchasing this item gives your user a 100% chance of a bonus of either a nuke or a pitchfork after completing each round as opposed to a 50% chance." fontName:@"Helvetica" fontSize:14.f dimensions:CGSizeMake(220, 100)];
             bonusDesc.positionType = CCPositionTypeNormalized;
@@ -265,7 +388,7 @@
             bonusDesc.anchorPoint = ccp(0,1);
             [node addChild:bonusDesc];
             
-            CCLabelTTF *bonusCost = [CCLabelTTF labelWithString:@"$1.99  or   200 Eggs" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
+            bonusCost = [CCLabelTTF labelWithString:@"$1.99" fontName:@"Helvetica" fontSize:22.f dimensions:CGSizeMake(100,100)];
             
             bonusCost.positionType = CCPositionTypeNormalized;
             bonusCost.position = ccp((x+.13f)/w, .23f);
@@ -276,6 +399,26 @@
             icon.positionType = CCPositionTypeNormalized;
             icon.position = ccp((x+.87f)/w,.75f);
             [node addChild:icon];
+            
+            toggleGold2 = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGold.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseGoldPressed.png"] disabledSpriteFrame:nil];
+            [toggleGold2 setTarget:self selector:@selector(showGold2)];
+            toggleGold2.positionType = CCPositionTypeNormalized;
+            toggleGold2.position = ccp((x + .06f)/w,.88f);
+            [node addChild:toggleGold2];
+            
+            toggleCash2 = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/purchaseMoney.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Rank/pruchaseMoneyPressed.png"] disabledSpriteFrame:nil];
+            [toggleCash2 setTarget:self selector:@selector(showCash2)];
+            toggleCash2.visible = false;
+            toggleCash2.positionType = CCPositionTypeNormalized;
+            toggleCash2.position = ccp((x + .06f)/w,.88f);
+            [node addChild:toggleCash2];
+            
+            
+            toggleLabel2 = [CCLabelTTF labelWithString:@"Purchase With Gold" fontName:@"Helvetica" fontSize:12.f dimensions:CGSizeMake(toggleCash2.contentSize.width + 20, 100)];
+            toggleLabel2.anchorPoint = ccp(0,1);
+            toggleLabel2.positionType = CCPositionTypeNormalized;
+            toggleLabel2.position = ccp((x + toggleCash.position.x)/w,toggleCash2.position.y - .08f);
+            [node addChild:toggleLabel2];
         }
         else if (x == 2){
             CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Golden Eggs"] fontName:@"HelveticaNeue-Light" fontSize:38];
