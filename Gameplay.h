@@ -17,15 +17,16 @@
 
 @interface Gameplay : CCNode <CCPhysicsCollisionDelegate>{
     int medalCount;
+    int targetsLaunched;
 }
 // -----------------------------------------------------------------
 // properties
 // -----------------------------------------------------------------
 // methods
-
 + (instancetype)node;
 - (instancetype)init;
 -(void)pauseScene;
+-(void)newRound:(NSString*)round;
 // -----------------------------------------------------------------
 
 @end

@@ -40,34 +40,38 @@ int killCount = 0;
     self.userInteractionEnabled = TRUE;
     _physicsNode.collisionDelegate = self;
     
-    //CCNode* _chicken = [CCBReader load:@"Chicken"];
-    //self.contentSize.width+Chicken.contentSize.width
-    _chicken.position = CGPointMake(300, 300);
-    id move=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-200,_chicken.position.y)];
-    [_chicken runAction:[CCActionSequence actions: move, nil]];
+    [self newRound:@"Round 1"];
+
+    _chicken.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
+    _canon.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
+    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-40,_chicken.position.y)];
+    id moveCanon=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-90,_chicken.position.y)];
+    id delay = [CCActionDelay actionWithDuration: .5f];
+    [_canon runAction:[CCActionSequence actions: moveCanon, nil]];
+    [_chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
     
-    if(killCount < 4){
     int minTime = 2.0f;
     int maxTime = 4.0f;
     int rangeTime = maxTime - minTime;
     int randomTime = (arc4random() % rangeTime) + minTime;
-    [self schedule:@selector(launchEgg) interval:.5f];
+    [self schedule:@selector(launchEgg) interval:randomTime repeat:50 delay:2.2f];
+}
+-(void)update:(CCTime)delta{
+    if(targetsLaunched == 50){
+        [self newRound:@"Round2"];
     }
-    if(killCount > 4 && killCount<10){
-        int minTime = .3f;
-        int maxTime = 2.0f;
-        int rangeTime = maxTime - minTime;
-        int randomTime = (arc4random() % rangeTime) + minTime;
-        [self schedule:@selector(launchEgg) interval:randomTime];
-    }
-    if(killCount >= 10){
-        int minTime = .05f;
-        int maxTime = .3f;
-        int rangeTime = maxTime - minTime;
-        int randomTime = (arc4random() % rangeTime) + minTime;
-        [self schedule:@selector(launchEgg) interval:randomTime];
-    }
-
+}
+-(void)newRound:(NSString*)round{
+    CCLabelTTF *label = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(100)];
+    label.positionType = CCPositionTypeNormalized;
+    label.position = ccp(.5f,.5f);
+    [self addChild:label];
+    
+    CCActionDelay *delay =  [CCActionDelay actionWithDuration:2];
+    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+        [self removeChild:label];
+    }];
+    [self runAction:[CCActionSequence actions:delay, block, nil]];
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
@@ -80,8 +84,8 @@ int killCount = 0;
     [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
 
 }
-
 - (void)launchEgg {
+    targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
     egg.position = ccpAdd(_canon.position, ccp(-27, 50));
     [_physicsNode addChild:egg];

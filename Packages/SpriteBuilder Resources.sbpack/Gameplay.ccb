@@ -159,7 +159,7 @@
 				<key>displayName</key>
 				<string>Chicken</string>
 				<key>memberVarAssignmentName</key>
-				<string></string>
+				<string>_chicken</string>
 				<key>memberVarAssignmentType</key>
 				<integer>1</integer>
 				<key>properties</key>
@@ -208,6 +208,8 @@
 						<string>Chicken.ccb</string>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
