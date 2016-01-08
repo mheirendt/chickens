@@ -39,6 +39,12 @@
 -(void)resumePressed{
     [[CCDirector sharedDirector] popScene];
 }
+-(void)restartPressed{
+    [[CCDirector sharedDirector] popScene];
+    [[CCDirector sharedDirector] popScene];
+    CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
+    [[CCDirector sharedDirector] pushScene:game];
+}
 -(void)quitPressed{
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];

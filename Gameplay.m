@@ -19,9 +19,11 @@
     CCNode *_canon;
     CCLabelTTF *_scoreLabel;
     CCNode *_chicken;
-    
+    CCTime _timeSinceLastCollision;
+    int roundCount;
+    int killCount;
+    int medalId;
 }
-int killCount = 0;
 // -----------------------------------------------------------------
 
 + (instancetype)node
@@ -33,6 +35,7 @@ int killCount = 0;
 {
     self = [super init];
     NSAssert(self, @"Unable to create class %@", [self class]);
+    _timeSinceLastCollision= 0.0;
     return self;
 }
 
@@ -49,38 +52,42 @@ int killCount = 0;
     id delay = [CCActionDelay actionWithDuration: .5f];
     [_canon runAction:[CCActionSequence actions: moveCanon, nil]];
     [_chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
-    
+    //[self addChicken:540.f y:104.f androtation:0.f];
     int minTime = 2.0f;
     int maxTime = 4.0f;
     int rangeTime = maxTime - minTime;
     int randomTime = (arc4random() % rangeTime) + minTime;
-    [self schedule:@selector(launchEgg) interval:randomTime repeat:50 delay:2.2f];
+    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:3.3f];
 }
--(void)update:(CCTime)delta{
-    if(targetsLaunched == 50){
-        [self newRound:@"Round2"];
-    }
-}
--(void)newRound:(NSString*)round{
-    CCLabelTTF *label = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(100)];
-    label.positionType = CCPositionTypeNormalized;
-    label.position = ccp(.5f,.5f);
-    [self addChild:label];
+//x:526.000000(568), y:104.000000
+////Automate addition of a canon to be added at later rounds
+
+-(void)addChicken:(float)x y:(float)y androtation:(float)rotation{
+    CCNode* chicken = [CCBReader load:@"Canon"];
+    CGPoint point =  CGPointMake(x,y);
+    chicken.position = point;
+    chicken.rotation = rotation;
+    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-90,_chicken.position.y)];
+    id delay = [CCActionDelay actionWithDuration: .5f];
+    [self addChild:chicken];
+    [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
+    int minTime = 2.0f;
+    int maxTime = 4.0f;
+    int rangeTime = maxTime - minTime;
+    int randomTime = (arc4random() % rangeTime) + minTime;
+    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:.2f];
     
-    CCActionDelay *delay =  [CCActionDelay actionWithDuration:2];
-    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
-        [self removeChild:label];
-    }];
-    [self runAction:[CCActionSequence actions:delay, block, nil]];
 }
+
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
     CGPoint touchLocation = [touch locationInNode:self];
     CCNode* bullet = [CCBReader load:@"Bullet"];
+    bullet.scale = .6;
     bullet.position = touchLocation;
     [_physicsNode addChild:bullet];
     CCActionRemove *actionRemove = [CCActionRemove action];
-    id delay = [CCActionDelay actionWithDuration:.0001f];
+    id delay = [CCActionDelay actionWithDuration:.000001f];
     [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
 
 }
@@ -106,25 +113,142 @@ int killCount = 0;
     int randomforce = (arc4random() % rangeforce) + minforce;
     CGPoint force = ccpMult(launchDirection, randomforce);
     [egg.physicsBody applyForce:force];
+     if(targetsLaunched == 5){
+        [self newRound:@"Round 2"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 15){
+        [self newRound:@"Round 3"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 35){
+        [self newRound:@"Round 4"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 85){
+        [self newRound:@"Round 5"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 185){
+        [self newRound:@"Round 6"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 285){
+        [self newRound:@"Round 7"];
+        [self initRound:roundCount];
+    }
+    else if(targetsLaunched == 400){
+        [self newRound:@"Round 8"];
+        [self initRound:roundCount];
+    }
+}
+
+-(void)newRound:(NSString*)round{
+    CCLabelTTF *label = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(100)];
+    label.positionType = CCPositionTypeNormalized;
+    label.position = ccp(.5f,0.5f);
+    
+    CCActionDelay *delay =  [CCActionDelay actionWithDuration:2.5];
+    CCActionCallBlock *blockAdd = [CCActionCallBlock actionWithBlock:^{
+        [self addChild:label];
+    }];
+    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+        [self removeChild:label];
+    }];
+    
+    [self runAction:[CCActionSequence actions:delay, blockAdd, delay, block, delay, nil]];
+    roundCount++;
+}
+
+-(void)initRound:(int)number{
+    switch (number){
+
+case 2:
+        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:3.f];
+        break;
+case 3:
+        [self schedule:@selector(launchEgg) interval:.7f repeat:19 delay:5.f];
+        break;
+case 4:
+        [self schedule:@selector(launchEgg) interval:.5f repeat:49 delay:5.f];
+        break;
+case 5:
+        [self schedule:@selector(launchEgg) interval:.4f repeat:99 delay:5.f];
+        break;
+case 6:
+        [self schedule:@selector(launchEgg) interval:.3f repeat:99 delay:5.f];
+        break;
+case 7:
+        [self schedule:@selector(launchEgg) interval:.2f repeat:99 delay:5.f];
+        break;
+case 8:
+        [self schedule:@selector(launchEgg) interval:.1f repeat:114 delay:5.f];
+        break;
+    }
 }
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bullet:(CCNode *)nodeB {
-    float energy = [pair totalKineticEnergy];
-    if (energy > .00001f) {
+    _timeSinceLastCollision = 0.0;
+    medalId++;
         [[_physicsNode space] addPostStepBlock:^{
             [self eggRemoved:nodeA];
         } key:nodeA];
+    if(medalId==3){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
+        [self rewardMedal:spree andLabel:@"Double Kill"];    }
+    else if(medalId==5){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
+        [self rewardMedal:triple andLabel:@"Triple Kill"];
+    }
+    else if(medalId==7){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
+        [self rewardMedal:triple andLabel:@"Over Kill"];
+    }
+    else if(medalId==9){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
+        [self rewardMedal:triple andLabel:@"Kill Tacular"];
+    }
+    else if(medalId==11){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
+        [self rewardMedal:triple andLabel:@"Killpocalypse"];
+    }
+    else if(medalId==13){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
+        [self rewardMedal:triple andLabel:@"7"];
+    }
+    else if(medalId==15){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
+        [self rewardMedal:triple andLabel:@"8"];
+    }
+    else if(medalId==17){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
+        [self rewardMedal:triple andLabel:@"9"];
+    }
+    else if(medalId==19 || (medalId%10) == 0){
+        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
+        [self rewardMedal:triple andLabel:@"10"];
+    }
+
+    
+}
+
+- (void)update:(CCTime)delta {
+    _timeSinceLastCollision += delta;
+    CCLOG(@"%d", medalId);
+    if ( _timeSinceLastCollision > .21f ) {
+        medalId = 0;
     }
 }
 - (void)eggRemoved:(CCNode *)egg {
     CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
     killCount++;
     CCLOG(@"Score: %d", killCount);
-    [_scoreLabel setString:[NSString stringWithFormat:@"Score: %d", killCount]];
+    [_scoreLabel setString:[NSString stringWithFormat:@"%d", killCount]];
     explosion.scale = 0.6f;
     explosion.position = egg.position;
+    explosion.rotation = egg.rotation;
     [egg.parent addChild:explosion];
     CCActionRemove *actionRemove = [CCActionRemove action];
-    id delay = [CCActionDelay actionWithDuration:2.5f];
+    id delay = [CCActionDelay actionWithDuration:0.3f];
     [explosion runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
     [egg removeFromParent];
     
@@ -149,12 +273,9 @@ int killCount = 0;
         [self rewardMedal:spree andLabel:@"Unstoppable"];
     }
 }
-- (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Bullet:(CCNode *)nodeA Chicken:(CCNode *)nodeB {
-    CCLOG(@"YAY");
-}
 
 
--(void)rewardMedal:(CCSprite *)medalType andLabel:(CCLabelTTF*)label {
+-(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input {
     medalCount+=1;
     CCLOG(@"%d", medalCount);
     //medalType = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
@@ -177,7 +298,7 @@ int killCount = 0;
     [self runAction:[CCActionFadeIn actionWithDuration:0.4]];
     [self addChild:medalType];
     
-    label = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@",label] fontName:@"Verdana-Bold" fontSize:16.0f];
+    CCLabelTTF *label = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@",input] fontName:@"Verdana-Bold" fontSize:16.0f];
     label.positionType = CCPositionTypeNormalized;
     if(medalCount == 1){
         label.position = ccp(.6f, .1f);
@@ -194,7 +315,7 @@ int killCount = 0;
     }
     [self addChild:label];
     
-    CCActionDelay *delay =  [CCActionDelay actionWithDuration:1];
+    CCActionDelay *delay =  [CCActionDelay actionWithDuration:.4f];
     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
         [self removeChild:medalType];
         [self removeChild:label];

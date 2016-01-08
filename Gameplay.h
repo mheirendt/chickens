@@ -25,8 +25,10 @@
 // methods
 + (instancetype)node;
 - (instancetype)init;
+//-(void)addChicken:(CGPoint*)position androtation:(float)rotation;
 -(void)pauseScene;
 -(void)newRound:(NSString*)round;
+-(void)initRound:(int)number;
 // -----------------------------------------------------------------
 
 @end
