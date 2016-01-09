@@ -27,11 +27,7 @@
 {
     self = [super init];
     NSAssert(self, @"Unable to create class %@", [self class]);
-    // class initalization goes here
-    
-    
-    
-    
+
     return self;
 }
 

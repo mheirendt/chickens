@@ -1,9 +1,9 @@
 //
-//  MedalsScene.h
+//  TableView.h
 //
 //  Created by : Michael Heirendt
 //  Project    : Crush
-//  Date       : 1/1/16
+//  Date       : 1/7/16
 //
 //  Copyright (c) 2016 Apportable.
 //  All rights reserved.
@@ -12,20 +12,21 @@
 
 #import <Foundation/Foundation.h>
 #import "cocos2d.h"
-#import "TableView.h"
+#import "cocos2d-ui.h"
 
 // -----------------------------------------------------------------
 
-@interface MedalsScene : CCNode
+@interface TableView : CCNode <CCTableViewDataSource>
 
 // -----------------------------------------------------------------
 // properties
 
 // -----------------------------------------------------------------
 // methods
--(void)backToMenu;
+
 + (instancetype)node;
 - (instancetype)init;
+
 // -----------------------------------------------------------------
 
 @end

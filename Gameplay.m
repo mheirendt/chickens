@@ -18,7 +18,8 @@
     CCPhysicsNode *_physicsNode;
     CCNode *_canon;
     CCLabelTTF *_scoreLabel;
-    CCNode *_chicken;
+    //CCNode *chicken;
+    CGPoint location;
     CCTime _timeSinceLastCollision;
     int roundCount;
     int killCount;
@@ -45,37 +46,41 @@
     
     [self newRound:@"Round 1"];
 
-    _chicken.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
+    /*_chicken.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
     _canon.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
     id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-40,_chicken.position.y)];
     id moveCanon=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-90,_chicken.position.y)];
     id delay = [CCActionDelay actionWithDuration: .5f];
     [_canon runAction:[CCActionSequence actions: moveCanon, nil]];
     [_chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
-    //[self addChicken:540.f y:104.f androtation:0.f];
+     */
+    [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:0.f andMoveToY:0.f];
     int minTime = 2.0f;
     int maxTime = 4.0f;
     int rangeTime = maxTime - minTime;
     int randomTime = (arc4random() % rangeTime) + minTime;
-    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:3.3f];
+    //[self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:3.3f];
 }
 //x:526.000000(568), y:104.000000
 ////Automate addition of a canon to be added at later rounds
 
--(void)addChicken:(float)x y:(float)y androtation:(float)rotation{
+-(void)addChicken:(float)x y:(float)y androtation:(float)rotation andMoveToX:(float)movex andMoveToY:(float)movey{
     CCNode* chicken = [CCBReader load:@"Canon"];
     CGPoint point =  CGPointMake(x,y);
     chicken.position = point;
+    location = chicken.position;
     chicken.rotation = rotation;
-    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-90,_chicken.position.y)];
+    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-130,104.f)];
     id delay = [CCActionDelay actionWithDuration: .5f];
     [self addChild:chicken];
     [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
+    location = ccpSub(chicken.position, ccp(-100,0));
     int minTime = 2.0f;
     int maxTime = 4.0f;
     int rangeTime = maxTime - minTime;
     int randomTime = (arc4random() % rangeTime) + minTime;
     [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:.2f];
+    
     
 }
 
@@ -91,10 +96,12 @@
     [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
 
 }
+
 - (void)launchEgg {
     targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
-    egg.position = ccpAdd(_canon.position, ccp(-27, 50));
+    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
+    egg.position = ccpAdd(location, ccp(-27, 50));
     [_physicsNode addChild:egg];
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
@@ -115,6 +122,7 @@
     [egg.physicsBody applyForce:force];
      if(targetsLaunched == 5){
         [self newRound:@"Round 2"];
+        [self addChicken:self.contentSize.width+5 y:600 androtation:-15 andMoveToX:self.contentSize.width-50 andMoveToY:600.f];
         [self initRound:roundCount];
     }
     else if(targetsLaunched == 15){
