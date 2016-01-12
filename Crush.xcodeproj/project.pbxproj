@@ -57,6 +57,10 @@
 		927F61BA196C771E000F43EF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = B737896D180762440076A88C /* Default.png */; };
 		927F61BB196C771E000F43EF /* iPad-old.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5907188484E7003F4D28 /* iPad-old.png */; };
 		A93C4A431C3F70060097C423 /* TableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A421C3F70060097C423 /* TableView.m */; };
+		A93C4A4E1C4320BD0097C423 /* GameOver.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A4D1C4320BD0097C423 /* GameOver.m */; };
+		A93C4A511C4477880097C423 /* GameData.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A501C4477880097C423 /* GameData.m */; };
+		A93C4A531C4496740097C423 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A93C4A521C4496740097C423 /* CoreData.framework */; };
+		A93C4A571C4496DE0097C423 /* HiScore.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A561C4496DE0097C423 /* HiScore.m */; };
 		A96A199F1C34AE520023033F /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = A96A199E1C34AE520023033F /* Gameplay.m */; };
 		A97DB91A1C36134900F0F4C2 /* Egg.m in Sources */ = {isa = PBXBuildFile; fileRef = A97DB9191C36134900F0F4C2 /* Egg.m */; };
 		A9A449F51C3725CA00E1FA40 /* Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A449F41C3725CA00E1FA40 /* Bullet.m */; };
@@ -210,6 +214,13 @@
 		927F61BF196C771E000F43EF /* Crush Android.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Crush Android.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93C4A411C3F70060097C423 /* TableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableView.h; sourceTree = "<group>"; };
 		A93C4A421C3F70060097C423 /* TableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableView.m; sourceTree = "<group>"; };
+		A93C4A4C1C4320BD0097C423 /* GameOver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameOver.h; sourceTree = "<group>"; };
+		A93C4A4D1C4320BD0097C423 /* GameOver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOver.m; sourceTree = "<group>"; };
+		A93C4A4F1C4477880097C423 /* GameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameData.h; sourceTree = "<group>"; };
+		A93C4A501C4477880097C423 /* GameData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameData.m; sourceTree = "<group>"; };
+		A93C4A521C4496740097C423 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		A93C4A551C4496DE0097C423 /* HiScore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HiScore.h; sourceTree = "<group>"; };
+		A93C4A561C4496DE0097C423 /* HiScore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HiScore.m; sourceTree = "<group>"; };
 		A96A199D1C34AE510023033F /* Gameplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gameplay.h; sourceTree = "<group>"; };
 		A96A199E1C34AE520023033F /* Gameplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Gameplay.m; sourceTree = "<group>"; };
 		A97DB9181C36134900F0F4C2 /* Egg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Egg.h; sourceTree = "<group>"; };
@@ -317,6 +328,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A93C4A531C4496740097C423 /* CoreData.framework in Frameworks */,
 				7A97911819E631CD001FFC4D /* libcocos2d.a in Frameworks */,
 				8392007A18EE8E3300B6C429 /* GLKit.framework in Frameworks */,
 				B77F1B3217B978D7009739AE /* QuartzCore.framework in Frameworks */,
@@ -495,6 +507,15 @@
 			name = libs;
 			sourceTree = "<group>";
 		};
+		A93C4A541C4496870097C423 /* Data Model */ = {
+			isa = PBXGroup;
+			children = (
+				A93C4A551C4496DE0097C423 /* HiScore.h */,
+				A93C4A561C4496DE0097C423 /* HiScore.m */,
+			);
+			name = "Data Model";
+			sourceTree = "<group>";
+		};
 		B737893C1807616C0076A88C /* Source */ = {
 			isa = PBXGroup;
 			children = (
@@ -509,16 +530,21 @@
 				A9A44A1E1C38732900E1FA40 /* PauseScene.h */,
 				A9A44A1F1C38732900E1FA40 /* PauseScene.m */,
 				A9A449F71C3740A900E1FA40 /* Chicken.h */,
+				A93C4A4C1C4320BD0097C423 /* GameOver.h */,
+				A93C4A541C4496870097C423 /* Data Model */,
+				A93C4A4D1C4320BD0097C423 /* GameOver.m */,
+				A93C4A4F1C4477880097C423 /* GameData.h */,
+				A93C4A501C4477880097C423 /* GameData.m */,
+				A9A449F81C3740A900E1FA40 /* Chicken.m */,
 				A93C4A411C3F70060097C423 /* TableView.h */,
 				A93C4A421C3F70060097C423 /* TableView.m */,
-				A9A449F81C3740A900E1FA40 /* Chicken.m */,
 				A9A44A151C378E9D00E1FA40 /* HighScoresScene.h */,
 				A9A44A161C378E9D00E1FA40 /* HighScoresScene.m */,
 				A9A44A181C378EF800E1FA40 /* MedalsScene.h */,
 				A9A44A191C378EF800E1FA40 /* MedalsScene.m */,
-				A97DB9181C36134900F0F4C2 /* Egg.h */,
 				A9A44A121C378E8400E1FA40 /* SettingsScene.h */,
 				A9A44A131C378E8400E1FA40 /* SettingsScene.m */,
+				A97DB9181C36134900F0F4C2 /* Egg.h */,
 				A97DB9191C36134900F0F4C2 /* Egg.m */,
 			);
 			name = Source;
@@ -571,6 +597,7 @@
 		B77F1B3017B978D7009739AE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A93C4A521C4496740097C423 /* CoreData.framework */,
 				BC5399D31A44DCC90063F482 /* AndroidKit.framework */,
 				BC5399D41A44DCC90063F482 /* CoreJava.framework */,
 				BC5399D51A44DCC90063F482 /* GLActivityKit.framework */,
@@ -932,8 +959,11 @@
 				B73789871807631A0076A88C /* main.m in Sources */,
 				A96A199F1C34AE520023033F /* Gameplay.m in Sources */,
 				7A046D8C19E8A20E004C4763 /* MainScene.m in Sources */,
+				A93C4A511C4477880097C423 /* GameData.m in Sources */,
 				A97DB91A1C36134900F0F4C2 /* Egg.m in Sources */,
 				A9A44A201C38732900E1FA40 /* PauseScene.m in Sources */,
+				A93C4A571C4496DE0097C423 /* HiScore.m in Sources */,
+				A93C4A4E1C4320BD0097C423 /* GameOver.m in Sources */,
 				A9A44A1A1C378EF800E1FA40 /* MedalsScene.m in Sources */,
 				5B121038197487F2004C1E1D /* AppDelegate.m in Sources */,
 				A93C4A431C3F70060097C423 /* TableView.m in Sources */,

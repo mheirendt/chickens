@@ -12,21 +12,26 @@
 
 #import "Gameplay.h"
 #import "CCPhysics+ObjectiveChipmunk.h"
+#import "GameData.h"
 // -----------------------------------------------------------------
 
 @implementation Gameplay{
     CCPhysicsNode *_physicsNode;
     CCNode *_canon;
     CCLabelTTF *_scoreLabel;
+    CCNode *_barn;
     //CCNode *chicken;
-    CGPoint location;
     CCTime _timeSinceLastCollision;
     int roundCount;
     int killCount;
     int medalId;
+    float _health;
+    int doubleKillCount;
+    CCProgressNode *_progressNode;
+    long gameScore;
+    
 }
 // -----------------------------------------------------------------
-
 + (instancetype)node
 {
     return [[self alloc] init];
@@ -43,7 +48,7 @@
 - (void)didLoadFromCCB {
     self.userInteractionEnabled = TRUE;
     _physicsNode.collisionDelegate = self;
-    
+    _health = 100.f;
     [self newRound:@"Round 1"];
 
     /*_chicken.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
@@ -54,12 +59,34 @@
     [_canon runAction:[CCActionSequence actions: moveCanon, nil]];
     [_chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
      */
-    [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:0.f andMoveToY:0.f];
+    [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:self.contentSize.width - 100 andMoveToY:104.f];
     int minTime = 2.0f;
     int maxTime = 4.0f;
     int rangeTime = maxTime - minTime;
     int randomTime = (arc4random() % rangeTime) + minTime;
-    //[self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:3.3f];
+    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.3f];
+    /*CCNode* chicken = [CCBReader load:@"barn"];
+    CGPoint point =  CGPointMake(300,300);
+    chicken.position = point;
+    [self addChild:chicken];
+     */
+    _barn.physicsBody.collisionType=@"Barn";
+    
+    CCSprite *sprite = [CCSprite spriteWithImageNamed:@"Assets/_100.png"];
+    _progressNode = [CCProgressNode progressWithSprite:sprite];
+    _progressNode.type = CCProgressNodeTypeBar;
+    _progressNode.midpoint = ccp(0.0f, 0.0f);
+    _progressNode.barChangeRate = ccp(1.0f, 0.0f);
+    _progressNode.percentage = 100.0f;
+    _progressNode.zOrder = 100001;
+    
+    _progressNode.positionType = CCPositionTypeNormalized;
+    _progressNode.position = ccp(0.12f, 0.1f);
+    [self addChild:_progressNode];
+
+
+    
+
 }
 //x:526.000000(568), y:104.000000
 ////Automate addition of a canon to be added at later rounds
@@ -68,21 +95,20 @@
     CCNode* chicken = [CCBReader load:@"Canon"];
     CGPoint point =  CGPointMake(x,y);
     chicken.position = point;
-    location = chicken.position;
     chicken.rotation = rotation;
-    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-130,104.f)];
+    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey)];
     id delay = [CCActionDelay actionWithDuration: .5f];
     [self addChild:chicken];
     [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
-    location = ccpSub(chicken.position, ccp(-100,0));
-    int minTime = 2.0f;
-    int maxTime = 4.0f;
-    int rangeTime = maxTime - minTime;
-    int randomTime = (arc4random() % rangeTime) + minTime;
-    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:.2f];
+    //int minTime = 2.0f;
+    //int maxTime = 4.0f;
+    //int rangeTime = maxTime - minTime;
+    //int randomTime = (arc4random() % rangeTime) + minTime;
+    //[self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:.2f];
     
     
 }
+
 
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
@@ -94,14 +120,15 @@
     CCActionRemove *actionRemove = [CCActionRemove action];
     id delay = [CCActionDelay actionWithDuration:.000001f];
     [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
-
 }
 
 - (void)launchEgg {
     targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
     //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
-    egg.position = ccpAdd(location, ccp(-27, 50));
+    egg.positionType = CCPositionTypePoints;
+    egg.position = ccp(440.f,160.f);
+    //egg.position =
     [_physicsNode addChild:egg];
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
@@ -111,7 +138,7 @@
     int maxy = 15;
     int rangex = maxx - minx;
     int rangey = maxy - miny;
-    int randomx = (arc4random() % rangex) + minx;
+    //int randomx = (arc4random() % rangex) + minx;
     int randomy = (arc4random() % rangey) + miny;
     CGPoint launchDirection = ccp(-10,randomy);
     int minforce = 500;
@@ -122,7 +149,6 @@
     [egg.physicsBody applyForce:force];
      if(targetsLaunched == 5){
         [self newRound:@"Round 2"];
-        [self addChicken:self.contentSize.width+5 y:600 androtation:-15 andMoveToX:self.contentSize.width-50 andMoveToY:600.f];
         [self initRound:roundCount];
     }
     else if(targetsLaunched == 15){
@@ -145,10 +171,37 @@
         [self newRound:@"Round 7"];
         [self initRound:roundCount];
     }
-    else if(targetsLaunched == 400){
+    else if(targetsLaunched == 385){
         [self newRound:@"Round 8"];
         [self initRound:roundCount];
     }
+}
+- (void)launchEggTopRight {
+    //targetsLaunched++;
+    CCNode* egg = [CCBReader load:@"Egg"];
+    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
+    egg.positionType = CCPositionTypePoints;
+    egg.position = ccp(540.f,300.f);
+    //egg.position =
+    [_physicsNode addChild:egg];
+    egg.scale = 0.6f;
+    egg.rotation = -45.0f;
+    //int minx = -11;
+    int miny = 0;
+    //int maxx = -12;
+    int maxy = 1;
+    //int rangex = maxx - minx;
+    int rangey = maxy - miny;
+    //int randomx = (arc4random() % rangex) + minx;
+    int randomy = (arc4random() % rangey) + miny;
+    CGPoint launchDirection = ccp(-10,randomy);
+    int minforce = 3000;
+    int maxforce = 5000;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    [egg.physicsBody applyForce:force];
+
 }
 
 -(void)newRound:(NSString*)round{
@@ -172,25 +225,32 @@
     switch (number){
 
 case 2:
-        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:3.f];
+        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:4.f];
         break;
 case 3:
         [self schedule:@selector(launchEgg) interval:.7f repeat:19 delay:5.f];
+        [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45 andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
+        [self schedule:@selector(launchEggTopRight) interval:.7f repeat:19 delay:6.5f];
         break;
 case 4:
         [self schedule:@selector(launchEgg) interval:.5f repeat:49 delay:5.f];
+            [self schedule:@selector(launchEggTopRight) interval:.5f repeat:49 delay:6.5f];
         break;
 case 5:
         [self schedule:@selector(launchEgg) interval:.4f repeat:99 delay:5.f];
+            [self schedule:@selector(launchEggTopRight) interval:.4f repeat:99 delay:6.5f];
         break;
 case 6:
         [self schedule:@selector(launchEgg) interval:.3f repeat:99 delay:5.f];
+            [self schedule:@selector(launchEggTopRight) interval:.3f repeat:99 delay:7.f];
         break;
 case 7:
         [self schedule:@selector(launchEgg) interval:.2f repeat:99 delay:5.f];
+            [self schedule:@selector(launchEggTopRight) interval:.2f repeat:99 delay:7.f];
         break;
 case 8:
         [self schedule:@selector(launchEgg) interval:.1f repeat:114 delay:5.f];
+            [self schedule:@selector(launchEggTopRight) interval:.1f repeat:114 delay:7.f];
         break;
     }
 }
@@ -239,9 +299,66 @@ case 8:
     
 }
 
+- (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Barn:(CCNode *)nodeB {
+    [[_physicsNode space] addPostStepBlock:^{
+        _progressNode.percentage -= 10.0f;
+        [self eggHit:nodeA];
+        if(_progressNode.percentage==0){
+            [self barnExp:nodeB];
+        }
+    } key:nodeA];
+}
+- (void)eggHit:(CCNode *)egg {
+    _health-=10;
+    //_progressNode.percentage -= 10.0f;
+    if(_health==0){
+        self.userInteractionEnabled = false;
+        CCActionDelay *delay =  [CCActionDelay actionWithDuration:4.5f];
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+            CCScene *gameOver = [CCBReader loadAsScene:@"GameOver"];
+            [[CCDirector sharedDirector] replaceScene:gameOver];
+        }];
+        
+        [self runAction:[CCActionSequence actions: delay, block, nil]];
+        //CCScene *gameOver = [CCBReader loadAsScene:@"GameOver"];
+        //[[CCDirector sharedDirector] replaceScene:gameOver];
+    }
+    CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"EggHit"];
+    explosion.scale = .5f;
+    explosion.autoRemoveOnFinish = TRUE;
+    // place the particle effect on the seals position
+    explosion.position = egg.position;
+    // add the particle effect to the same node the seal is on
+    [self addChild:explosion];
+    //CCActionDelay *delay =  [CCActionDelay actionWithDuration:2.5f];
+    //CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+        //[self removeChild:explosion];
+    //}];
+    //[self runAction:[CCActionSequence actions:delay, block, nil]];
+    
+    // finally, remove the destroyed seal
+    [egg removeFromParent];
+}
+- (void)barnExp:(CCNode *)barn {
+    CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"EggHit"];
+    explosion.scale = 2.f;
+    explosion.autoRemoveOnFinish = TRUE;
+    // place the particle effect on the seals position
+    explosion.position = barn.position;
+    // add the particle effect to the same node the seal is on
+    [self addChild:explosion];
+    //CCActionDelay *delay =  [CCActionDelay actionWithDuration:2.5f];
+    //CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+    //[self removeChild:explosion];
+    //}];
+    //[self runAction:[CCActionSequence actions:delay, block, nil]];
+    
+    // finally, remove the destroyed seal
+    [barn removeFromParent];
+}
+
 - (void)update:(CCTime)delta {
     _timeSinceLastCollision += delta;
-    CCLOG(@"%d", medalId);
     if ( _timeSinceLastCollision > .21f ) {
         medalId = 0;
     }
@@ -249,8 +366,9 @@ case 8:
 - (void)eggRemoved:(CCNode *)egg {
     CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
     killCount++;
+    [GameData sharedGameData].score++;
     CCLOG(@"Score: %d", killCount);
-    [_scoreLabel setString:[NSString stringWithFormat:@"%d", killCount]];
+    [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
     explosion.scale = 0.6f;
     explosion.position = egg.position;
     explosion.rotation = egg.rotation;
@@ -286,7 +404,10 @@ case 8:
 -(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input {
     medalCount+=1;
     CCLOG(@"%d", medalCount);
-    //medalType = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
+    doubleKillCount++;
+    
+    [GameData sharedGameData].doubleKills += 1;
+    
     medalType.positionType = CCPositionTypeNormalized;
     if(medalCount == 1){
         medalType.position = ccp(.5f, .03f);

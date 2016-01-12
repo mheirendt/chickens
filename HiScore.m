@@ -1,35 +1,44 @@
 //
-//  TableView.h
+//  HiScore.m
 //
 //  Created by : Michael Heirendt
 //  Project    : Crush
-//  Date       : 1/7/16
+//  Date       : 1/11/16
 //
 //  Copyright (c) 2016 Apportable.
 //  All rights reserved.
 //
 // -----------------------------------------------------------------
 
-#import <Foundation/Foundation.h>
-#import "cocos2d.h"
-#import "cocos2d-ui.h"
-#import "Gameplay.h"
+#import "HiScore.h"
 
 // -----------------------------------------------------------------
 
-@interface TableView : CCNode <CCTableViewDataSource>
+@implementation HiScore
 
 // -----------------------------------------------------------------
-// properties
-// -----------------------------------------------------------------
-// methods
 
-+ (instancetype)node;
-- (instancetype)init;
++ (instancetype)node
+{
+    return [[self alloc] init];
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    NSAssert(self, @"Unable to create class %@", [self class]);
+    // class initalization goes here
+    
+    
+    
+    
+    return self;
+}
 
 // -----------------------------------------------------------------
 
 @end
+
 
 
 

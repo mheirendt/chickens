@@ -1,21 +1,19 @@
 //
-//  HighScoresScene.m
+//  GameData.m
 //
 //  Created by : Michael Heirendt
 //  Project    : Crush
-//  Date       : 1/1/16
+//  Date       : 1/11/16
 //
 //  Copyright (c) 2016 Apportable.
 //  All rights reserved.
 //
 // -----------------------------------------------------------------
 
-#import "HighScoresScene.h"
 #import "GameData.h"
-
 // -----------------------------------------------------------------
 
-@implementation HighScoresScene
+@implementation GameData
 
 // -----------------------------------------------------------------
 
@@ -28,22 +26,27 @@
 {
     self = [super init];
     NSAssert(self, @"Unable to create class %@", [self class]);
+    // class initalization goes here
+    
+    
+    
+    
     return self;
 }
 
--(void)backToMenu{
-    CCScene *gameplayScene = [CCBReader loadAsScene:@"MainScene"];
-    [[CCDirector sharedDirector] replaceScene:gameplayScene];
-}
--(void) onEnter
-{
-    [super onEnter];
-    NSString *doubles = [NSString stringWithFormat:@"%li", [GameData sharedGameData].highScore];
-    CCLabelTTF* count = [CCLabelTTF labelWithString:doubles fontName:@"HelveticaNeue" fontSize:30];
-    count.positionType = CCPositionTypeNormalized;
-    count.position = ccp(.5f,.4f);
++ (instancetype)sharedGameData {
+    static id sharedInstance = nil;
     
-    [self addChild:count];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    
+    return sharedInstance;
+}
+-(void)reset
+{
+    self.score = 0;
 }
 
 // -----------------------------------------------------------------

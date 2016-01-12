@@ -11,13 +11,16 @@
 // -----------------------------------------------------------------
 
 #import "MedalsScene.h"
+#import "TableView.h"
 
 // -----------------------------------------------------------------
 
 @implementation MedalsScene{
 
 }
-
+@synthesize doubleKills;
+@synthesize tripleKills;
+@synthesize overKills;
 // -----------------------------------------------------------------
 
 + (instancetype)node
@@ -29,7 +32,15 @@
 {
     self = [super init];
     NSAssert(self, @"Unable to create class %@", [self class]);
-
+    self.doubleKills = 0;
+    TableView *table = [TableView node];
+    table.contentSizeType = CCSizeTypeNormalized;
+    table.positionType = CCPositionTypeNormalized;
+    table.position = ccp(.2f,-0.01f);
+    table.contentSize = CGSizeMake(1, 1);
+    table.zOrder = 1000;
+    [self addChild:table];
+    
     return self;
 }
 
