@@ -1,44 +1,37 @@
 //
-//  HiScore.m
+//  signInScene.h
 //
 //  Created by : Michael Heirendt
 //  Project    : Crush
-//  Date       : 1/11/16
+//  Date       : 1/13/16
 //
 //  Copyright (c) 2016 Apportable.
 //  All rights reserved.
 //
 // -----------------------------------------------------------------
 
-#import "HiScore.h"
+#import <Foundation/Foundation.h>
+#import "cocos2d.h"
 
 // -----------------------------------------------------------------
 
-@implementation HiScore
+@interface signInScene : CCNode
 
 // -----------------------------------------------------------------
+// properties
 
-+ (instancetype)node
-{
-    return [[self alloc] init];
-}
+// -----------------------------------------------------------------
+// methods
 
-- (instancetype)init
-{
-    self = [super init];
-    NSAssert(self, @"Unable to create class %@", [self class]);
-    // class initalization goes here
-    
-    
-    
-    
-    return self;
-}
++ (instancetype)node;
++ (instancetype)sharedGameData;
+- (instancetype)init;
+- (NSString *)buttonText:(CCTextField*)sender;
+-(void)createPressed;
 
 // -----------------------------------------------------------------
 
 @end
-
 
 
 

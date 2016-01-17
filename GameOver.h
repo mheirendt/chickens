@@ -25,8 +25,11 @@
 
 + (instancetype)node;
 - (instancetype)init;
++ (instancetype)sharedGameData;
 -(void)retryPressed;
 -(void)backPressed;
+-(void)addHighScore;
+-(void)assignRank;
 // -----------------------------------------------------------------
 
 @end

@@ -24,6 +24,7 @@
     CCTime _timeSinceLastCollision;
     int roundCount;
     int killCount;
+    int shotCount;
     int medalId;
     float _health;
     int doubleKillCount;
@@ -112,6 +113,7 @@
 
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
+    shotCount ++;
     CGPoint touchLocation = [touch locationInNode:self];
     CCNode* bullet = [CCBReader load:@"Bullet"];
     bullet.scale = .6;
@@ -132,11 +134,8 @@
     [_physicsNode addChild:egg];
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
-    int minx = -11;
     int miny = 5;
-    int maxx = -12;
     int maxy = 15;
-    int rangex = maxx - minx;
     int rangey = maxy - miny;
     //int randomx = (arc4random() % rangex) + minx;
     int randomy = (arc4random() % rangey) + miny;
@@ -273,7 +272,7 @@ case 8:
     }
     else if(medalId==9){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
-        [self rewardMedal:triple andLabel:@"Kill Tacular"];
+        [self rewardMedal:triple andLabel:@"KillTacular"];
     }
     else if(medalId==11){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
@@ -313,6 +312,9 @@ case 8:
     //_progressNode.percentage -= 10.0f;
     if(_health==0){
         self.userInteractionEnabled = false;
+        //Create an NSNumber and add it to the hiScores array to be used by core data
+        NSNumber *highScore = [NSNumber numberWithLong:[GameData sharedGameData].score];
+        [[GameData sharedGameData].hiScores addObject: highScore];
         CCActionDelay *delay =  [CCActionDelay actionWithDuration:4.5f];
         CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
             CCScene *gameOver = [CCBReader loadAsScene:@"GameOver"];
@@ -359,6 +361,10 @@ case 8:
 
 - (void)update:(CCTime)delta {
     _timeSinceLastCollision += delta;
+    if (killCount !=shotCount){
+        killCount = 0;
+        shotCount = 0;
+    }
     if ( _timeSinceLastCollision > .21f ) {
         medalId = 0;
     }
@@ -378,23 +384,23 @@ case 8:
     [explosion runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
     [egg removeFromParent];
     
-    if (killCount == 2){
+    if (killCount == 20){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
-        [self rewardMedal:spree andLabel:@"Spree"];
+        [self rewardMedal:spree andLabel:@"Killing Spree"];
     }
-    else if (killCount == 4){
+    else if (killCount == 40){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
-        [self rewardMedal:spree andLabel:@"frenzy"];
+        [self rewardMedal:spree andLabel:@"Killing Frenzy"];
     }
-    else if (killCount == 6){
+    else if (killCount == 60){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
         [self rewardMedal:spree andLabel:@"Running Riot"];
     }
-    else if (killCount == 8){
+    else if (killCount == 80){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
         [self rewardMedal:spree andLabel:@"Psycho"];
     }
-    else if (killCount == 10){
+    else if (killCount == 100){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
         [self rewardMedal:spree andLabel:@"Unstoppable"];
     }
@@ -451,6 +457,60 @@ case 8:
         medalCount-=1;
     }];
     [self runAction:[CCActionSequence actions:delay, block, nil]];
+    
+    
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    if([input isEqualToString:@"Double Kill"]){
+        CCLOG(@"double kill awarded");
+        int doubleCount = person.two.intValue;
+        doubleCount++;
+        [person setValue:[NSNumber numberWithInt:doubleCount] forKey:@"two"];
+    }
+    else if ([input isEqualToString:@"Triple Kill"]){
+        CCLOG(@"Triple kill awarded");
+        int tripleCount = person.three.intValue;
+        tripleCount++;
+        [person setValue:[NSNumber numberWithInt:tripleCount] forKey:@"three"];
+    }
+    else if ([input isEqualToString:@"Over Kill"]){
+        CCLOG(@"double kill awarded");
+        int fourCount = person.four.intValue;
+        fourCount++;
+        [person setValue:[NSNumber numberWithInt:fourCount] forKey:@"four"];
+    }
+    else if ([input isEqualToString:@"KillTacular"]){
+        CCLOG(@"killTacular awarded");
+        int fiveCount = person.five.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"five"];
+    }
+    else if ([input isEqualToString:@"Killing Spree"]){
+        CCLOG(@"killing spree awarded");
+        int twentyCount = person.twenty.intValue;
+        twentyCount++;
+        NSNumber *conv = [NSNumber numberWithInt:twentyCount];
+        [person setValue:conv forKey:@"twenty"];
+    }
+    else if ([input isEqualToString:@"Killing Frenzy"]){
+        CCLOG(@"killing frenzy awarded");
+        int fortyCount = person.forty.intValue;
+        fortyCount++;
+        [person setValue:[NSNumber numberWithInt:fortyCount] forKey:@"forty"];
+    }
+    else if ([input isEqualToString:@"Running Riot"]){
+        CCLOG(@"double kill awarded");
+        int sixtyCount = person.sixty.intValue;
+        sixtyCount++;
+        [person setValue:[NSNumber numberWithInt:sixtyCount] forKey:@"sixty"];
+    }
+    if (![person.managedObjectContext save:&error2]) {
+        NSLog(@"Unable to save managed object context.");
+        NSLog(@"%@, %@", error2, error2.localizedDescription);
+    }
 }
 -(void)pauseScene{
     CCScene *pauseScene = [CCBReader loadAsScene:@"PauseScene"];

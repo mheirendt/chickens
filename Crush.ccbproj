@@ -83,6 +83,15 @@
 			<key>isSmartSpriteSheet</key>
 			<true/>
 		</dict>
+		<key>Assets/_100.png</key>
+		<dict/>
+		<key>Rank</key>
+		<dict>
+			<key>isDirty</key>
+			<true/>
+			<key>isSmartSpriteSheet</key>
+			<true/>
+		</dict>
 		<key>Sprites</key>
 		<dict/>
 		<key>Text</key>
@@ -92,17 +101,17 @@
 		</dict>
 		<key>Text/PlayPressed.png</key>
 		<dict/>
-		<key>ccbResources</key>
-		<dict>
-			<key>previewFolderHidden</key>
-			<true/>
-		</dict>
-		<key>ccbResources/ccbButtonHighlighted.png</key>
+		<key>ccbButtonHighlighted.png</key>
 		<dict>
 			<key>scaleFrom</key>
 			<integer>2</integer>
 			<key>tabletScale</key>
 			<integer>1</integer>
+		</dict>
+		<key>ccbResources</key>
+		<dict>
+			<key>previewFolderHidden</key>
+			<true/>
 		</dict>
 		<key>ccbResources/ccbButtonNormal.png</key>
 		<dict>

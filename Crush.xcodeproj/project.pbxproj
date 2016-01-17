@@ -60,7 +60,10 @@
 		A93C4A4E1C4320BD0097C423 /* GameOver.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A4D1C4320BD0097C423 /* GameOver.m */; };
 		A93C4A511C4477880097C423 /* GameData.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A501C4477880097C423 /* GameData.m */; };
 		A93C4A531C4496740097C423 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A93C4A521C4496740097C423 /* CoreData.framework */; };
-		A93C4A571C4496DE0097C423 /* HiScore.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4A561C4496DE0097C423 /* HiScore.m */; };
+		A93C4AA91C47377A0097C423 /* User.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A93C4AA71C47377A0097C423 /* User.xcdatamodeld */; };
+		A93C4AAE1C4737A60097C423 /* Person+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4AAB1C4737A60097C423 /* Person+CoreDataProperties.m */; };
+		A93C4AAF1C4737A60097C423 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4AAD1C4737A60097C423 /* Person.m */; };
+		A93C4AB21C47453B0097C423 /* signInScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A93C4AB11C47453B0097C423 /* signInScene.m */; };
 		A96A199F1C34AE520023033F /* Gameplay.m in Sources */ = {isa = PBXBuildFile; fileRef = A96A199E1C34AE520023033F /* Gameplay.m */; };
 		A97DB91A1C36134900F0F4C2 /* Egg.m in Sources */ = {isa = PBXBuildFile; fileRef = A97DB9191C36134900F0F4C2 /* Egg.m */; };
 		A9A449F51C3725CA00E1FA40 /* Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A449F41C3725CA00E1FA40 /* Bullet.m */; };
@@ -219,8 +222,13 @@
 		A93C4A4F1C4477880097C423 /* GameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameData.h; sourceTree = "<group>"; };
 		A93C4A501C4477880097C423 /* GameData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameData.m; sourceTree = "<group>"; };
 		A93C4A521C4496740097C423 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		A93C4A551C4496DE0097C423 /* HiScore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HiScore.h; sourceTree = "<group>"; };
-		A93C4A561C4496DE0097C423 /* HiScore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HiScore.m; sourceTree = "<group>"; };
+		A93C4AA81C47377A0097C423 /* User.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = User.xcdatamodel; sourceTree = "<group>"; };
+		A93C4AAA1C4737A60097C423 /* Person+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Person+CoreDataProperties.h"; sourceTree = "<group>"; };
+		A93C4AAB1C4737A60097C423 /* Person+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Person+CoreDataProperties.m"; sourceTree = "<group>"; };
+		A93C4AAC1C4737A60097C423 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		A93C4AAD1C4737A60097C423 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		A93C4AB01C47453B0097C423 /* signInScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signInScene.h; sourceTree = "<group>"; };
+		A93C4AB11C47453B0097C423 /* signInScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = signInScene.m; sourceTree = "<group>"; };
 		A96A199D1C34AE510023033F /* Gameplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gameplay.h; sourceTree = "<group>"; };
 		A96A199E1C34AE520023033F /* Gameplay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Gameplay.m; sourceTree = "<group>"; };
 		A97DB9181C36134900F0F4C2 /* Egg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Egg.h; sourceTree = "<group>"; };
@@ -510,8 +518,11 @@
 		A93C4A541C4496870097C423 /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
-				A93C4A551C4496DE0097C423 /* HiScore.h */,
-				A93C4A561C4496DE0097C423 /* HiScore.m */,
+				A93C4AA71C47377A0097C423 /* User.xcdatamodeld */,
+				A93C4AAA1C4737A60097C423 /* Person+CoreDataProperties.h */,
+				A93C4AAB1C4737A60097C423 /* Person+CoreDataProperties.m */,
+				A93C4AAC1C4737A60097C423 /* Person.h */,
+				A93C4AAD1C4737A60097C423 /* Person.m */,
 			);
 			name = "Data Model";
 			sourceTree = "<group>";
@@ -531,8 +542,10 @@
 				A9A44A1F1C38732900E1FA40 /* PauseScene.m */,
 				A9A449F71C3740A900E1FA40 /* Chicken.h */,
 				A93C4A4C1C4320BD0097C423 /* GameOver.h */,
-				A93C4A541C4496870097C423 /* Data Model */,
 				A93C4A4D1C4320BD0097C423 /* GameOver.m */,
+				A93C4A541C4496870097C423 /* Data Model */,
+				A93C4AB01C47453B0097C423 /* signInScene.h */,
+				A93C4AB11C47453B0097C423 /* signInScene.m */,
 				A93C4A4F1C4477880097C423 /* GameData.h */,
 				A93C4A501C4477880097C423 /* GameData.m */,
 				A9A449F81C3740A900E1FA40 /* Chicken.m */,
@@ -958,12 +971,15 @@
 				A9A44A171C378E9D00E1FA40 /* HighScoresScene.m in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 				A96A199F1C34AE520023033F /* Gameplay.m in Sources */,
+				A93C4AB21C47453B0097C423 /* signInScene.m in Sources */,
+				A93C4AAF1C4737A60097C423 /* Person.m in Sources */,
 				7A046D8C19E8A20E004C4763 /* MainScene.m in Sources */,
 				A93C4A511C4477880097C423 /* GameData.m in Sources */,
 				A97DB91A1C36134900F0F4C2 /* Egg.m in Sources */,
 				A9A44A201C38732900E1FA40 /* PauseScene.m in Sources */,
-				A93C4A571C4496DE0097C423 /* HiScore.m in Sources */,
+				A93C4AAE1C4737A60097C423 /* Person+CoreDataProperties.m in Sources */,
 				A93C4A4E1C4320BD0097C423 /* GameOver.m in Sources */,
+				A93C4AA91C47377A0097C423 /* User.xcdatamodeld in Sources */,
 				A9A44A1A1C378EF800E1FA40 /* MedalsScene.m in Sources */,
 				5B121038197487F2004C1E1D /* AppDelegate.m in Sources */,
 				A93C4A431C3F70060097C423 /* TableView.m in Sources */,
@@ -1443,6 +1459,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		A93C4AA71C47377A0097C423 /* User.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				A93C4AA81C47377A0097C423 /* User.xcdatamodel */,
+			);
+			currentVersion = A93C4AA81C47377A0097C423 /* User.xcdatamodel */;
+			path = User.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = B77F1B2617B978D7009739AE /* Project object */;
 }
