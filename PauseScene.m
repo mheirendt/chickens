@@ -11,11 +11,17 @@
 // -----------------------------------------------------------------
 
 #import "PauseScene.h"
+#import "GameData.h"
 
 // -----------------------------------------------------------------
 
 @implementation PauseScene{
     CCNode *pauseNode;
+    CCLabelTTF *user;
+    CCLabelTTF *rank;
+    CCSprite *icon;
+    CCProgressNode *_progressNode;
+    CCSprite *progress;
 }
 
 // -----------------------------------------------------------------
@@ -36,16 +42,23 @@
     
     return self;
 }
+-(void)onEnter{
+    [super onEnter];
+    [[GameData sharedGameData]summarizeRank:rank andUser:user andRankIcon:icon];
+
+}
 -(void)resumePressed{
     [[CCDirector sharedDirector] popScene];
 }
 -(void)restartPressed{
+    [[GameData sharedGameData]reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];
     CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
     [[CCDirector sharedDirector] pushScene:game];
 }
 -(void)quitPressed{
+    [[GameData sharedGameData]reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];
     //CCScene *mainMenu = [CCBReader loadAsScene:@"MainScene"];

@@ -32,5 +32,7 @@
 @dynamic sixty;
 @dynamic eighty;
 @dynamic hundred;
+@dynamic perfect;
+@dynamic gold;
 
 @end

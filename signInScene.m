@@ -91,6 +91,9 @@
         [newPerson setValue:@0 forKey:@"sixty"];
         [newPerson setValue:@0 forKey:@"eighty"];
         [newPerson setValue:@0 forKey:@"hundred"];
+        [newPerson setValue:@0 forKey:@"perfect"];
+        [newPerson setValue:@0 forKey:@"gold"];
+
 
     
     NSError *error = nil;

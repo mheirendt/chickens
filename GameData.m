@@ -20,9 +20,37 @@
     int currentScore;
     CCSprite *darkSprite;
     
+    
 }
 @synthesize hiScores;
 @synthesize rank = _rank;
+
+@synthesize bombCount;
+
+@synthesize rank1;
+@synthesize rank2;
+@synthesize rank3;
+@synthesize rank4;
+@synthesize rank5;
+@synthesize rank6;
+@synthesize rank7;
+@synthesize rank8;
+@synthesize rank9;
+@synthesize rank10;
+@synthesize rank11;
+@synthesize rank12;
+@synthesize rank13;
+@synthesize rank14;
+@synthesize rank15;
+@synthesize rank16;
+@synthesize rank17;
+@synthesize rank18;
+@synthesize rank19;
+@synthesize rank20;
+@synthesize rank21;
+@synthesize rank22;
+@synthesize rank23;
+@synthesize rank24;
 // -----------------------------------------------------------------
 
 + (instancetype)node
@@ -56,6 +84,7 @@
 {
     self.score = 0;
 }
+
 -(void)summarizeRank:(CCLabelTTF *)rank andUser:(CCLabelTTF*) user andRankIcon:(CCSprite*)icon{
     user.positionType = CCPositionTypeNormalized;
     user.anchorPoint = ccp(0,1);
@@ -69,20 +98,240 @@
     icon.anchorPoint = ccp(.5f,1);
     icon.position=(ccp(.1f,.81f));
     
+    
+    self.rank1 = [NSNumber numberWithInt:300];
+    self.rank2 = [NSNumber numberWithInt:600];
+    self.rank3 = [NSNumber numberWithInt:1000];
+    self.rank4 = [NSNumber numberWithInt:5000];
+    self.rank5 = [NSNumber numberWithInt:10000];
+    self.rank6 = [NSNumber numberWithInt:15000];
+    self.rank7 = [NSNumber numberWithInt:20000];
+    self.rank8 = [NSNumber numberWithInt:25000];
+    self.rank9 = [NSNumber numberWithInt:30000];
+    self.rank10 = [NSNumber numberWithInt:35000];
+    self.rank11 = [NSNumber numberWithInt:40000];
+    self.rank12 = [NSNumber numberWithInt:45000];
+    self.rank13 = [NSNumber numberWithInt:50000];
+    self.rank14 = [NSNumber numberWithInt:60000];
+    self.rank15 = [NSNumber numberWithInt:75000];
+    self.rank16 = [NSNumber numberWithInt:100000];
+    self.rank17 = [NSNumber numberWithInt:150000];
+    self.rank18 = [NSNumber numberWithInt:200000];
+    self.rank19 = [NSNumber numberWithInt:300000];
+    self.rank20 = [NSNumber numberWithInt:500000];
+    self.rank21 = [NSNumber numberWithInt:750000];
+    self.rank22 = [NSNumber numberWithInt:1000000];
+    self.rank23 = [NSNumber numberWithInt:1500000];
+    self.rank24 = [NSNumber numberWithInt:2000000];
+    
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     [user setString:person.name];
-    if([person.rank  isEqual:@24]){
-        [rank setString:@"Five Star General"];
-        CCSpriteFrame *sprite = [CCSpriteFrame frameWithImageNamed:@"Rank/X_5 Star General.png"];
+    if (person.experience<rank1){
+        person.rank = [NSNumber numberWithInt:0];
+        [rank setString:@"Recruit"];
+        CCSpriteFrame *sprite = [CCSpriteFrame frameWithImageNamed:@"Rank/a_Recruit.png"];
         [icon setSpriteFrame:sprite];
     }
-    
+    else if(person.experience>=rank1 && person.experience<rank2){
+        person.rank = [NSNumber numberWithInt:1];
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/aa_Private.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Private"];
+        
+    }
+    else if(person.experience>=rank2 && person.experience<rank3){
+        person.rank = [NSNumber numberWithInt:2];
 
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/b_Private First Class.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Private First Class"];
+        
+    }
+    else if(person.experience>=rank3 && person.experience<rank4){
+        person.rank = [NSNumber numberWithInt:3];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/c_Private Second Class.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Private Second Class"];
+        
+    }
+    else if(person.experience>=rank4 && person.experience<rank5){
+        person.rank = [NSNumber numberWithInt:4];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/d_Lance Corporal.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Lance Corporal"];
+        
+    }
+    else if(person.experience>=rank5 && person.experience<rank6){
+        person.rank = [NSNumber numberWithInt:5];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/e_Corporal.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Corporal"];
+        
+    }
+    else if(person.experience>=rank6 && person.experience<rank7){
+        person.rank = [NSNumber numberWithInt:6];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/f_Sergeant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Sergeant"];
+        
+    }
+    else if(person.experience>=rank7 && person.experience<rank8){
+        person.rank = [NSNumber numberWithInt:7];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/g_Staff Sergeant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Staff Sergeant"];
+        
+    }
+    else if(person.experience>=rank8 && person.experience<rank9){
+        person.rank = [NSNumber numberWithInt:8];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/h_Gunnery Sergeant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Gunnery Sergeant"];
+        
+    }
+    else if(person.experience>=rank9 && person.experience<rank10){
+        person.rank = [NSNumber numberWithInt:9];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/i_Master Sergeant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Master Sergeant"];
+        
+    }
+    else if(person.experience>=rank10 && person.experience<rank11){
+        person.rank = [NSNumber numberWithInt:10];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/j_First Sergeant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"First Sergeant"];
+        
+    }
+    else if(person.experience>=rank11 && person.experience<rank12){
+        person.rank = [NSNumber numberWithInt:11];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/k_Leutenant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Leutenant"];
+        
+    }
+    else if(person.experience>=rank12 && person.experience<rank13){
+        person.rank = [NSNumber numberWithInt:12];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/l_First Leutenant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"First Leutenant"];
+        
+    }
+    else if(person.experience>=rank13 && person.experience<rank14){
+        person.rank = [NSNumber numberWithInt:13];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/m_Second Leutenant.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Second Leutenant"];
+        
+    }
+    else if(person.experience>=rank14 && person.experience<rank15){
+        person.rank = [NSNumber numberWithInt:14];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/n_Captain.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Captain"];
+        
+    }
+    else if(person.experience>=rank15 && person.experience<rank16){
+        person.rank = [NSNumber numberWithInt:15];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/o_Staff Captain.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Staff Captain"];
+        
+    }
+    else if(person.experience>=rank16 && person.experience<rank17){
+        person.rank = [NSNumber numberWithInt:16];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/p_Leutenant Colonel.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Leutenant Colonel"];
+    }
+    else if(person.experience>=rank17 && person.experience<rank18){
+        person.rank = [NSNumber numberWithInt:17];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/q_Colonel.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Colonel"];
+        
+    }
+    else if(person.experience>=rank18 && person.experience<rank19){
+        person.rank = [NSNumber numberWithInt:18];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/r_Brigadier.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Brigadier"];
+        
+    }
+    else if(person.experience>=rank19 && person.experience<rank20){
+        person.rank = [NSNumber numberWithInt:19];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/s_Brigadier General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Brigadier General"];
+        
+    }
+    else if(person.experience>=rank20 && person.experience<rank21){
+        person.rank = [NSNumber numberWithInt:20];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/t_General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"General"];
+        
+    }
+    else if(person.experience>=rank21 && person.experience<rank22){
+        person.rank = [NSNumber numberWithInt:21];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/U_2 Star General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Two Star General"];
+        
+    }
+    else if(person.experience>=rank22 && person.experience<rank23){
+        person.rank = [NSNumber numberWithInt:22];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/V_3 Star General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Three Star General"];
+        
+    }
+    else if(person.experience>=rank23 && person.experience<rank24){
+        person.rank = [NSNumber numberWithInt:23];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/W_4 Star General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Four Star General"];
+        
+    }
+    else if(person.experience>=rank24){
+        person.rank = [NSNumber numberWithInt:24];
+
+        CCSpriteFrame *private = [CCSpriteFrame frameWithImageNamed:@"Rank/X_5 Star General.png"];
+        [icon setSpriteFrame:private];
+        [rank setString:@"Five Star General"];
+        
+    }
+    if (![person.managedObjectContext save:&error2]) {
+        NSLog(@"Unable to save managed object context.");
+        NSLog(@"%@, %@", error2, error2.localizedDescription);
+    }
 }
+
 
 
 

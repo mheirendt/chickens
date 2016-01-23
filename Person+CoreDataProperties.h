@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSNumber *sixty;
 @property (nullable, nonatomic, retain) NSNumber *eighty;
 @property (nullable, nonatomic, retain) NSNumber *hundred;
+@property (nullable, nonatomic, retain) NSNumber *perfect;
+@property (nullable, nonatomic, retain) NSNumber *gold;
 
 
 @end

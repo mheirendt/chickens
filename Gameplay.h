@@ -30,10 +30,21 @@
 // methods
 + (instancetype)node;
 - (instancetype)init;
-//-(void)addChicken:(CGPoint*)position androtation:(float)rotation;
--(void)pauseScene;
+
+
+-(void)addChicken:(float)x y:(float)y androtation:(float)rotation andMoveToX:(float)movex andMoveToY:(float)movey;
+- (void)launchEgg;
+-(void)flyingChicken;
+-(void)dropEgg:(CCNode*)flying;
+-(void)roundComplete;
+-(void)_continuePressed;
+- (void)launchEggTopRight;
 -(void)newRound:(NSString*)round;
 -(void)initRound:(int)number;
+-(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input andExp:(int)exp;
+-(void)pauseScene;
+-(void)bombPurchased;
+-(void)repairPurchased;
 // -----------------------------------------------------------------
 
 @end

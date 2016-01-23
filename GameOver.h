@@ -29,7 +29,6 @@
 -(void)retryPressed;
 -(void)backPressed;
 -(void)addHighScore;
--(void)assignRank;
 // -----------------------------------------------------------------
 
 @end

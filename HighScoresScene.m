@@ -19,6 +19,7 @@
     CCLabelTTF *_userName;
     CCLabelTTF *_rankLabel;
     CCSprite *_rankIcon;
+    CCProgressNode *_progress;
 }
 
 // -----------------------------------------------------------------
@@ -43,13 +44,86 @@
 {
     [super onEnter];
     [self addHighScore];
+    
+    CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
+    /*
+    _progressNode1.type = CCProgressNodeTypeBar;
+    _progressNode1.midpoint = ccp(0.0f, 0.0f);
+    _progressNode1.anchorPoint = ccp(0,1);
+    _progressNode1.barChangeRate = ccp(1.0f, 0.5f);
+    
+    _progressNode1.zOrder = 2500000;
+    
+    _progressNode1.positionType = CCPositionTypeNormalized;
+    _progressNode1.position = ccp(.2f,.65f);
+     */
+
+    
+    CCSprite *base = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
+    //sprite = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
+    base.anchorPoint = ccp(0,1);
+    base.positionType = CCPositionTypeNormalized;
+    base.position = ccp(.2f,.65f);
+    [self addChild:base];
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     [fetchRequest setEntity:entity];
+    
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:fetchRequest error:&error2] objectAtIndex:0];
     [[GameData sharedGameData]summarizeRank:_rankLabel andUser:_userName andRankIcon:_rankIcon];
     
+    
+    _progress = [CCProgressNode progressWithSprite:progress];
+    _progress.type = CCProgressNodeTypeBar;
+    _progress.midpoint = ccp(0.0f, 0.0f);
+    _progress.anchorPoint = ccp(0,1);
+    _progress.barChangeRate = ccp(1.0f, 0.5f);
+    _progress.zOrder = 2500000;
+    
+    int rank = person.rank.intValue;
+    if(rank ==0){
+        int experience = person.experience.intValue;
+        int currentRankExp = [GameData sharedGameData].rank1.intValue;
+        float temp = (float)experience/(float)currentRankExp *100;
+        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+        _progress.percentage=temp;
+    }
+    else if (rank == 1){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank2.intValue;
+        int nextRank = [GameData sharedGameData].rank1.intValue;
+        int currentRankExp = experience - nextRank;
+        
+        float temp = (float)currentRankExp/(float)currentRank *100;
+        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+        _progress.percentage=temp;
+    }
+    else if (rank == 2){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank3.intValue;
+        int nextRank = [GameData sharedGameData].rank2.intValue;
+        int currentRankExp = experience - nextRank;
+        
+        float temp = (float)currentRankExp/(float)currentRank *100;
+        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+        _progress.percentage=temp;
+    }
+    else if (rank == 3){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank4.intValue;
+        int nextRank = [GameData sharedGameData].rank3.intValue;
+        int currentRankExp = experience - nextRank;
+        
+        float temp = (float)currentRankExp/(float)currentRank *100;
+        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+        _progress.percentage=temp;
+    }
+    _progress.positionType = CCPositionTypeNormalized;
+    _progress.position = ccp(.2f,.65f);
+    [self addChild:_progress];
     
     
 }

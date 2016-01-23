@@ -27,10 +27,40 @@
     int shotCount;
     int medalId;
     float _health;
-    int doubleKillCount;
-    CCProgressNode *_progressNode;
-    long gameScore;
     
+    CCProgressNode *_progressNode;
+    CCNode *overlay;
+    CCLabelTTF *complete;
+    CCButton *_nextRoundButton;
+    CCButton *_buyBombsButton;
+    CCButton *_repairButton;
+    
+    CCLabelTTF *_upgradesLabel;
+    CCLabelTTF *_costLabel;
+    CCSprite *_costRepair1;
+    CCSprite *_costRepair2;
+    CCSprite *_costBomb;
+    CCButton *_pauseButton;
+    CCButton *_bomb;
+    CCLabelTTF *_bombCount;
+    CCSprite *bomb;
+    CCLabelTTF *_nukes;
+    CCLabelTTF *_repairs;
+    CCSprite *_gold;
+    CCLabelTTF *_goldCount;
+    
+    
+    
+    CCLabelTTF *rank;
+    CCLabelTTF *user;
+    CCSprite *icon;
+    CCSprite *base;
+    CCProgressNode *_progress;
+    CCLabelTTF *nextRound;
+    
+    int gameCurrency;
+    
+    int exp;
 }
 // -----------------------------------------------------------------
 + (instancetype)node
@@ -50,28 +80,23 @@
     self.userInteractionEnabled = TRUE;
     _physicsNode.collisionDelegate = self;
     _health = 100.f;
-    [self newRound:@"Round 1"];
-
-    /*_chicken.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
-    _canon.position = CGPointMake(self.contentSize.width+_chicken.contentSize.width, _chicken.position.y);
-    id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-40,_chicken.position.y)];
-    id moveCanon=[CCActionMoveTo actionWithDuration:2.0f position:ccp(self.contentSize.width-90,_chicken.position.y)];
-    id delay = [CCActionDelay actionWithDuration: .5f];
-    [_canon runAction:[CCActionSequence actions: moveCanon, nil]];
-    [_chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
-     */
+    roundCount=1;
+    [self newRound:[NSString stringWithFormat:@"Round %d",roundCount]];
+    [self initRound:roundCount];
     [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:self.contentSize.width - 100 andMoveToY:104.f];
-    int minTime = 2.0f;
-    int maxTime = 4.0f;
-    int rangeTime = maxTime - minTime;
-    int randomTime = (arc4random() % rangeTime) + minTime;
-    [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.3f];
-    /*CCNode* chicken = [CCBReader load:@"barn"];
-    CGPoint point =  CGPointMake(300,300);
-    chicken.position = point;
-    [self addChild:chicken];
-     */
+    //int minTime = 2.0f;
+    //int maxTime = 4.0f;
+    //int rangeTime = maxTime - minTime;
+    //int randomTime = (arc4random() % rangeTime) + minTime;
+    
+    overlay.visible = false;
+    
+    _physicsNode.positionType=CCPositionTypeNormalized;
+    _physicsNode.position = ccp(.5f,.5f);
+    
     _barn.physicsBody.collisionType=@"Barn";
+    
+    [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
     
     CCSprite *sprite = [CCSprite spriteWithImageNamed:@"Assets/_100.png"];
     _progressNode = [CCProgressNode progressWithSprite:sprite];
@@ -84,9 +109,6 @@
     _progressNode.positionType = CCPositionTypeNormalized;
     _progressNode.position = ccp(0.12f, 0.1f);
     [self addChild:_progressNode];
-
-
-    
 
 }
 //x:526.000000(568), y:104.000000
@@ -109,89 +131,99 @@
     
     
 }
+-(void)flyingChicken{
+    CCNode* flying = [CCBReader load:@"Flying"];
+    flying.positionType = CCPositionTypeNormalized;
+    flying.position = ccp(.95f,1.2f);
+    [self addChild:flying];
+    ccBezierConfig bez;
+    bez.controlPoint_1 = ccp(.7f,.3f);
+    bez.controlPoint_2 = ccp(.4f,.5f);
+    bez.endPosition = ccp(0.f, 1.3f);
+    CCActionBezierTo *bezier = [CCActionBezierTo actionWithDuration:2.5f bezier:bez];
+    [flying runAction:bezier];
+    
+    int minTime = .7 * 1000;
+    int maxTime = 1.8 * 1000;
+    int rangeTime = maxTime - minTime;
+    int a = (arc4random() % rangeTime) + minTime;
+    float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+    CCActionDelay *delay = [CCActionDelay actionWithDuration:randomTime];
+    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+        [self dropEgg:flying];
+    }];
+    [self runAction:[CCActionSequence actions:delay,block,nil]];
+}
+-(void)dropEgg:(CCNode*)flying{
+    CCNode *gold = [CCBReader load:@"Gold"];
+    gold.physicsBody.collisionType = @"Gold";
+    gold.positionType = CCPositionTypeNormalized;
+    gold.scale = .5f;
+    gold.position = flying.position;
+    
+    CGPoint launchDirection = ccp(gold.position.x-10,gold.position.y-10);
+    int minforce = 500;
+    int maxforce = 2000;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    [_physicsNode addChild:gold];
+    [gold.physicsBody applyForce:force];
+
+}
+-(void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Bullet:(CCNode *)nodeA Gold:(CCNode *)nodeB{
+        [[_physicsNode space] addPostStepBlock:^{
+            gameCurrency++;
+            nodeB.positionType = CCPositionTypeNormalized;
+            nodeB.physicsBody.sensor = true;
+            CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:.5f position:ccp(nodeB.position.x, 1.1f)];
+            CCActionRemove *actionRemove = [CCActionRemove action];
+            [nodeB runAction:[CCActionSequence actionWithArray:@[lift, actionRemove]]];
+            //[nodeB removeFromParent];
+    } key:nodeB];
+}
 
 
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
-    shotCount ++;
-    CGPoint touchLocation = [touch locationInNode:self];
-    CCNode* bullet = [CCBReader load:@"Bullet"];
-    bullet.scale = .6;
-    bullet.position = touchLocation;
-    [_physicsNode addChild:bullet];
-    CCActionRemove *actionRemove = [CCActionRemove action];
-    id delay = [CCActionDelay actionWithDuration:.000001f];
-    [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
-}
+    if (self.userInteractionEnabled){
+        shotCount ++;
+        CGPoint touchLocation = [touch locationInNode:self];
+        CCNode* bullet = [CCBReader load:@"Bullet"];
+        bullet.visible = false;
+        bullet.scale = .6;
+        bullet.position = touchLocation;
+        [_physicsNode addChild:bullet];
+        CCActionRemove *actionRemove = [CCActionRemove action];
+        id delay = [CCActionDelay actionWithDuration:.000001f];
+        [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
+    }
 
-- (void)launchEgg {
-    targetsLaunched++;
-    CCNode* egg = [CCBReader load:@"Egg"];
-    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
-    egg.positionType = CCPositionTypePoints;
-    egg.position = ccp(440.f,160.f);
-    //egg.position =
-    [_physicsNode addChild:egg];
-    egg.scale = 0.6f;
-    egg.rotation = -45.0f;
-    int miny = 5;
-    int maxy = 15;
-    int rangey = maxy - miny;
-    //int randomx = (arc4random() % rangex) + minx;
-    int randomy = (arc4random() % rangey) + miny;
-    CGPoint launchDirection = ccp(-10,randomy);
-    int minforce = 500;
-    int maxforce = 3000;
-    int rangeforce = maxforce - minforce;
-    int randomforce = (arc4random() % rangeforce) + minforce;
-    CGPoint force = ccpMult(launchDirection, randomforce);
-    [egg.physicsBody applyForce:force];
-     if(targetsLaunched == 5){
-        [self newRound:@"Round 2"];
-        [self initRound:roundCount];
+}
+-(void)bombPurchased{
+    if (gameCurrency>=1){
+        [GameData sharedGameData].bombCount++;
+        gameCurrency-=1;
+        [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
     }
-    else if(targetsLaunched == 15){
-        [self newRound:@"Round 3"];
-        [self initRound:roundCount];
+    else{
+        CCLOG(@"NEED MORE MONEY");
     }
-    else if(targetsLaunched == 35){
-        [self newRound:@"Round 4"];
-        [self initRound:roundCount];
-    }
-    else if(targetsLaunched == 85){
-        [self newRound:@"Round 5"];
-        [self initRound:roundCount];
-    }
-    else if(targetsLaunched == 185){
-        [self newRound:@"Round 6"];
-        [self initRound:roundCount];
-    }
-    else if(targetsLaunched == 285){
-        [self newRound:@"Round 7"];
-        [self initRound:roundCount];
-    }
-    else if(targetsLaunched == 385){
-        [self newRound:@"Round 8"];
-        [self initRound:roundCount];
-    }
+}
+-(void)repairPurchased{
+    
 }
 - (void)launchEggTopRight {
-    //targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
-    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
     egg.positionType = CCPositionTypePoints;
     egg.position = ccp(540.f,300.f);
-    //egg.position =
     [_physicsNode addChild:egg];
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
-    //int minx = -11;
     int miny = 0;
-    //int maxx = -12;
     int maxy = 1;
-    //int rangex = maxx - minx;
     int rangey = maxy - miny;
-    //int randomx = (arc4random() % rangex) + minx;
     int randomy = (arc4random() % rangey) + miny;
     CGPoint launchDirection = ccp(-10,randomy);
     int minforce = 3000;
@@ -207,33 +239,48 @@
     CCLabelTTF *label = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(100)];
     label.positionType = CCPositionTypeNormalized;
     label.position = ccp(.5f,0.5f);
+    label.opacity = 0.f;
+    [self addChild:label];
+    CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
+    CCActionDelay *delay2 = [CCActionDelay actionWithDuration:2.5f];
+    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
+    CCActionRemove *remove = [CCActionRemove action];
+    int miny = 1;
+    int maxy = 3;
+    int rangey = maxy - miny;
+    int randomy = (arc4random() % rangey) + miny;
+    if (randomy == 2){
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+            [self flyingChicken];
+        }];
+        int min = 5;
+        int max = 15;
+        int range = max - min;
+        int random = (arc4random() % range) + min;
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:random];
+        [self runAction:[CCActionSequence actions:delay, block, nil]];
+    }
     
-    CCActionDelay *delay =  [CCActionDelay actionWithDuration:2.5];
-    CCActionCallBlock *blockAdd = [CCActionCallBlock actionWithBlock:^{
-        [self addChild:label];
-    }];
-    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
-        [self removeChild:label];
-    }];
-    
-    [self runAction:[CCActionSequence actions:delay, blockAdd, delay, block, delay, nil]];
-    roundCount++;
+    [label runAction:[CCActionSequence actions:fade,delay2,lift,remove, nil]];
 }
 
 -(void)initRound:(int)number{
     switch (number){
+case 1:
+        [self schedule:@selector(launchEgg) interval:2.f repeat:9 delay:5.f];
+        break;
 
 case 2:
-        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:4.f];
+        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:5.f];
         break;
 case 3:
         [self schedule:@selector(launchEgg) interval:.7f repeat:19 delay:5.f];
         [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45 andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
-        [self schedule:@selector(launchEggTopRight) interval:.7f repeat:19 delay:6.5f];
+        [self schedule:@selector(launchEggTopRight) interval:.7f repeat:19 delay:7.5f];
         break;
 case 4:
         [self schedule:@selector(launchEgg) interval:.5f repeat:49 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.5f repeat:49 delay:6.5f];
+            [self schedule:@selector(launchEggTopRight) interval:.5f repeat:49 delay:6.f];
         break;
 case 5:
         [self schedule:@selector(launchEgg) interval:.4f repeat:99 delay:5.f];
@@ -256,48 +303,130 @@ case 8:
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bullet:(CCNode *)nodeB {
     _timeSinceLastCollision = 0.0;
     medalId++;
+    [GameData sharedGameData].score++;
         [[_physicsNode space] addPostStepBlock:^{
             [self eggRemoved:nodeA];
         } key:nodeA];
     if(medalId==3){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
-        [self rewardMedal:spree andLabel:@"Double Kill"];    }
+        [self rewardMedal:spree andLabel:@"Double Kill" andExp:5];    }
     else if(medalId==5){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
-        [self rewardMedal:triple andLabel:@"Triple Kill"];
+        [self rewardMedal:triple andLabel:@"Triple Kill" andExp:5];
     }
     else if(medalId==7){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
-        [self rewardMedal:triple andLabel:@"Over Kill"];
+        [self rewardMedal:triple andLabel:@"Over Kill" andExp:5];
     }
     else if(medalId==9){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
-        [self rewardMedal:triple andLabel:@"KillTacular"];
+        [self rewardMedal:triple andLabel:@"KillTacular" andExp:5];
     }
     else if(medalId==11){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
-        [self rewardMedal:triple andLabel:@"Killpocalypse"];
+        [self rewardMedal:triple andLabel:@"Killpocalypse" andExp:5];
     }
     else if(medalId==13){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
-        [self rewardMedal:triple andLabel:@"7"];
+        [self rewardMedal:triple andLabel:@"7" andExp:10];
     }
     else if(medalId==15){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
-        [self rewardMedal:triple andLabel:@"8"];
+        [self rewardMedal:triple andLabel:@"8" andExp:10];
     }
     else if(medalId==17){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
-        [self rewardMedal:triple andLabel:@"9"];
+        [self rewardMedal:triple andLabel:@"9" andExp:10];
     }
-    else if(medalId==19 || (medalId%10) == 0){
+    else if((medalId%19) == 0){
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
-        [self rewardMedal:triple andLabel:@"10"];
+        [self rewardMedal:triple andLabel:@"10" andExp:10];
+    }
+    if (killCount == 9){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
+        [self rewardMedal:spree andLabel:@"Killing Spree" andExp:5];
+    }
+    else if (killCount == 19){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
+        [self rewardMedal:spree andLabel:@"Killing Frenzy" andExp:5];
+    }
+    else if (killCount ==29){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
+        [self rewardMedal:spree andLabel:@"Running Riot" andExp:10];
+    }
+    else if (killCount == 39){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
+        [self rewardMedal:spree andLabel:@"Psycho" andExp:10];
+    }
+    else if (killCount == 49 || ((killCount%49) == 0 && killCount !=0)){
+        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
+        [self rewardMedal:spree andLabel:@"Unstoppable" andExp:10];
     }
 
-    
 }
-
+-(void)bombPressed{
+    if ([GameData sharedGameData].bombCount){
+        [GameData sharedGameData].bombCount--;
+        [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+        bomb = [CCSprite spriteWithImageNamed:@"Assets/BombOverlay.png"];
+        bomb.anchorPoint = ccp(.5f,.5f);
+        CCSprite *show = [CCSprite spriteWithImageNamed:@"Assets/BombOverlay.png"];
+        show.positionType = CCPositionTypeNormalized;
+        show.scale = 200;
+        show.position = ccp(.5f,.5f);
+        show.opacity = .5f;
+        show.zOrder = 20000000;
+        [self addChild:show];
+        bomb.positionType = CCPositionTypeNormalized;
+        bomb.scale = 200;
+        bomb.position = ccp(.5f,.5f);
+        bomb.zOrder = 20000000;
+        bomb.physicsBody = [CCPhysicsBody bodyWithCircleOfRadius:2000.f andCenter:ccp(.5f,.5f)];
+        [_physicsNode addChild:bomb];
+        bomb.physicsBody.collisionType=@"Bomb";
+        CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.05f];
+        CCActionDelay *delay2 = [CCActionDelay actionWithDuration:.05f];
+        CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+        CCActionRemove *remove = [CCActionRemove action];
+        CCActionCallBlock *disable = [CCActionCallBlock actionWithBlock:^(void){
+            _bomb.enabled = false;
+        }];
+        CCActionCallBlock *enable = [CCActionCallBlock actionWithBlock:^(void){
+            _bomb.enabled = true;
+            if(exp > 0){
+                CCLabelTTF *expLabel = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"+ %d", exp]     fontName:@"Helvetica" fontSize:22];
+                expLabel.positionType = CCPositionTypeNormalized;
+                expLabel.position = ccp(.5f,.7f);
+                CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
+                CCActionDelay *delay2 = [CCActionDelay actionWithDuration:.3f];
+                CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:.5f position:ccp(.5f,1.5f)];
+                CCActionRemove *remove = [CCActionRemove action];
+                [self addChild:expLabel];
+                [expLabel runAction:[CCActionSequence actions:fade, delay2, lift,remove,nil]];
+                [GameData sharedGameData].score+=exp;
+                [_scoreLabel setString:[NSString stringWithFormat:@"%ld",[GameData sharedGameData].score]];
+                exp = 0;
+            }
+        }];
+        [show runAction:[CCActionSequence actions:fade,delay2,fadeOut, remove, nil]];
+        [bomb runAction:[CCActionSequence actions:disable, delay2, remove, enable, nil]];
+    }
+}
+- (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bomb:(CCNode *)nodeB {
+    [[_physicsNode space] addPostStepBlock:^{
+        exp++;
+        CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
+        [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
+        explosion.scale = 0.6f;
+        explosion.position = nodeA.position;
+        explosion.rotation = nodeA.rotation;
+        [nodeA.parent addChild:explosion];
+        CCActionRemove *actionRemove = [CCActionRemove action];
+        id delay = [CCActionDelay actionWithDuration:0.3f];
+        [explosion runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
+        [nodeA removeFromParent];
+    } key:nodeA];
+}
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Barn:(CCNode *)nodeB {
     [[_physicsNode space] addPostStepBlock:^{
         _progressNode.percentage -= 10.0f;
@@ -361,7 +490,7 @@ case 8:
 
 - (void)update:(CCTime)delta {
     _timeSinceLastCollision += delta;
-    if (killCount !=shotCount){
+    if (killCount < shotCount){
         killCount = 0;
         shotCount = 0;
     }
@@ -372,8 +501,6 @@ case 8:
 - (void)eggRemoved:(CCNode *)egg {
     CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
     killCount++;
-    [GameData sharedGameData].score++;
-    CCLOG(@"Score: %d", killCount);
     [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
     explosion.scale = 0.6f;
     explosion.position = egg.position;
@@ -383,36 +510,13 @@ case 8:
     id delay = [CCActionDelay actionWithDuration:0.3f];
     [explosion runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
     [egg removeFromParent];
-    
-    if (killCount == 20){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
-        [self rewardMedal:spree andLabel:@"Killing Spree"];
-    }
-    else if (killCount == 40){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
-        [self rewardMedal:spree andLabel:@"Killing Frenzy"];
-    }
-    else if (killCount == 60){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
-        [self rewardMedal:spree andLabel:@"Running Riot"];
-    }
-    else if (killCount == 80){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
-        [self rewardMedal:spree andLabel:@"Psycho"];
-    }
-    else if (killCount == 100){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
-        [self rewardMedal:spree andLabel:@"Unstoppable"];
-    }
 }
 
 
--(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input {
+-(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input andExp:(int)points {
     medalCount+=1;
-    CCLOG(@"%d", medalCount);
-    doubleKillCount++;
-    
     [GameData sharedGameData].doubleKills += 1;
+    [GameData sharedGameData].score+=points;
     
     medalType.positionType = CCPositionTypeNormalized;
     if(medalCount == 1){
@@ -428,6 +532,16 @@ case 8:
     }else if (medalCount==6){
         medalType.position = ccp(.1f, .35f);
     }
+    CCLabelTTF *expLabel = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"+ %d", points] fontName:@"Helvetica" fontSize:22];
+    expLabel.positionType = CCPositionTypeNormalized;
+    expLabel.position = ccp(.5f,.7f);
+    CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
+    CCActionDelay *delay2 = [CCActionDelay actionWithDuration:.3f];
+    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:.5f position:ccp(.5f,1.5f)];
+    CCActionRemove *remove = [CCActionRemove action];
+    [self addChild:expLabel];
+    [expLabel runAction:[CCActionSequence actions:fade, delay2, lift,remove,nil]];
+    
     
     medalType.anchorPoint = ccp(.5f, .001f);
     [self runAction:[CCActionFadeIn actionWithDuration:0.4]];
@@ -436,17 +550,17 @@ case 8:
     CCLabelTTF *label = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@",input] fontName:@"Verdana-Bold" fontSize:16.0f];
     label.positionType = CCPositionTypeNormalized;
     if(medalCount == 1){
-        label.position = ccp(.6f, .1f);
+        label.position = ccp(.7f, .1f);
     }else if (medalCount==2){
-        label.position = ccp(.6f, .25f);
+        label.position = ccp(.7f, .25f);
     }else if (medalCount==3){
-        label.position = ccp(.6f, .4f);
+        label.position = ccp(.7f, .4f);
     }else if (medalCount==4){
-        label.position = ccp(.2f, .1f);
+        label.position = ccp(.3f, .1f);
     }else if (medalCount==5){
-        label.position = ccp(.2f, .25f);
+        label.position = ccp(.3f, .25f);
     }else if (medalCount==6){
-        label.position = ccp(.2f, .4f);
+        label.position = ccp(.3f, .4f);
     }
     [self addChild:label];
     
@@ -465,13 +579,13 @@ case 8:
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     if([input isEqualToString:@"Double Kill"]){
-        CCLOG(@"double kill awarded");
+
         int doubleCount = person.two.intValue;
         doubleCount++;
         [person setValue:[NSNumber numberWithInt:doubleCount] forKey:@"two"];
     }
     else if ([input isEqualToString:@"Triple Kill"]){
-        CCLOG(@"Triple kill awarded");
+
         int tripleCount = person.three.intValue;
         tripleCount++;
         [person setValue:[NSNumber numberWithInt:tripleCount] forKey:@"three"];
@@ -516,6 +630,309 @@ case 8:
     CCScene *pauseScene = [CCBReader loadAsScene:@"PauseScene"];
     [[CCDirector sharedDirector] pushScene:pauseScene];
 }
+
+
+- (void)launchEgg {
+    targetsLaunched++;
+    CCNode* egg = [CCBReader load:@"Egg"];
+    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
+    egg.positionType = CCPositionTypePoints;
+    egg.position = ccp(440.f,160.f);
+    //egg.position =
+    [_physicsNode addChild:egg];
+    egg.scale = 0.6f;
+    egg.rotation = -45.0f;
+    int miny = 5;
+    int maxy = 15;
+    int rangey = maxy - miny;
+    //int randomx = (arc4random() % rangex) + minx;
+    int randomy = (arc4random() % rangey) + miny;
+    CGPoint launchDirection = ccp(-10,randomy);
+    int minforce = 500;
+    int maxforce = 3000;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    [egg.physicsBody applyForce:force];
+    
+    if(targetsLaunched == 10){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 20){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 40){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 90){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 190){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 290){
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 385){
+        [self roundComplete];
+    }
+}
+-(void)roundComplete{
+    _pauseButton.visible = false;
+    [GameData sharedGameData].bombCount++;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    NSNumber *expSum = [NSNumber numberWithLong:(person.experience.intValue + [GameData sharedGameData].score)];
+    [person setValue:expSum forKey:@"experience"];
+    if (![person.managedObjectContext save:&error2]) {
+        NSLog(@"Unable to save managed object context.");
+        NSLog(@"%@, %@", error2, error2.localizedDescription);
+    }
+    CCActionDelay *delay =  [CCActionDelay actionWithDuration:6.f];
+    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+        overlay = [CCBReader load:@"overlay"];
+        overlay.anchorPoint = ccp(.5f,.5f);
+        overlay.positionType = CCPositionTypeNormalized;
+        overlay.position = ccp(.5f,.5f);
+        [self addChild:overlay];
+        self.userInteractionEnabled = FALSE;
+        
+        NSString *string = [NSString stringWithFormat:@"Round %d Complete!", roundCount];
+        complete = [CCLabelTTF labelWithString:string fontName:nil fontSize:48];
+        complete.positionType = CCPositionTypeNormalized;
+        complete.position = ccp(.5f,.5f);
+        [overlay addChild:complete];
+        
+        CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
+        CCActionDelay *delay2 = [CCActionDelay actionWithDuration:1.2f];
+        CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
+        CCActionRemove *remove = [CCActionRemove action];
+        [complete runAction:[CCActionSequence actions:fade, delay2, lift,remove,nil]];
+        
+        
+        
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+            [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+            rank = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:18];
+            [overlay addChild:rank];
+            user = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:22];
+            [overlay addChild:user];
+            icon = [CCSprite spriteWithImageNamed:@"Rank/a_Recruit.png"];
+            [overlay addChild:icon];
+            
+            [[GameData sharedGameData] summarizeRank:rank andUser:user andRankIcon:icon];
+            
+            
+            
+            base = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
+            //sprite = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
+            base.anchorPoint = ccp(0,1);
+            base.positionType = CCPositionTypeNormalized;
+            base.position = ccp(.2f,.65f);
+            [overlay addChild:base];
+            
+            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+            
+            NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+            [fetchRequest setEntity:entity];
+            
+            NSError *error2 = nil;
+            Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:fetchRequest error:&error2] objectAtIndex:0];
+            
+            CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
+            _progress = [CCProgressNode progressWithSprite:progress];
+            _progress.type = CCProgressNodeTypeBar;
+            _progress.midpoint = ccp(0.0f, 0.0f);
+            _progress.anchorPoint = ccp(0,1);
+            _progress.barChangeRate = ccp(1.0f, 0.5f);
+            _progress.zOrder = 2500000;
+            
+            int rank1 = person.rank.intValue;
+            if(rank1 ==0){
+                CCLOG(@"OKAY");
+                int experience = person.experience.intValue;
+                long diff = person.experience.intValue-[GameData sharedGameData].score;
+                
+                int currentRank = [GameData sharedGameData].rank1.intValue;
+                CCLOG(@"diff %li exp: %d", diff, experience);
+                float preTemp = (float)experience/(float)currentRank *100;
+                float temp = (float)diff/(float)currentRank *100;
+                CCLOG(@"temp: %f experience %d, preTemp: %f", temp, experience, preTemp);
+                _progress.percentage=preTemp;
+            }
+            else if (rank1 == 1){
+                CCLOG(@"OKAY");
+                int experience = person.experience.intValue;
+                long diff = person.experience.intValue-[GameData sharedGameData].score;
+                
+                int currentRank = [GameData sharedGameData].rank2.intValue;
+                int nextRank = [GameData sharedGameData].rank1.intValue;
+                long diffRankExp = diff - nextRank;
+                int currentRankExp = experience - nextRank;
+                
+                float preTemp = (float)currentRankExp/(float)currentRank *100;
+                float temp = (float)diffRankExp/(float)currentRank *100;
+                CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+                _progress.percentage=preTemp;
+            }
+            else if (rank1 == 2){
+                CCLOG(@"2");
+                int experience = person.experience.intValue;
+                long diff = person.experience.intValue-[GameData sharedGameData].score;
+                
+                int currentRank = [GameData sharedGameData].rank3.intValue;
+                int nextRank = [GameData sharedGameData].rank2.intValue;
+                long diffRankExp = diff - nextRank;
+                int currentRankExp = experience - nextRank;
+                
+                float preTemp = (float)currentRankExp/(float)currentRank *100;
+                float temp = (float)diffRankExp/(float)currentRank *100;
+                CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+                _progress.percentage=preTemp;            }
+            else if (rank1 == 3){
+                CCLOG(@"OKAY");
+                int experience = person.experience.intValue;
+                long diff = person.experience.intValue-[GameData sharedGameData].score;
+                
+                int currentRank = [GameData sharedGameData].rank4.intValue;
+                int nextRank = [GameData sharedGameData].rank3.intValue;
+                long diffRankExp = diff - nextRank;
+                int currentRankExp = experience - nextRank;
+                
+                float preTemp = (float)currentRankExp/(float)currentRank *100;
+                float temp = (float)diffRankExp/(float)currentRank *100;
+                CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+                _progress.percentage=preTemp;
+            }
+            else if (rank1 == 4){
+                int experience = person.experience.intValue;
+                int currentRank = [GameData sharedGameData].rank5.intValue;
+                int nextRank = [GameData sharedGameData].rank4.intValue;
+                int currentRankExp = experience - nextRank;
+                
+                float temp = (float)currentRankExp/(float)currentRank *100;
+                CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
+                _progress.percentage=temp;
+            }
+            _progress.positionType = CCPositionTypeNormalized;
+            _progress.position = ccp(.2f,.65f);
+            [overlay addChild:_progress];
+            
+            
+            
+            
+            _nextRoundButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
+            _nextRoundButton.positionType = CCPositionTypeNormalized;
+            _nextRoundButton.position = ccp(.5f,.1f);
+            [_nextRoundButton setTarget:self selector:@selector(_continuePressed)];
+            [overlay addChild:_nextRoundButton];
+            
+            nextRound = [CCLabelTTF labelWithString:@"Ready" fontName:@"Helvetica" fontSize:32];
+            nextRound.positionType = CCPositionTypeNormalized;
+            nextRound.anchorPoint = ccp(0.0f,.5f);
+            nextRound.position = ccp(.58f,.1f);
+            [overlay addChild:nextRound];
+            
+            _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
+            _repairButton.positionType = CCPositionTypeNormalized;
+            _repairButton.position = ccp(.65f,.5f);
+            [_repairButton setTarget:self selector:@selector(bombPurchased)];
+            [overlay addChild:_repairButton];
+            
+            _repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
+            _repairs.positionType = CCPositionTypeNormalized;
+            _repairs.position = ccp(.65f,.42f);
+            [overlay addChild:_repairs];
+            
+            
+            _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
+            _buyBombsButton.positionType = CCPositionTypeNormalized;
+            _buyBombsButton.position = ccp(.65f,.3f);
+            [_buyBombsButton setTarget:self selector:@selector(bombPurchased)];
+            [overlay addChild:_buyBombsButton];
+            
+            _nukes = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
+            _nukes.positionType = CCPositionTypeNormalized;
+            _nukes.position = ccp(.65f,.22f);
+            [overlay addChild:_nukes];
+            
+            _upgradesLabel = [CCLabelTTF labelWithString:@"Upgrades" fontName:@"Helvetica" fontSize:28];
+            _upgradesLabel.positionType = CCPositionTypeNormalized;
+            _upgradesLabel.position = ccp(.65f,.7f);
+            [overlay addChild:_upgradesLabel];
+            
+            _costLabel = [CCLabelTTF labelWithString:@"Cost" fontName:@"Helvetica" fontSize:28];
+            _costLabel.positionType = CCPositionTypeNormalized;
+            _costLabel.position = ccp(.85f,.7f);
+            [overlay addChild:_costLabel];
+            
+            _costBomb = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costBomb.scale = .65f;
+             _costBomb.positionType = CCPositionTypeNormalized;
+             _costBomb.position = ccp(.85f, .3f);
+             [overlay addChild:_costBomb];
+            
+            _costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costRepair1.scale = .65f;
+            _costRepair1.positionType = CCPositionTypeNormalized;
+            _costRepair1.position = ccp(.833f, .5f);
+            [overlay addChild:_costRepair1];
+            
+            _costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costRepair2.scale = .65f;
+            _costRepair2.positionType = CCPositionTypeNormalized;
+            _costRepair2.position = ccp(.867f, .5f);
+            [overlay addChild:_costRepair2];
+            
+            _gold = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _gold.positionType = CCPositionTypeNormalized;
+            _gold.position = ccp(.1f,.4f);
+            [overlay addChild:_gold];
+            
+            
+            _goldCount = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %d", gameCurrency ] fontName:@"Helvetica" fontSize:28];
+            _goldCount.positionType = CCPositionTypeNormalized;
+            _goldCount.position = ccp(.8f,.7f);
+            [overlay addChild:_goldCount];
+            
+            
+        }];
+        CCActionDelay *delay3 = [CCActionDelay actionWithDuration:2.2f];
+        [overlay runAction:[CCActionSequence actions:delay3, block, nil]];
+        roundCount++;
+        overlay.visible = true;
+    }];
+    [self runAction:[CCActionSequence actions:delay, block, nil]];
+}
+-(void)_continuePressed{
+    self.userInteractionEnabled = true;
+    [overlay removeChild:rank];
+    [overlay removeChild:user];
+    [overlay removeChild:icon];
+    [overlay removeChild:nextRound];
+    [overlay removeChild:_progress];
+    [overlay removeChild:base];
+    [overlay removeChild:_nextRoundButton];
+    [overlay removeChild:_buyBombsButton];
+    [overlay removeChild:_nukes];
+    [overlay removeChild:_upgradesLabel];
+    [overlay removeChild:_repairButton];
+    [overlay removeChild:_repairs];
+    [overlay removeChild:_costBomb];
+    [overlay removeChild:_costRepair1];
+    [overlay removeChild:_costRepair2];
+    [overlay removeChild:_gold];
+    [overlay removeChild:_goldCount];
+    overlay.visible = false;
+    _pauseButton.visible = true;
+    NSString *text = [NSString stringWithFormat:@"Round %d", roundCount];
+    [self newRound:text];
+    [self initRound:roundCount];
+}
+
 
 
 // -----------------------------------------------------------------

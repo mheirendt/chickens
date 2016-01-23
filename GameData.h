@@ -34,10 +34,41 @@
 @property (assign, nonatomic) long doubleKills;
 @property (assign, nonatomic) NSMutableArray *hiScores;
 
+@property (assign, nonatomic) int bombCount;
+
 
 @property (retain,nonatomic,readonly) NSManagedObjectModel *managedObjectModel;
 @property (retain,nonatomic,readonly) NSManagedObjectContext *managedObjectContext;
 @property (retain,nonatomic,readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
+
+
+
+
+@property (retain, nonatomic) NSNumber* rank1;
+@property (retain, nonatomic) NSNumber *rank2;
+@property (retain, nonatomic) NSNumber *rank3;
+@property (retain, nonatomic) NSNumber *rank4;
+@property (retain, nonatomic) NSNumber *rank5;
+@property (retain, nonatomic) NSNumber *rank6;
+@property (retain, nonatomic) NSNumber *rank7;
+@property (retain, nonatomic) NSNumber *rank8;
+@property (retain, nonatomic) NSNumber *rank9;
+@property (retain, nonatomic) NSNumber *rank10;
+@property (retain, nonatomic) NSNumber *rank11;
+@property (retain, nonatomic) NSNumber *rank12;
+@property (retain, nonatomic) NSNumber *rank13;
+@property (retain, nonatomic) NSNumber *rank14;
+@property (retain, nonatomic) NSNumber *rank15;
+@property (retain, nonatomic) NSNumber *rank16;
+@property (retain, nonatomic) NSNumber *rank17;
+@property (retain, nonatomic) NSNumber *rank18;
+@property (retain, nonatomic) NSNumber *rank19;
+@property (retain, nonatomic) NSNumber *rank20;
+@property (retain, nonatomic) NSNumber *rank21;
+@property (retain, nonatomic) NSNumber *rank22;
+@property (retain, nonatomic) NSNumber *rank23;
+@property (retain, nonatomic) NSNumber *rank24;
 
 // -----------------------------------------------------------------
 // methods
