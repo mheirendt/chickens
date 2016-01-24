@@ -25,7 +25,9 @@
 
 + (instancetype)node;
 - (instancetype)init;
-
+- (void)medalsPressed;
+-(void)viewUsers;
+-(void)rankPressed;
 // -----------------------------------------------------------------
 
 @end

@@ -101,12 +101,18 @@
         NSLog(@"Unable to save managed object context.");
         NSLog(@"%@, %@", error, error.localizedDescription);
     }
+        [[NSUserDefaults standardUserDefaults] setObject:userName forKey:@"defaultUser"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        if([GameData sharedGameData].tableID){
+            CCScene *mainScene = [CCBReader loadAsScene:@"HighScores"];
+            [[CCDirector sharedDirector] replaceScene: mainScene];
+        }
     else{
         CCScene *mainScene = [CCBReader loadAsScene:@"MainScene"];
         [[CCDirector sharedDirector] replaceScene: mainScene];
             CCScene *gameplayScene = [CCBReader loadAsScene:@"Gameplay"];
             [[CCDirector sharedDirector] pushScene:gameplayScene];
-    }
+        }
     }
 
 }

@@ -12,6 +12,7 @@
 
 #import "MedalsScene.h"
 #import "TableView.h"
+#import "GameData.h"
 
 // -----------------------------------------------------------------
 
@@ -45,8 +46,10 @@
 }
 
 -(void)backToMenu{
-    CCScene *gameplayScene = [CCBReader loadAsScene:@"MainScene"];
-    [[CCDirector sharedDirector] replaceScene:gameplayScene];
+    //CCScene *gameplayScene = [CCBReader loadAsScene:@"MainScene"];
+    //[[CCDirector sharedDirector] replaceScene:gameplayScene];
+    [GameData sharedGameData].tableID = 0;
+    [[CCDirector sharedDirector] popScene];
 }
 
 // -----------------------------------------------------------------

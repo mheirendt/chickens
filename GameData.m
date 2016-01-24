@@ -27,6 +27,8 @@
 
 @synthesize bombCount;
 
+@synthesize tableID;
+
 @synthesize rank1;
 @synthesize rank2;
 @synthesize rank3;
@@ -127,6 +129,10 @@
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                            stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     [user setString:person.name];

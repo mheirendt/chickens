@@ -34,6 +34,7 @@
     CCButton *_nextRoundButton;
     CCButton *_buyBombsButton;
     CCButton *_repairButton;
+    CCLabelTTF *roundLabel;
     
     CCLabelTTF *_upgradesLabel;
     CCLabelTTF *_costLabel;
@@ -46,6 +47,8 @@
     CCSprite *bomb;
     CCLabelTTF *_nukes;
     CCLabelTTF *_repairs;
+    CCButton *_shopping;
+    CCLabelTTF *_shoppingLabel;
     CCSprite *_gold;
     CCLabelTTF *_goldCount;
     
@@ -81,7 +84,7 @@
     _physicsNode.collisionDelegate = self;
     _health = 100.f;
     roundCount=1;
-    [self newRound:[NSString stringWithFormat:@"Round %d",roundCount]];
+    [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
     [self initRound:roundCount];
     [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:self.contentSize.width - 100 andMoveToY:104.f];
     //int minTime = 2.0f;
@@ -206,12 +209,22 @@
         [GameData sharedGameData].bombCount++;
         gameCurrency-=1;
         [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+        [_goldCount setString:[NSString stringWithFormat:@"X %d", gameCurrency]];
     }
     else{
         CCLOG(@"NEED MORE MONEY");
     }
 }
 -(void)repairPurchased{
+    if (gameCurrency>=2){
+        gameCurrency-=2;
+        _progressNode.percentage = 100.f;
+        _health = 100.f;
+        [_goldCount setString:[NSString stringWithFormat:@"X %d", gameCurrency]];
+    }
+    else{
+        CCLOG(@"NEED MORE MONEY");
+    }
     
 }
 - (void)launchEggTopRight {
@@ -236,15 +249,17 @@
 }
 
 -(void)newRound:(NSString*)round{
-    CCLabelTTF *label = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(100)];
-    label.positionType = CCPositionTypeNormalized;
-    label.position = ccp(.5f,0.5f);
-    label.opacity = 0.f;
-    [self addChild:label];
-    CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
-    CCActionDelay *delay2 = [CCActionDelay actionWithDuration:2.5f];
-    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
-    CCActionRemove *remove = [CCActionRemove action];
+    if (!roundLabel){
+    roundLabel = [CCLabelTTF labelWithString:(round) fontName:(nil) fontSize:(48)];
+    roundLabel.positionType = CCPositionTypeNormalized;
+    roundLabel.position = ccp(.07f,0.77f);
+    roundLabel.opacity = 0.f;
+    [self addChild:roundLabel];
+    CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:1.f];
+    CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:1.f];
+    //CCActionDelay *delay2 = [CCActionDelay actionWithDuration:2.5f];
+    //CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
+    //CCActionRemove *remove = [CCActionRemove action];
     int miny = 1;
     int maxy = 3;
     int rangey = maxy - miny;
@@ -261,43 +276,110 @@
         [self runAction:[CCActionSequence actions:delay, block, nil]];
     }
     
-    [label runAction:[CCActionSequence actions:fade,delay2,lift,remove, nil]];
+    [roundLabel runAction:[CCActionSequence actions:fade,fadeOut,fade,fadeOut, fade, nil]];
+    }
+    else{
+        CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:1.f];
+        CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:1.f];
+        [roundLabel setString:round];
+        [roundLabel runAction:[CCActionSequence actions:fade,fadeOut,fade,fadeOut, fade, nil]];
+    }
 }
 
 -(void)initRound:(int)number{
-    switch (number){
-case 1:
-        [self schedule:@selector(launchEgg) interval:2.f repeat:9 delay:5.f];
+        switch (number){
+            case 1:{
+                int minTime = .9f * 1000;
+                int maxTime = 2.1f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
+        }
         break;
 
-case 2:
-        [self schedule:@selector(launchEgg) interval:1.0f repeat:9 delay:5.f];
-        break;
-case 3:
-        [self schedule:@selector(launchEgg) interval:.7f repeat:19 delay:5.f];
-        [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45 andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
-        [self schedule:@selector(launchEggTopRight) interval:.7f repeat:19 delay:7.5f];
-        break;
-case 4:
-        [self schedule:@selector(launchEgg) interval:.5f repeat:49 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.5f repeat:49 delay:6.f];
-        break;
-case 5:
-        [self schedule:@selector(launchEgg) interval:.4f repeat:99 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.4f repeat:99 delay:6.5f];
-        break;
-case 6:
-        [self schedule:@selector(launchEgg) interval:.3f repeat:99 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.3f repeat:99 delay:7.f];
-        break;
-case 7:
-        [self schedule:@selector(launchEgg) interval:.2f repeat:99 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.2f repeat:99 delay:7.f];
-        break;
-case 8:
-        [self schedule:@selector(launchEgg) interval:.1f repeat:114 delay:5.f];
-            [self schedule:@selector(launchEggTopRight) interval:.1f repeat:114 delay:7.f];
-        break;
+        case 2:{
+            int minTime = .5f * 1000;
+            int maxTime = 1.f * 1000;
+            int rangeTime = maxTime - minTime;
+            int a = (arc4random() % rangeTime) + minTime;
+            float randomTime = a/1000.f;
+            CCLOG(@"%f", randomTime);
+            [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
+            break;
+        }
+            case 3:{
+                int minTime = .9f * 1000;
+                int maxTime = 1.5f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:19 delay:5.f];
+                [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45    andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:19 delay:7.5f];
+                break;
+            }
+            case 4:{
+                int minTime = .6f * 1000;
+                int maxTime = 1.2f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:49 delay:5.f];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:49 delay:6.f];
+                break;
+            }
+            case 5:{
+                int minTime = .5f * 1000;
+                int maxTime = 8.f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+            
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:6.5f];
+                break;
+            }
+            case 6:{
+                int minTime = .3f * 1000;
+                int maxTime = .6f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                break;
+            }
+            case 7:{
+                int minTime = .2f * 1000;
+                int maxTime = .5f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                break;
+            }
+            case 8:{
+                int minTime = .2f * 1000;
+                int maxTime = .4f * 1000;
+                int rangeTime = maxTime - minTime;
+                int a = (arc4random() % rangeTime) + minTime;
+                float randomTime = a/1000.f;
+                CCLOG(@"%f", randomTime);
+                
+                [self schedule:@selector(launchEgg) interval:randomTime repeat:114 delay:5.f];
+                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:114 delay:7.f];
+                break;
+            }
     }
 }
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bullet:(CCNode *)nodeB {
@@ -411,6 +493,9 @@ case 8:
         [show runAction:[CCActionSequence actions:fade,delay2,fadeOut, remove, nil]];
         [bomb runAction:[CCActionSequence actions:disable, delay2, remove, enable, nil]];
     }
+}
+-(void)armoryPressed{
+    CCLOG(@"Armory");
 }
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bomb:(CCNode *)nodeB {
     [[_physicsNode space] addPostStepBlock:^{
@@ -678,7 +763,6 @@ case 8:
     }
 }
 -(void)roundComplete{
-    _pauseButton.visible = false;
     [GameData sharedGameData].bombCount++;
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -699,6 +783,10 @@ case 8:
         overlay.position = ccp(.5f,.5f);
         [self addChild:overlay];
         self.userInteractionEnabled = FALSE;
+        
+        _pauseButton.visible = false;
+        _bomb.visible = false;
+        roundLabel.visible = false;
         
         NSString *string = [NSString stringWithFormat:@"Round %d Complete!", roundCount];
         complete = [CCLabelTTF labelWithString:string fontName:nil fontSize:48];
@@ -839,7 +927,7 @@ case 8:
             _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
             _repairButton.positionType = CCPositionTypeNormalized;
             _repairButton.position = ccp(.65f,.5f);
-            [_repairButton setTarget:self selector:@selector(bombPurchased)];
+            [_repairButton setTarget:self selector:@selector(repairPurchased)];
             [overlay addChild:_repairButton];
             
             _repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
@@ -895,8 +983,19 @@ case 8:
             
             _goldCount = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %d", gameCurrency ] fontName:@"Helvetica" fontSize:28];
             _goldCount.positionType = CCPositionTypeNormalized;
-            _goldCount.position = ccp(.8f,.7f);
+            _goldCount.position = ccp(.2f,.4f);
             [overlay addChild:_goldCount];
+            
+            _shopping = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Shop.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/ShopPressed.png"] disabledSpriteFrame:nil];
+            _shopping.positionType = CCPositionTypeNormalized;
+            _shopping.position = ccp(.1f,.18f);
+            [_shopping setTarget:self selector:@selector(armoryPressed)];
+            [overlay addChild:_shopping];
+            
+            _shoppingLabel = [CCLabelTTF labelWithString:@"Armory" fontName:@"Helvetica" fontSize:14];
+            _shoppingLabel.positionType = CCPositionTypeNormalized;
+            _shoppingLabel.position = ccp(.2f,.18f);
+            [overlay addChild:_shoppingLabel];
             
             
         }];
@@ -926,9 +1025,14 @@ case 8:
     [overlay removeChild:_costRepair2];
     [overlay removeChild:_gold];
     [overlay removeChild:_goldCount];
+    [overlay removeChild: _shopping];
+    [overlay removeChild: _shoppingLabel];
     overlay.visible = false;
     _pauseButton.visible = true;
-    NSString *text = [NSString stringWithFormat:@"Round %d", roundCount];
+    _bomb.visible = true;
+    roundLabel.visible = true;
+
+    NSString *text = [NSString stringWithFormat:@"%d", roundCount];
     [self newRound:text];
     [self initRound:roundCount];
 }

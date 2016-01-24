@@ -26,7 +26,7 @@
 
 + (instancetype)node;
 - (instancetype)init;
-
+-(void)createUser;
 // -----------------------------------------------------------------
 
 @end

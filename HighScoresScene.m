@@ -20,6 +20,8 @@
     CCLabelTTF *_rankLabel;
     CCSprite *_rankIcon;
     CCProgressNode *_progress;
+    CCLabelTTF *scoreLabel;
+    CCLabelTTF *roundLabel;
 }
 
 // -----------------------------------------------------------------
@@ -127,6 +129,24 @@
     
     
 }
+
+- (void)medalsPressed{
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"Medals"];
+    [GameData sharedGameData].tableID = 1;
+    [[CCDirector sharedDirector] pushScene:gameplayScene];
+}
+
+-(void)rankPressed{
+    [GameData sharedGameData].tableID = 2;
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"Medals"];
+    [[CCDirector sharedDirector] pushScene:gameplayScene];
+}
+-(void)viewUsers{
+    [GameData sharedGameData].tableID = 3;
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"Medals"];
+    [[CCDirector sharedDirector] pushScene:gameplayScene];
+}
+
 -(void)addHighScore{
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     
@@ -143,13 +163,7 @@
         
     } else {
         NSString *doubles = [NSString stringWithFormat:@"%@", [person valueForKey:@"highscore"]];
-        CCLabelTTF* count = [CCLabelTTF labelWithString:doubles fontName:@"HelveticaNeue" fontSize:30];
-        count.positionType = CCPositionTypeNormalized;
-        count.position = ccp(.5f,.4f);
-        
-        
-        
-        [self addChild:count];
+        [scoreLabel setString:doubles];
     }
     if (result.count > 0) {
         NSManagedObject *person = (NSManagedObject *)[result objectAtIndex:0];

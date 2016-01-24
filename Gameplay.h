@@ -43,6 +43,8 @@
 -(void)initRound:(int)number;
 -(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input andExp:(int)exp;
 -(void)pauseScene;
+-(void)bombPressed;
+-(void)armoryPressed;
 -(void)bombPurchased;
 -(void)repairPurchased;
 // -----------------------------------------------------------------

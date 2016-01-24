@@ -718,7 +718,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>Assets/_Leaderboards.png</string>
+							<string>Assets/Profile.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -729,7 +729,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>Assets/_LeaderboardsPressed.png</string>
+							<string>Assets/ProfilePressed.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -916,6 +916,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -1313,7 +1315,7 @@
 						<string>Block</string>
 						<key>value</key>
 						<array>
-							<string>medalsPressed</string>
+							<string>gameCenterPressed</string>
 							<integer>1</integer>
 						</array>
 					</dict>
@@ -1370,7 +1372,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>Assets/_Medals.png</string>
+							<string>Assets/_Leaderboards.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -1381,7 +1383,7 @@
 						<key>value</key>
 						<array>
 							<string></string>
-							<string>Assets/_MedalsPressed.png</string>
+							<string>Assets/_LeaderboardsPressed.png</string>
 						</array>
 					</dict>
 					<dict>
@@ -1602,7 +1604,7 @@
 						<key>value</key>
 						<array>
 							<real>94.34478759765625</real>
-							<real>159.66818237304688</real>
+							<real>162.5</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -1639,8 +1641,7 @@
 						<string>Text</string>
 						<key>value</key>
 						<array>
-							<string>Leaderboards
-</string>
+							<string>Profile</string>
 							<false/>
 						</array>
 					</dict>
@@ -1810,7 +1811,7 @@
 						<key>value</key>
 						<array>
 							<real>488</real>
-							<real>155</real>
+							<real>162.5</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -1847,7 +1848,7 @@
 						<string>Text</string>
 						<key>value</key>
 						<array>
-							<string>Medal Collection</string>
+							<string>Game Center</string>
 							<false/>
 						</array>
 					</dict>

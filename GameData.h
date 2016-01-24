@@ -36,13 +36,11 @@
 
 @property (assign, nonatomic) int bombCount;
 
+@property (assign, nonatomic) int tableID;
 
 @property (retain,nonatomic,readonly) NSManagedObjectModel *managedObjectModel;
 @property (retain,nonatomic,readonly) NSManagedObjectContext *managedObjectContext;
 @property (retain,nonatomic,readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-
-
-
 
 
 @property (retain, nonatomic) NSNumber* rank1;
