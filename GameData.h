@@ -35,6 +35,7 @@
 @property (assign, nonatomic) NSMutableArray *hiScores;
 
 @property (assign, nonatomic) int bombCount;
+@property (assign,nonatomic) int bladeCount;
 
 @property (assign, nonatomic) int tableID;
 

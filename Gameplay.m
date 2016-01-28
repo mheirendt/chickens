@@ -13,6 +13,8 @@
 #import "Gameplay.h"
 #import "CCPhysics+ObjectiveChipmunk.h"
 #import "GameData.h"
+#import "TableView.h"
+#import "AlertView.h"
 // -----------------------------------------------------------------
 
 @implementation Gameplay{
@@ -51,7 +53,12 @@
     CCLabelTTF *_shoppingLabel;
     CCSprite *_gold;
     CCLabelTTF *_goldCount;
+    CCButton *buyBlades;
+    CCSprite *bladeCost1;
+    CCSprite *bladeCost2;
+    CCLabelTTF *bladeCostLabel;
     
+    //TableView *table;
     
     
     CCLabelTTF *rank;
@@ -61,9 +68,25 @@
     CCProgressNode *_progress;
     CCLabelTTF *nextRound;
     
+    CGPoint _startPoint;
+    CGPoint _endPoint;
+    
+    CCNode *blade;
+    CCMotionStreak *streak;
+    int timeRemain;
+    int bladeActive;
+    CCButton *bladeButton;
+    CCLabelTTF *timer;
+    CCLabelTTF *bladeCount;
+    
     int gameCurrency;
     
     int exp;
+    
+    //alertView vars
+    CCButton *okayButton;
+    CCButton *goToStoreButton;
+    CCLabelTTF *message;
 }
 // -----------------------------------------------------------------
 + (instancetype)node
@@ -78,6 +101,7 @@
     _timeSinceLastCollision= 0.0;
     return self;
 }
+
 
 - (void)didLoadFromCCB {
     self.userInteractionEnabled = TRUE;
@@ -100,22 +124,38 @@
     _barn.physicsBody.collisionType=@"Barn";
     
     [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+    [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
     
-    CCSprite *sprite = [CCSprite spriteWithImageNamed:@"Assets/_100.png"];
+    CCSprite *sprite = [CCSprite spriteWithImageNamed:@"Assets/progressBarn.png"];
     _progressNode = [CCProgressNode progressWithSprite:sprite];
     _progressNode.type = CCProgressNodeTypeBar;
     _progressNode.midpoint = ccp(0.0f, 0.0f);
     _progressNode.barChangeRate = ccp(1.0f, 0.0f);
     _progressNode.percentage = 100.0f;
-    _progressNode.zOrder = 100001;
+    //_progressNode.zOrder = 100001;
+    
+    CCSprite *base1 = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
+    base1.positionType = CCPositionTypeNormalized;
+    base1.position = ccp(0.12f, 0.05f);
+    [self addChild:base1];
     
     _progressNode.positionType = CCPositionTypeNormalized;
-    _progressNode.position = ccp(0.12f, 0.1f);
+    _progressNode.position = ccp(0.12f, 0.05f);
     [self addChild:_progressNode];
+    
+    
+    CCTexture *texture = [CCTexture textureWithFile:@"Back.png"];
+    streak = [CCMotionStreak streakWithFade:.5f minSeg:.5f width:10.f color:[CCColor colorWithCcColor3b:ccYELLOW] texture:texture];
+    //CCMotionStreak *streak = [CCMotionStreak streakWithFade:.5f minSeg:5.f width:10.f color: [CCColor colorWithCcColor3b:ccYELLOW] textureFilename:@"Assets/2.png"];
+     [self addChild:streak];
+    streak.position = _endPoint;
+    
+    blade = [CCBReader load:@"Bullet"];
+    blade.visible = false;
+    blade.scale = .6;
 
 }
-//x:526.000000(568), y:104.000000
-////Automate addition of a canon to be added at later rounds
+
 
 -(void)addChicken:(float)x y:(float)y androtation:(float)rotation andMoveToX:(float)movex andMoveToY:(float)movey{
     CCNode* chicken = [CCBReader load:@"Canon"];
@@ -177,6 +217,22 @@
 }
 -(void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Bullet:(CCNode *)nodeA Gold:(CCNode *)nodeB{
         [[_physicsNode space] addPostStepBlock:^{
+            NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+            NSFetchRequest *request = [[NSFetchRequest alloc] init];
+            [request setEntity:entity];
+            NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                                     stringForKey:@"defaultUser"];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+            [request setPredicate:predicate];
+            NSError *error2 = nil;
+            Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+            int newAmount = person.gold.intValue + 1;
+            [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
+            if (![person.managedObjectContext save:&error2]) {
+                NSLog(@"Unable to save managed object context.");
+                NSLog(@"%@, %@", error2, error2.localizedDescription);
+            }
+            
             gameCurrency++;
             nodeB.positionType = CCPositionTypeNormalized;
             nodeB.physicsBody.sensor = true;
@@ -192,38 +248,182 @@
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
     if (self.userInteractionEnabled){
         shotCount ++;
-        CGPoint touchLocation = [touch locationInNode:self];
+        _startPoint = [touch locationInNode:self];
+        _endPoint = [touch locationInNode:self];;
         CCNode* bullet = [CCBReader load:@"Bullet"];
         bullet.visible = false;
         bullet.scale = .6;
-        bullet.position = touchLocation;
+        bullet.position = _startPoint;
         [_physicsNode addChild:bullet];
         CCActionRemove *actionRemove = [CCActionRemove action];
         id delay = [CCActionDelay actionWithDuration:.000001f];
         [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
+        [_physicsNode addChild:blade];
+    }
+}
+-(void)timerUpdate:(CCTime)delta
+{
+    timeRemain--;
+    [timer setString:[NSString stringWithFormat:@"%d",timeRemain]];
+    if (timeRemain <=3){
+        timer.color = [CCColor colorWithCcColor3b:ccRED];
+        CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.5f];
+        CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+        [timer runAction:[CCActionSequence actions:fade,fadeOut,nil]];
+    }
+    if(timeRemain == 0){
+        bladeActive = 0;
+        [self removeChild:timer];
+        [self unschedule:@selector(timerUpdate:)];
+        [bladeButton setEnabled:true];
+    }
+    // update timer here, using numSeconds
+}
+-(void)bladePressed{
+    if([GameData sharedGameData].bladeCount >=1){
+    bladeActive = 1;
+    [bladeButton setEnabled:false];
+    timeRemain = 15;
+    
+    timer = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",timeRemain] fontName:@"Helvetica" fontSize:14];
+    timer.positionType = CCPositionTypeUIPoints;
+    timer.position = ccp(289.f,46.f);
+    [self addChild:timer];
+    [GameData sharedGameData].bladeCount--;
+    [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
+    [self schedule:@selector(timerUpdate:) interval:1];
+    }else{
+        CCLOG(@"NEED MO MONEY");
     }
 
 }
+
+-(void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
+    if(bladeActive == 1){
+        CGPoint location = [touch locationInNode:self];
+        _endPoint = location;
+        CCLOG(@"%f, %f",_endPoint.x, _endPoint.y);
+        //blade = [CCBReader load:@"Bullet"];
+       // blade.visible = true;
+       // blade.scale = .6;
+        //blade.position = _endPoint;
+        //[_physicsNode addChild:blade];
+        [self doStep:.001f];
+    }
+}
+-(void)touchEnded:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
+    //if(blade.parent == _physicsNode){
+    if (blade){
+        [_physicsNode removeChild:blade];
+    }
+        //[_physicsNode removeChild:blade];
+    //}
+}
+-(void)touchCancelled:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
+    //if(blade.parent == _physicsNode){
+    if (blade){
+        [_physicsNode removeChild:blade];
+    }
+    //}
+}
+- (void)doStep:(CCTime)delta
+{
+    //update the position
+    blade.position = _endPoint;
+    [streak setPosition:_endPoint];
+}
+/*
+// Add this method
+- (void)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    for (UITouch *touch in touches){
+        CGPoint location = [touch locationInView:[touch view]];
+        location = [[CCDirector sharedDirector] convertToGL:location];
+        _endPoint = location;
+        CCLOG(@"%f, %f",_endPoint.x, _endPoint.y);
+    }
+}
+ */
 -(void)bombPurchased{
-    if (gameCurrency>=1){
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                                 stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    if(person.gold.intValue>=1){
+        int newAmount = person.gold.intValue - 1;
+        [_nukes setString:[NSString stringWithFormat:@"%d",person.gold.intValue]];
+        [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
         [GameData sharedGameData].bombCount++;
-        gameCurrency-=1;
         [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
-        [_goldCount setString:[NSString stringWithFormat:@"X %d", gameCurrency]];
+        [_goldCount setString:[NSString stringWithFormat:@"X %d", person.gold.intValue]];
+        if (![person.managedObjectContext save:&error2]) {
+            NSLog(@"Unable to save managed object context.");
+            NSLog(@"%@, %@", error2, error2.localizedDescription);
+        }
     }
     else{
-        CCLOG(@"NEED MORE MONEY");
+        CCLOG(@"NEED MO MONEY");
     }
 }
 -(void)repairPurchased{
-    if (gameCurrency>=2){
-        gameCurrency-=2;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    if(person.gold.intValue >=2){
+        int newAmount = person.gold.intValue - 2;
+        [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
         _progressNode.percentage = 100.f;
         _health = 100.f;
-        [_goldCount setString:[NSString stringWithFormat:@"X %d", gameCurrency]];
+        [_goldCount setString:[NSString stringWithFormat:@"X %d", person.gold.intValue]];
+        if (![person.managedObjectContext save:&error2]) {
+            NSLog(@"Unable to save managed object context.");
+            NSLog(@"%@, %@", error2, error2.localizedDescription);
+        }
     }
     else{
         CCLOG(@"NEED MORE MONEY");
+    }
+    
+}
+-(void)bladePurchased{
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    if(person.gold.intValue >=2){
+        int newAmount = person.gold.intValue - 2;
+        [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
+        [GameData sharedGameData].bladeCount++;
+        [bladeCount setString:[NSString stringWithFormat:@"%d", [GameData sharedGameData].bladeCount]];
+        [bladeCostLabel setString:[NSString stringWithFormat:@"%d", [GameData sharedGameData].bladeCount]];
+        [_goldCount setString:[NSString stringWithFormat:@"X %d", person.gold.intValue]];
+        if (![person.managedObjectContext save:&error2]) {
+            NSLog(@"Unable to save managed object context.");
+            NSLog(@"%@, %@", error2, error2.localizedDescription);
+        }
+    }
+    else{
+        id block = ^(void){
+            CCLOG(@"OKAY");
+        };
+        //AlertView *alert = [AlertView ];
+        [AlertView ShowAlert:@"You do not have enough gold!" onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
     
 }
@@ -322,8 +522,8 @@
                 break;
             }
             case 4:{
-                int minTime = .6f * 1000;
-                int maxTime = 1.2f * 1000;
+                int minTime = .5f * 1000;
+                int maxTime = 1.f * 1000;
                 int rangeTime = maxTime - minTime;
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
@@ -333,8 +533,8 @@
                 break;
             }
             case 5:{
-                int minTime = .5f * 1000;
-                int maxTime = 8.f * 1000;
+                int minTime = .4f * 1000;
+                int maxTime = .6f * 1000;
                 int rangeTime = maxTime - minTime;
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
@@ -424,23 +624,23 @@
         CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
         [self rewardMedal:triple andLabel:@"10" andExp:10];
     }
-    if (killCount == 9){
+    if (killCount == 19){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
         [self rewardMedal:spree andLabel:@"Killing Spree" andExp:5];
     }
-    else if (killCount == 19){
+    else if (killCount == 39){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
         [self rewardMedal:spree andLabel:@"Killing Frenzy" andExp:5];
     }
-    else if (killCount ==29){
+    else if (killCount ==59){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
         [self rewardMedal:spree andLabel:@"Running Riot" andExp:10];
     }
-    else if (killCount == 39){
+    else if (killCount == 79){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
         [self rewardMedal:spree andLabel:@"Psycho" andExp:10];
     }
-    else if (killCount == 49 || ((killCount%49) == 0 && killCount !=0)){
+    else if (killCount == 99 || ((killCount%19) == 0 && killCount!= 0)){
         CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
         [self rewardMedal:spree andLabel:@"Unstoppable" andExp:10];
     }
@@ -661,8 +861,13 @@
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    
     if([input isEqualToString:@"Double Kill"]){
 
         int doubleCount = person.two.intValue;
@@ -687,6 +892,36 @@
         fiveCount++;
         [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"five"];
     }
+    else if ([input isEqualToString:@"6"]){
+        CCLOG(@"6 awarded");
+        int fiveCount = person.six.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"six"];
+    }
+    else if ([input isEqualToString:@"7"]){
+        CCLOG(@"7 awarded");
+        int fiveCount = person.seven.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"seven"];
+    }
+    else if ([input isEqualToString:@"8"]){
+        CCLOG(@"8 awarded");
+        int fiveCount = person.eight.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"eight"];
+    }
+    else if ([input isEqualToString:@"9"]){
+        CCLOG(@"9 awarded");
+        int fiveCount = person.nine.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"nine"];
+    }
+    else if ([input isEqualToString:@"10"]){
+        CCLOG(@"10 awarded");
+        int fiveCount = person.ten.intValue;
+        fiveCount++;
+        [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"ten"];
+    }
     else if ([input isEqualToString:@"Killing Spree"]){
         CCLOG(@"killing spree awarded");
         int twentyCount = person.twenty.intValue;
@@ -705,6 +940,18 @@
         int sixtyCount = person.sixty.intValue;
         sixtyCount++;
         [person setValue:[NSNumber numberWithInt:sixtyCount] forKey:@"sixty"];
+    }
+    else if ([input isEqualToString:@"Psycho"]){
+        CCLOG(@"80 spree");
+        int sixtyCount = person.eighty.intValue;
+        sixtyCount++;
+        [person setValue:[NSNumber numberWithInt:sixtyCount] forKey:@"eighty"];
+    }
+    else if ([input isEqualToString:@"Unstoppable"]){
+        CCLOG(@"100 spree");
+        int sixtyCount = person.hundred.intValue;
+        sixtyCount++;
+        [person setValue:[NSNumber numberWithInt:sixtyCount] forKey:@"hundred"];
     }
     if (![person.managedObjectContext save:&error2]) {
         NSLog(@"Unable to save managed object context.");
@@ -739,7 +986,7 @@
     int randomforce = (arc4random() % rangeforce) + minforce;
     CGPoint force = ccpMult(launchDirection, randomforce);
     [egg.physicsBody applyForce:force];
-    
+    //**
     if(targetsLaunched == 10){
         [self roundComplete];
     }
@@ -763,10 +1010,13 @@
     }
 }
 -(void)roundComplete{
-    [GameData sharedGameData].bombCount++;
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     NSNumber *expSum = [NSNumber numberWithLong:(person.experience.intValue + [GameData sharedGameData].score)];
@@ -776,7 +1026,9 @@
         NSLog(@"%@, %@", error2, error2.localizedDescription);
     }
     CCActionDelay *delay =  [CCActionDelay actionWithDuration:6.f];
+
     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+        
         overlay = [CCBReader load:@"overlay"];
         overlay.anchorPoint = ccp(.5f,.5f);
         overlay.positionType = CCPositionTypeNormalized;
@@ -787,6 +1039,10 @@
         _pauseButton.visible = false;
         _bomb.visible = false;
         roundLabel.visible = false;
+        _bombCount.visible = false;
+        bladeCount.visible = false;
+        timer.visible = false;
+        bladeButton.visible = false;
         
         NSString *string = [NSString stringWithFormat:@"Round %d Complete!", roundCount];
         complete = [CCLabelTTF labelWithString:string fontName:nil fontSize:48];
@@ -809,6 +1065,7 @@
             user = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:22];
             [overlay addChild:user];
             icon = [CCSprite spriteWithImageNamed:@"Rank/a_Recruit.png"];
+            icon.scale = .8f;
             [overlay addChild:icon];
             
             [[GameData sharedGameData] summarizeRank:rank andUser:user andRankIcon:icon];
@@ -822,13 +1079,15 @@
             base.position = ccp(.2f,.65f);
             [overlay addChild:base];
             
-            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-            
             NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
-            [fetchRequest setEntity:entity];
-            
+            NSFetchRequest *request = [[NSFetchRequest alloc] init];
+            [request setEntity:entity];
+            NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                                     stringForKey:@"defaultUser"];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+            [request setPredicate:predicate];
             NSError *error2 = nil;
-            Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:fetchRequest error:&error2] objectAtIndex:0];
+            Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
             
             CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
             _progress = [CCProgressNode progressWithSprite:progress];
@@ -914,16 +1173,27 @@
             
             _nextRoundButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
             _nextRoundButton.positionType = CCPositionTypeNormalized;
-            _nextRoundButton.position = ccp(.5f,.1f);
+            _nextRoundButton.position = ccp(.1f,.1f);
             [_nextRoundButton setTarget:self selector:@selector(_continuePressed)];
             [overlay addChild:_nextRoundButton];
             
             nextRound = [CCLabelTTF labelWithString:@"Ready" fontName:@"Helvetica" fontSize:32];
             nextRound.positionType = CCPositionTypeNormalized;
             nextRound.anchorPoint = ccp(0.0f,.5f);
-            nextRound.position = ccp(.58f,.1f);
+            nextRound.position = ccp(.18f,.1f);
             [overlay addChild:nextRound];
             
+            _upgradesLabel = [CCLabelTTF labelWithString:@"Upgrades" fontName:@"Helvetica" fontSize:28];
+            _upgradesLabel.positionType = CCPositionTypeNormalized;
+            _upgradesLabel.position = ccp(.65f,.7f);
+            [overlay addChild:_upgradesLabel];
+            
+            _costLabel = [CCLabelTTF labelWithString:@"Cost" fontName:@"Helvetica" fontSize:28];
+            _costLabel.positionType = CCPositionTypeNormalized;
+            _costLabel.position = ccp(.85f,.7f);
+            [overlay addChild:_costLabel];
+            
+
             _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
             _repairButton.positionType = CCPositionTypeNormalized;
             _repairButton.position = ccp(.65f,.5f);
@@ -936,27 +1206,17 @@
             [overlay addChild:_repairs];
             
             
-            _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
+            _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nuke.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nukeNil.png"] disabledSpriteFrame:nil];
             _buyBombsButton.positionType = CCPositionTypeNormalized;
             _buyBombsButton.position = ccp(.65f,.3f);
             [_buyBombsButton setTarget:self selector:@selector(bombPurchased)];
             [overlay addChild:_buyBombsButton];
             
-            _nukes = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
+            _nukes = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d", [GameData sharedGameData].bombCount] fontName:@"Helvetica" fontSize:10];
             _nukes.positionType = CCPositionTypeNormalized;
-            _nukes.position = ccp(.65f,.22f);
+            _nukes.position = ccp(.679f,.343f);
             [overlay addChild:_nukes];
-            
-            _upgradesLabel = [CCLabelTTF labelWithString:@"Upgrades" fontName:@"Helvetica" fontSize:28];
-            _upgradesLabel.positionType = CCPositionTypeNormalized;
-            _upgradesLabel.position = ccp(.65f,.7f);
-            [overlay addChild:_upgradesLabel];
-            
-            _costLabel = [CCLabelTTF labelWithString:@"Cost" fontName:@"Helvetica" fontSize:28];
-            _costLabel.positionType = CCPositionTypeNormalized;
-            _costLabel.position = ccp(.85f,.7f);
-            [overlay addChild:_costLabel];
-            
+
             _costBomb = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
             _costBomb.scale = .65f;
              _costBomb.positionType = CCPositionTypeNormalized;
@@ -975,28 +1235,62 @@
             _costRepair2.position = ccp(.867f, .5f);
             [overlay addChild:_costRepair2];
             
+            buyBlades = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/blade.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/bladeNil.png"] disabledSpriteFrame:nil];
+            buyBlades.positionType = CCPositionTypeNormalized;
+            buyBlades.position = ccp(.65f,.1f);
+            buyBlades.scale = 1.1f;
+            [buyBlades setTarget:self selector:@selector(bladePurchased)];
+            [overlay addChild:buyBlades];
+            
+            bladeCostLabel = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d", [GameData sharedGameData].bladeCount] fontName:@"Helvetica" fontSize:10];
+            bladeCostLabel.positionType = CCPositionTypeNormalized;
+            bladeCostLabel.position = ccp(.682f,.142f);
+            [overlay addChild:bladeCostLabel];
+            
+            bladeCost1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            bladeCost1.scale = .65f;
+            bladeCost1.positionType = CCPositionTypeNormalized;
+            bladeCost1.position = ccp(.833f, .1f);
+            [overlay addChild:bladeCost1];
+            
+            bladeCost2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            bladeCost2.scale = .65f;
+            bladeCost2.positionType = CCPositionTypeNormalized;
+            bladeCost2.position = ccp(.867f, .1f);
+            [overlay addChild:bladeCost2];
+            /*
+            [GameData sharedGameData].tableID=4;
+            table = [TableView node];
+            table.contentSizeType = CCSizeTypeNormalized;
+            table.positionType = CCPositionTypeNormalized;
+            table.position = ccp(.6f,-.5f);
+            table.contentSize = CGSizeMake(1, 1);
+            table.zOrder = 1000;
+            [overlay addChild:table];
+             */
+
             _gold = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
             _gold.positionType = CCPositionTypeNormalized;
             _gold.position = ccp(.1f,.4f);
             [overlay addChild:_gold];
             
             
-            _goldCount = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %d", gameCurrency ] fontName:@"Helvetica" fontSize:28];
+            _goldCount = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %d", person.gold.intValue ] fontName:@"Helvetica" fontSize:28];
             _goldCount.positionType = CCPositionTypeNormalized;
             _goldCount.position = ccp(.2f,.4f);
             [overlay addChild:_goldCount];
             
             _shopping = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Shop.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/ShopPressed.png"] disabledSpriteFrame:nil];
             _shopping.positionType = CCPositionTypeNormalized;
-            _shopping.position = ccp(.1f,.18f);
+            _shopping.position = ccp(.5f,.1f);
             [_shopping setTarget:self selector:@selector(armoryPressed)];
             [overlay addChild:_shopping];
             
             _shoppingLabel = [CCLabelTTF labelWithString:@"Armory" fontName:@"Helvetica" fontSize:14];
             _shoppingLabel.positionType = CCPositionTypeNormalized;
-            _shoppingLabel.position = ccp(.2f,.18f);
+            _shoppingLabel.position = ccp(.5f,.025f);
             [overlay addChild:_shoppingLabel];
-            
+             
             
         }];
         CCActionDelay *delay3 = [CCActionDelay actionWithDuration:2.2f];
@@ -1004,7 +1298,62 @@
         roundCount++;
         overlay.visible = true;
     }];
-    [self runAction:[CCActionSequence actions:delay, block, nil]];
+    CCActionCallBlock *awardBlock = [CCActionCallBlock actionWithBlock:^{
+        int min = 1;
+        int max = 4;
+        int range = max - min;
+        int random = (arc4random() % range) + min;
+        CCLOG(@"%d",random);
+        switch (random){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:{
+                [GameData sharedGameData].bombCount++;
+                CCSprite *bonus = [CCSprite spriteWithImageNamed:@"Assets/nuke.png"];
+                bonus.positionType = CCPositionTypeNormalized;
+                bonus.position = ccp(.5f,.5f);
+                bonus.opacity = 0.f;
+                [self addChild:bonus];
+                CCActionFadeIn *fadeIn =[CCActionFadeIn actionWithDuration:.5f];
+                CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+                CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
+                CCActionRemove *actionRemove = [CCActionRemove action];
+                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:28];
+                label.positionType = CCPositionTypeNormalized;
+                label.position = ccp(.6f,.5f);
+                label.opacity = 0.f;
+                [self addChild:label];
+                [label runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                [bonus runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                
+                break;
+            }
+            case 4:{
+                [GameData sharedGameData].bladeCount++;
+                CCSprite *bonus = [CCSprite spriteWithImageNamed:@"Assets/blade.png"];
+                bonus.positionType = CCPositionTypeNormalized;
+                bonus.position = ccp(.5f,.5f);
+                [self addChild:bonus];
+                CCActionFadeIn *fadeIn =[CCActionFadeIn actionWithDuration:.5f];
+                CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+                CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
+                CCActionRemove *actionRemove = [CCActionRemove action];
+                
+                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:28];
+                label.positionType = CCPositionTypeNormalized;
+                label.position = ccp(.6f,.5f);
+                label.opacity = 0.f;
+                [self addChild: label];
+                [label runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                [bonus runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                break;
+            }
+        }
+    }];
+    CCActionDelay *shortDelay = [CCActionDelay actionWithDuration:1.6f];
+    [self runAction:[CCActionSequence actions:delay, awardBlock, shortDelay, block, nil]];
 }
 -(void)_continuePressed{
     self.userInteractionEnabled = true;
@@ -1023,6 +1372,10 @@
     [overlay removeChild:_costBomb];
     [overlay removeChild:_costRepair1];
     [overlay removeChild:_costRepair2];
+    [overlay removeChild:bladeCost1];
+    [overlay removeChild:bladeCost2];
+    [overlay removeChild:buyBlades];
+    [overlay removeChild:bladeCostLabel];
     [overlay removeChild:_gold];
     [overlay removeChild:_goldCount];
     [overlay removeChild: _shopping];
@@ -1031,6 +1384,10 @@
     _pauseButton.visible = true;
     _bomb.visible = true;
     roundLabel.visible = true;
+    _bombCount.visible = true;
+    bladeCount.visible = true;
+    bladeButton.visible = true;
+    timer.visible = true;
 
     NSString *text = [NSString stringWithFormat:@"%d", roundCount];
     [self newRound:text];

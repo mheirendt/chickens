@@ -63,9 +63,19 @@
     
     [GameData sharedGameData].highScore = MAX([GameData sharedGameData].score,
                                                 [GameData sharedGameData].highScore);
+   /* NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSError *error2 = nil;
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    */
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     NSNumber *highScore = [NSNumber numberWithLong:[GameData sharedGameData].score];
@@ -97,6 +107,8 @@
     [[CCDirector sharedDirector] popScene];
     CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
     [[CCDirector sharedDirector] pushScene:game];
+    [GameData sharedGameData].bladeCount = 0;
+    [GameData sharedGameData].bombCount = 0;
 }
 -(void)backPressed{
     [[GameData sharedGameData] reset];

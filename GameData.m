@@ -26,6 +26,7 @@
 @synthesize rank = _rank;
 
 @synthesize bombCount;
+@synthesize bladeCount;
 
 @synthesize tableID;
 
@@ -85,6 +86,8 @@
 -(void)reset
 {
     self.score = 0;
+    self.bombCount = 0;
+    self.bladeCount = 0;
 }
 
 -(void)summarizeRank:(CCLabelTTF *)rank andUser:(CCLabelTTF*) user andRankIcon:(CCSprite*)icon{
@@ -98,9 +101,10 @@
     
     icon.positionType = CCPositionTypeNormalized;
     icon.anchorPoint = ccp(.5f,1);
+    icon.scale = .8f;
     icon.position=(ccp(.1f,.81f));
     
-    
+  /*
     self.rank1 = [NSNumber numberWithInt:300];
     self.rank2 = [NSNumber numberWithInt:600];
     self.rank3 = [NSNumber numberWithInt:1000];
@@ -125,6 +129,31 @@
     self.rank22 = [NSNumber numberWithInt:1000000];
     self.rank23 = [NSNumber numberWithInt:1500000];
     self.rank24 = [NSNumber numberWithInt:2000000];
+   */
+    self.rank1 = [NSNumber numberWithInt:1];
+    self.rank2 = [NSNumber numberWithInt:2];
+    self.rank3 = [NSNumber numberWithInt:3];
+    self.rank4 = [NSNumber numberWithInt:4];
+    self.rank5 = [NSNumber numberWithInt:5];
+    self.rank6 = [NSNumber numberWithInt:6];
+    self.rank7 = [NSNumber numberWithInt:7];
+    self.rank8 = [NSNumber numberWithInt:8];
+    self.rank9 = [NSNumber numberWithInt:9];
+    self.rank10 = [NSNumber numberWithInt:10];
+    self.rank11 = [NSNumber numberWithInt:11];
+    self.rank12 = [NSNumber numberWithInt:12];
+    self.rank13 = [NSNumber numberWithInt:13];
+    self.rank14 = [NSNumber numberWithInt:14];
+    self.rank15 = [NSNumber numberWithInt:15];
+    self.rank16 = [NSNumber numberWithInt:16];
+    self.rank17 = [NSNumber numberWithInt:17];
+    self.rank18 = [NSNumber numberWithInt:18];
+    self.rank19 = [NSNumber numberWithInt:19];
+    self.rank20 = [NSNumber numberWithInt:20];
+    self.rank21 = [NSNumber numberWithInt:21];
+    self.rank22 = [NSNumber numberWithInt:22];
+    self.rank23 = [NSNumber numberWithInt:23];
+    self.rank24 = [NSNumber numberWithInt:24];
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];

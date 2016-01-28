@@ -52,6 +52,25 @@
     NSString * userName = sender.string;
     return userName;
 }
+-(void)onEnter{
+    [super onEnter];
+    CCLOG(@"%d", [GameData sharedGameData].tableID);
+    if([GameData sharedGameData].tableID == 3){
+        CCButton *back = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Back.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BackPressed.png"] disabledSpriteFrame:nil];
+        back.positionType = CCPositionTypeNormalized;
+        back.position = ccp(.065f, .13f);
+        [back setTarget:self selector:@selector(backPressed)];
+        [self addChild:back];
+        
+        CCLabelTTF *label = [CCLabelTTF labelWithString:@"Cancel" fontName:@"Helvetica" fontSize:14];
+        label.positionType = CCPositionTypeNormalized;
+        label.position = ccp(.065f, .04f);
+        [self addChild:label];
+    }
+}
+-(void)backPressed{
+    [[CCDirector sharedDirector] popScene];
+}
 
 -(void)createPressed{
     //NSString *containerForTextFieldValue = _profileText.textField.text;
@@ -108,10 +127,13 @@
             [[CCDirector sharedDirector] replaceScene: mainScene];
         }
     else{
+        
         CCScene *mainScene = [CCBReader loadAsScene:@"MainScene"];
         [[CCDirector sharedDirector] replaceScene: mainScene];
             CCScene *gameplayScene = [CCBReader loadAsScene:@"Gameplay"];
             [[CCDirector sharedDirector] pushScene:gameplayScene];
+         
+        //[[CCDirector sharedDirector] popScene];
         }
     }
 

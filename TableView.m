@@ -61,7 +61,7 @@
 }
 -(void)createUser{
     CCScene *gameplayScene = [CCBReader loadAsScene:@"SignIn"];
-    [[CCDirector sharedDirector] replaceScene:gameplayScene];
+    [[CCDirector sharedDirector] pushScene:gameplayScene];
 }
 
 
@@ -748,6 +748,138 @@
             [cell addChild:lbl];
         }
          */
+    }
+    else if ([GameData sharedGameData].tableID == 4){
+        amount = 4;
+        if(index == 1){
+            CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
+            _repairButton.positionType = CCPositionTypeNormalized;
+            _repairButton.anchorPoint = CGPointZero;
+            _repairButton.position = ccp(0.f,.2f);
+            //cell.contentSize = _repairButton.contentSize;
+            _rowHeight = cell.contentSize.height;
+            [_repairButton setTarget:self selector:@selector(repairPurchased)];
+            [cell addChild:_repairButton];
+            
+            CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
+            _repairs.positionType = CCPositionTypeNormalized;
+            _repairs.anchorPoint = CGPointZero;
+            _repairs.position = ccp(0.f,0.f);
+            [cell addChild:_repairs];
+            
+            CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costRepair1.scale = .7f;
+            _costRepair1.anchorPoint = CGPointZero;
+            _costRepair1.positionType = CCPositionTypeNormalized;
+            cell.contentSize = _costRepair1.contentSize;
+            _costRepair1.position = ccp(2.2f, 0.2f);
+            [cell addChild:_costRepair1];
+            
+            CCSprite *_costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costRepair2.scale = .75f;
+            _costRepair2.anchorPoint = CGPointZero;
+            _costRepair2.positionType = CCPositionTypeNormalized;
+            _costRepair2.position = ccp(2.7f, 0.2f);
+            [cell addChild:_costRepair2];
+        }
+        else if (index == 2){
+            CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
+            _repairButton.positionType = CCPositionTypeNormalized;
+            _repairButton.anchorPoint = CGPointZero;
+            _repairButton.position = ccp(0.f,.2f);
+            //cell.contentSize = _repairButton.contentSize;
+            _rowHeight = cell.contentSize.height;
+            [_repairButton setTarget:self selector:@selector(bombPurchased)];
+            [cell addChild:_repairButton];
+            
+            CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
+            _repairs.positionType = CCPositionTypeNormalized;
+            _repairs.anchorPoint = CGPointZero;
+            _repairs.position = ccp(0.f,0.f);
+            [cell addChild:_repairs];
+            
+            CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+            _costRepair1.scale = .75f;
+            _costRepair1.anchorPoint = CGPointZero;
+            _costRepair1.positionType = CCPositionTypeNormalized;
+            cell.contentSize = _costRepair1.contentSize;
+            _costRepair1.position = ccp(2.45f, 0.2f);
+            [cell addChild:_costRepair1];
+        }
+            if(index == 3){
+                CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
+                _repairButton.positionType = CCPositionTypeNormalized;
+                _repairButton.anchorPoint = CGPointZero;
+                _repairButton.position = ccp(0.f,.2f);
+                //cell.contentSize = _repairButton.contentSize;
+                _rowHeight = cell.contentSize.height;
+                [_repairButton setTarget:self selector:@selector(repairPurchased)];
+                [cell addChild:_repairButton];
+                
+                CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
+                _repairs.positionType = CCPositionTypeNormalized;
+                _repairs.anchorPoint = CGPointZero;
+                _repairs.position = ccp(0.f,0.f);
+                [cell addChild:_repairs];
+                
+                CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+                _costRepair1.scale = .7f;
+                _costRepair1.anchorPoint = CGPointZero;
+                _costRepair1.positionType = CCPositionTypeNormalized;
+                cell.contentSize = _costRepair1.contentSize;
+                _costRepair1.position = ccp(2.2f, 0.2f);
+                [cell addChild:_costRepair1];
+                
+                CCSprite *_costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+                _costRepair2.scale = .75f;
+                _costRepair2.anchorPoint = CGPointZero;
+                _costRepair2.positionType = CCPositionTypeNormalized;
+                _costRepair2.position = ccp(2.7f, 0.2f);
+                [cell addChild:_costRepair2];
+            }
+        /*
+         _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
+         _repairButton.positionType = CCPositionTypeNormalized;
+         _repairButton.position = ccp(.65f,.5f);
+         [_repairButton setTarget:self selector:@selector(repairPurchased)];
+         [overlay addChild:_repairButton];
+         
+         _repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
+         _repairs.positionType = CCPositionTypeNormalized;
+         _repairs.position = ccp(.65f,.42f);
+         [overlay addChild:_repairs];
+         
+         
+         _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
+         _buyBombsButton.positionType = CCPositionTypeNormalized;
+         _buyBombsButton.position = ccp(.65f,.3f);
+         [_buyBombsButton setTarget:self selector:@selector(bombPurchased)];
+         [overlay addChild:_buyBombsButton];
+         
+         _nukes = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
+         _nukes.positionType = CCPositionTypeNormalized;
+         _nukes.position = ccp(.65f,.22f);
+         [overlay addChild:_nukes];
+         
+         _costBomb = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+         _costBomb.scale = .65f;
+         _costBomb.positionType = CCPositionTypeNormalized;
+         _costBomb.position = ccp(.85f, .3f);
+         [overlay addChild:_costBomb];
+         
+         _costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+         _costRepair1.scale = .65f;
+         _costRepair1.positionType = CCPositionTypeNormalized;
+         _costRepair1.position = ccp(.833f, .5f);
+         [overlay addChild:_costRepair1];
+         
+         _costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
+         _costRepair2.scale = .65f;
+         _costRepair2.positionType = CCPositionTypeNormalized;
+         _costRepair2.position = ccp(.867f, .5f);
+         [overlay addChild:_costRepair2];
+         */
+
     }
     
     return cell;

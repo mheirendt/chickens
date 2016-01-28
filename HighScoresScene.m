@@ -138,7 +138,7 @@
 
 -(void)rankPressed{
     [GameData sharedGameData].tableID = 2;
-    CCScene *gameplayScene = [CCBReader loadAsScene:@"Medals"];
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"RankScene"];
     [[CCDirector sharedDirector] pushScene:gameplayScene];
 }
 -(void)viewUsers{

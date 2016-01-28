@@ -180,7 +180,7 @@
 						<key>value</key>
 						<array>
 							<real>31</real>
-							<real>36.6116943359375</real>
+							<real>35.6116943359375</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -544,6 +544,8 @@
 				</array>
 			</dict>
 		</array>
+		<key>selected</key>
+		<true/>
 	</dict>
 	<key>notes</key>
 	<array/>

@@ -87,6 +87,8 @@
 		</dict>
 		<key>Assets/_100.png</key>
 		<dict/>
+		<key>Assets/dialogBox-hd.png</key>
+		<dict/>
 		<key>Rank</key>
 		<dict>
 			<key>isSmartSpriteSheet</key>

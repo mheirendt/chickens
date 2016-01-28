@@ -47,6 +47,7 @@
 -(void)armoryPressed;
 -(void)bombPurchased;
 -(void)repairPurchased;
+-(void)bladePressed;
 // -----------------------------------------------------------------
 
 @end

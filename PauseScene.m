@@ -51,7 +51,7 @@
     [[CCDirector sharedDirector] popScene];
 }
 -(void)restartPressed{
-    [[GameData sharedGameData]reset];
+    [[GameData sharedGameData] reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];
     CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
