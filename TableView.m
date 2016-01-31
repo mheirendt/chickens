@@ -555,332 +555,38 @@
         
         [cell addChild:count];
         }
+    else if (index == 16){
+        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/Perfect.png"];
+        icon.anchorPoint = CGPointZero;
+        cell.contentSize = icon.contentSize;
+        [cell addChild:icon];
+        
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Perfect Round"] fontName:@"HelveticaNeue" fontSize:18];
+        lbl.anchorPoint = CGPointZero;
+        lbl.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        lbl.position = ccp(1.3f,.5f);
+        
+        [cell addChild:lbl];
+        
+        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Don't miss a single egg"] fontName:@"HelveticaNeue" fontSize:14];
+        desc.anchorPoint = CGPointZero;
+        desc.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        desc.position = ccp(1.3f,.1f);
+        
+        [cell addChild:desc];
+        
+        CCLabelTTF* count = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %@", [person1 valueForKey:@"perfect"]] fontName:@"HelveticaNeue" fontSize:22];
+        count.anchorPoint = CGPointZero;
+        count.positionType = CCPositionTypeNormalized;
+        //lbl.position = ccp(70, 20);
+        count.position = ccp(7.f,.2f);
+        
+        [cell addChild:count];
     }
-    
-    
-    
-    else if ([GameData sharedGameData].tableID == 2){
-        amount = 25;
-        int rank = person1.rank.intValue;
-        if (index == 1){
-                CCSprite* icon = [CCSprite spriteWithImageNamed:@"Rank/a_Recruit.png"];
-                icon.anchorPoint = CGPointZero;
-                icon.scale = .5f;
-                cell.contentSize = icon.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [cell addChild:icon];
-                
-                CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Recruit"] fontName:@"HelveticaNeue" fontSize:18];
-                lbl.anchorPoint = CGPointZero;
-                lbl.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                lbl.position = ccp(.75f,.3f);
-                
-                [cell addChild:lbl];
-                
-                CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"You are a Recruit"] fontName:@"HelveticaNeue" fontSize:14];
-                desc.anchorPoint = CGPointZero;
-                desc.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                desc.position = ccp(.75f,.1f);
-                
-                [cell addChild:desc];
-                
-            }
-        else if (index == 2){
-            if (rank >=1){
-                CCSprite* icon = [CCSprite spriteWithImageNamed:@"Rank/aa_Private.png"];
-                icon.anchorPoint = CGPointZero;
-                icon.scale = .5f;
-                cell.contentSize = icon.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [cell addChild:icon];
-            
-                CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Private"] fontName:@"HelveticaNeue" fontSize:18];
-                lbl.anchorPoint = CGPointZero;
-                lbl.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                lbl.position = ccp(.75f,.3f);
-            
-                [cell addChild:lbl];
-            
-                CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"You are a Private"] fontName:@"HelveticaNeue" fontSize:14];
-                desc.anchorPoint = CGPointZero;
-                desc.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                desc.position = ccp(.75f,.1f);
-            
-                [cell addChild:desc];
-            
-            }
-            else{
-                CCSprite* icon = [CCSprite spriteWithImageNamed:@"Rank/aa_Private.png"];
-                icon.anchorPoint = CGPointZero;
-                icon.scale = .5f;
-                cell.contentSize = icon.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [cell addChild:icon];
-                
-                CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Locked"] fontName:@"HelveticaNeue" fontSize:18];
-                lbl.anchorPoint = CGPointZero;
-                lbl.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                lbl.position = ccp(.75f,.5f);
-                
-                [cell addChild:lbl];
-            }
-        }
-        else if (index == 3){
-            if (rank >=1){
-                CCSprite* icon = [CCSprite spriteWithImageNamed:@"Rank/b_Private First Class.png"];
-                icon.anchorPoint = CGPointZero;
-                icon.scale = .5f;
-                cell.contentSize = icon.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [cell addChild:icon];
-                
-                CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Private First Class"] fontName:@"HelveticaNeue" fontSize:18];
-                lbl.anchorPoint = CGPointZero;
-                lbl.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                lbl.position = ccp(.75f,.3f);
-                
-                [cell addChild:lbl];
-                
-                CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"You are a Private First Class"] fontName:@"HelveticaNeue" fontSize:14];
-                desc.anchorPoint = CGPointZero;
-                desc.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                desc.position = ccp(.75f,.1f);
-                
-                [cell addChild:desc];
-            }
-            else{
-                CCSprite* icon = [CCSprite spriteWithImageNamed:@"Rank/aa_Private.png"];
-                icon.anchorPoint = CGPointZero;
-                icon.scale = .5f;
-                cell.contentSize = icon.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [cell addChild:icon];
-                
-                CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Locked"] fontName:@"HelveticaNeue" fontSize:18];
-                lbl.anchorPoint = CGPointZero;
-                lbl.positionType = CCPositionTypeNormalized;
-                //lbl.position = ccp(70, 20);
-                lbl.position = ccp(1.3f,.5f);
-                
-                [cell addChild:lbl];
-            }
-        }
     }
-    else if ([GameData sharedGameData].tableID == 3){
-        if (index == 1){
-            Person *person11 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:0];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person11.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 2){
-            Person *person2 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:1];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person2.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 3){
-            Person *person3 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:2];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person3.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 4){
-            Person *person4 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:3];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person4.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 5){
-            Person *person5 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:4];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person5.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 6){
-            Person *person6 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:5];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person6.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        else if (index == 7){
-            Person *person7 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:6];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person7.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-        /*
-        else if (index == 8){
-            Person *person8 = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request1 error:&error2] objectAtIndex:7];
-            CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%@", person8.name] fontName:@"HelveticaNeue" fontSize:32];
-            lbl.positionType = CCPositionTypeNormalized;
-            //lbl.position = ccp(70, 20);
-            lbl.position = ccp(.5f,.4f);
-            cell.contentSize = lbl.contentSize;
-            [cell addChild:lbl];
-        }
-         */
-    }
-    else if ([GameData sharedGameData].tableID == 4){
-        amount = 4;
-        if(index == 1){
-            CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
-            _repairButton.positionType = CCPositionTypeNormalized;
-            _repairButton.anchorPoint = CGPointZero;
-            _repairButton.position = ccp(0.f,.2f);
-            //cell.contentSize = _repairButton.contentSize;
-            _rowHeight = cell.contentSize.height;
-            [_repairButton setTarget:self selector:@selector(repairPurchased)];
-            [cell addChild:_repairButton];
-            
-            CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
-            _repairs.positionType = CCPositionTypeNormalized;
-            _repairs.anchorPoint = CGPointZero;
-            _repairs.position = ccp(0.f,0.f);
-            [cell addChild:_repairs];
-            
-            CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-            _costRepair1.scale = .7f;
-            _costRepair1.anchorPoint = CGPointZero;
-            _costRepair1.positionType = CCPositionTypeNormalized;
-            cell.contentSize = _costRepair1.contentSize;
-            _costRepair1.position = ccp(2.2f, 0.2f);
-            [cell addChild:_costRepair1];
-            
-            CCSprite *_costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-            _costRepair2.scale = .75f;
-            _costRepair2.anchorPoint = CGPointZero;
-            _costRepair2.positionType = CCPositionTypeNormalized;
-            _costRepair2.position = ccp(2.7f, 0.2f);
-            [cell addChild:_costRepair2];
-        }
-        else if (index == 2){
-            CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
-            _repairButton.positionType = CCPositionTypeNormalized;
-            _repairButton.anchorPoint = CGPointZero;
-            _repairButton.position = ccp(0.f,.2f);
-            //cell.contentSize = _repairButton.contentSize;
-            _rowHeight = cell.contentSize.height;
-            [_repairButton setTarget:self selector:@selector(bombPurchased)];
-            [cell addChild:_repairButton];
-            
-            CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
-            _repairs.positionType = CCPositionTypeNormalized;
-            _repairs.anchorPoint = CGPointZero;
-            _repairs.position = ccp(0.f,0.f);
-            [cell addChild:_repairs];
-            
-            CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-            _costRepair1.scale = .75f;
-            _costRepair1.anchorPoint = CGPointZero;
-            _costRepair1.positionType = CCPositionTypeNormalized;
-            cell.contentSize = _costRepair1.contentSize;
-            _costRepair1.position = ccp(2.45f, 0.2f);
-            [cell addChild:_costRepair1];
-        }
-            if(index == 3){
-                CCButton *_repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
-                _repairButton.positionType = CCPositionTypeNormalized;
-                _repairButton.anchorPoint = CGPointZero;
-                _repairButton.position = ccp(0.f,.2f);
-                //cell.contentSize = _repairButton.contentSize;
-                _rowHeight = cell.contentSize.height;
-                [_repairButton setTarget:self selector:@selector(repairPurchased)];
-                [cell addChild:_repairButton];
-                
-                CCLabelTTF *_repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
-                _repairs.positionType = CCPositionTypeNormalized;
-                _repairs.anchorPoint = CGPointZero;
-                _repairs.position = ccp(0.f,0.f);
-                [cell addChild:_repairs];
-                
-                CCSprite *_costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-                _costRepair1.scale = .7f;
-                _costRepair1.anchorPoint = CGPointZero;
-                _costRepair1.positionType = CCPositionTypeNormalized;
-                cell.contentSize = _costRepair1.contentSize;
-                _costRepair1.position = ccp(2.2f, 0.2f);
-                [cell addChild:_costRepair1];
-                
-                CCSprite *_costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-                _costRepair2.scale = .75f;
-                _costRepair2.anchorPoint = CGPointZero;
-                _costRepair2.positionType = CCPositionTypeNormalized;
-                _costRepair2.position = ccp(2.7f, 0.2f);
-                [cell addChild:_costRepair2];
-            }
-        /*
-         _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
-         _repairButton.positionType = CCPositionTypeNormalized;
-         _repairButton.position = ccp(.65f,.5f);
-         [_repairButton setTarget:self selector:@selector(repairPurchased)];
-         [overlay addChild:_repairButton];
-         
-         _repairs = [CCLabelTTF labelWithString:@"Repairs" fontName:@"Helvetica" fontSize:14];
-         _repairs.positionType = CCPositionTypeNormalized;
-         _repairs.position = ccp(.65f,.42f);
-         [overlay addChild:_repairs];
-         
-         
-         _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Bomb.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BombPressed.png"] disabledSpriteFrame:nil];
-         _buyBombsButton.positionType = CCPositionTypeNormalized;
-         _buyBombsButton.position = ccp(.65f,.3f);
-         [_buyBombsButton setTarget:self selector:@selector(bombPurchased)];
-         [overlay addChild:_buyBombsButton];
-         
-         _nukes = [CCLabelTTF labelWithString:@"Nukes" fontName:@"Helvetica" fontSize:14];
-         _nukes.positionType = CCPositionTypeNormalized;
-         _nukes.position = ccp(.65f,.22f);
-         [overlay addChild:_nukes];
-         
-         _costBomb = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-         _costBomb.scale = .65f;
-         _costBomb.positionType = CCPositionTypeNormalized;
-         _costBomb.position = ccp(.85f, .3f);
-         [overlay addChild:_costBomb];
-         
-         _costRepair1 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-         _costRepair1.scale = .65f;
-         _costRepair1.positionType = CCPositionTypeNormalized;
-         _costRepair1.position = ccp(.833f, .5f);
-         [overlay addChild:_costRepair1];
-         
-         _costRepair2 = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
-         _costRepair2.scale = .65f;
-         _costRepair2.positionType = CCPositionTypeNormalized;
-         _costRepair2.position = ccp(.867f, .5f);
-         [overlay addChild:_costRepair2];
-         */
 
-    }
     
     return cell;
 }
@@ -909,7 +615,7 @@
         return count+1;
     }
      */
-    return 16;
+    return 17;
 }
 
 // -----------------------------------------------------------------

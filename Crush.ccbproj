@@ -84,10 +84,10 @@
 			<true/>
 			<key>isSmartSpriteSheet</key>
 			<true/>
+			<key>trimSprites</key>
+			<true/>
 		</dict>
 		<key>Assets/_100.png</key>
-		<dict/>
-		<key>Assets/dialogBox-hd.png</key>
 		<dict/>
 		<key>Rank</key>
 		<dict>

@@ -80,6 +80,9 @@
     if (userName.length == 0){
         CCLOG(@"fail");
     }
+    else if (userName.length > 16){
+        CCLOG(@"too long");
+    }
     else{
     
         /*
@@ -123,8 +126,10 @@
         [[NSUserDefaults standardUserDefaults] setObject:userName forKey:@"defaultUser"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         if([GameData sharedGameData].tableID){
-            CCScene *mainScene = [CCBReader loadAsScene:@"HighScores"];
-            [[CCDirector sharedDirector] replaceScene: mainScene];
+            //CCScene *mainScene = [CCBReader loadAsScene:@"HighScores"];
+            //[[CCDirector sharedDirector] replaceScene: mainScene];
+            [[CCDirector sharedDirector] popScene];
+            [[CCDirector sharedDirector] popScene];
         }
     else{
         

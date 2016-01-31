@@ -143,7 +143,7 @@
 }
 -(void)viewUsers{
     [GameData sharedGameData].tableID = 3;
-    CCScene *gameplayScene = [CCBReader loadAsScene:@"Medals"];
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"UsersTable"];
     [[CCDirector sharedDirector] pushScene:gameplayScene];
 }
 

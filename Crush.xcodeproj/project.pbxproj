@@ -78,10 +78,18 @@
 		A9A44A171C378E9D00E1FA40 /* HighScoresScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A161C378E9D00E1FA40 /* HighScoresScene.m */; };
 		A9A44A1A1C378EF800E1FA40 /* MedalsScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A191C378EF800E1FA40 /* MedalsScene.m */; };
 		A9A44A201C38732900E1FA40 /* PauseScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A1F1C38732900E1FA40 /* PauseScene.m */; };
-		A9D4B0521C58380A0084241A /* iPhone@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A9D4B0511C58380A0084241A /* iPhone@2x.png */; };
 		A9D4B0581C58591D0084241A /* AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0571C58591D0084241A /* AlertView.m */; };
 		A9D4B05B1C58618C0084241A /* RankTable.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B05A1C58618C0084241A /* RankTable.m */; };
 		A9D4B05E1C586ED80084241A /* Ranks.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B05D1C586ED80084241A /* Ranks.m */; };
+		A9D4B06D1C5AF0110084241A /* Users.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B06C1C5AF0100084241A /* Users.m */; };
+		A9D4B0711C5AF0200084241A /* UsersTable.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0701C5AF0200084241A /* UsersTable.m */; };
+		A9D4B0741C5C48E80084241A /* IntroScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0731C5C48E80084241A /* IntroScene.m */; };
+		A9D4B0841C5DA1D90084241A /* iPhone@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A9D4B0831C5DA1D90084241A /* iPhone@2x.png */; };
+		A9D4B0861C5DBD0C0084241A /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9D4B0851C5DBD0C0084241A /* MediaPlayer.framework */; };
+		A9D4B08A1C5DC12B0084241A /* CCVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0881C5DC12B0084241A /* CCVideoPlayer.m */; };
+		A9D4B0A01C5DC5470084241A /* intro.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A9D4B09F1C5DC5470084241A /* intro.mp4 */; };
+		A9D4B0A61C5DC7390084241A /* CCVideoPlayerImpliOS.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0A31C5DC7390084241A /* CCVideoPlayerImpliOS.m */; };
+		A9D4B0A71C5DC7390084241A /* videoOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0A51C5DC7390084241A /* videoOverlayView.m */; };
 		B71F5911188484E7003F4D28 /* iPad-old.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5907188484E7003F4D28 /* iPad-old.png */; };
 		B71F5912188484E7003F4D28 /* iPad-old@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5908188484E7003F4D28 /* iPad-old@2x.png */; };
 		B71F5913188484E7003F4D28 /* iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5909188484E7003F4D28 /* iPad.png */; };
@@ -245,13 +253,27 @@
 		A9A44A191C378EF800E1FA40 /* MedalsScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedalsScene.m; sourceTree = "<group>"; };
 		A9A44A1E1C38732900E1FA40 /* PauseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PauseScene.h; sourceTree = "<group>"; };
 		A9A44A1F1C38732900E1FA40 /* PauseScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PauseScene.m; sourceTree = "<group>"; };
-		A9D4B0511C58380A0084241A /* iPhone@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPhone@2x.png"; path = "../../../../../Desktop/App/iPhone@2x.png"; sourceTree = "<group>"; };
 		A9D4B0561C58591D0084241A /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		A9D4B0571C58591D0084241A /* AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertView.m; sourceTree = "<group>"; };
 		A9D4B0591C58618B0084241A /* RankTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RankTable.h; sourceTree = "<group>"; };
 		A9D4B05A1C58618C0084241A /* RankTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RankTable.m; sourceTree = "<group>"; };
 		A9D4B05C1C586ED80084241A /* Ranks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ranks.h; sourceTree = "<group>"; };
 		A9D4B05D1C586ED80084241A /* Ranks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ranks.m; sourceTree = "<group>"; };
+		A9D4B06B1C5AF0100084241A /* Users.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Users.h; sourceTree = "<group>"; };
+		A9D4B06C1C5AF0100084241A /* Users.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Users.m; sourceTree = "<group>"; };
+		A9D4B06F1C5AF0200084241A /* UsersTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTable.h; sourceTree = "<group>"; };
+		A9D4B0701C5AF0200084241A /* UsersTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTable.m; sourceTree = "<group>"; };
+		A9D4B0721C5C48E80084241A /* IntroScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntroScene.h; sourceTree = "<group>"; };
+		A9D4B0731C5C48E80084241A /* IntroScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IntroScene.m; sourceTree = "<group>"; };
+		A9D4B0831C5DA1D90084241A /* iPhone@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPhone@2x.png"; path = "Icons/iPhone@2x.png"; sourceTree = "<group>"; };
+		A9D4B0851C5DBD0C0084241A /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		A9D4B0871C5DC12B0084241A /* CCVideoPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCVideoPlayer.h; sourceTree = "<group>"; };
+		A9D4B0881C5DC12B0084241A /* CCVideoPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCVideoPlayer.m; sourceTree = "<group>"; };
+		A9D4B09F1C5DC5470084241A /* intro.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = intro.mp4; sourceTree = "<group>"; };
+		A9D4B0A21C5DC7390084241A /* CCVideoPlayerImpliOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCVideoPlayerImpliOS.h; sourceTree = "<group>"; };
+		A9D4B0A31C5DC7390084241A /* CCVideoPlayerImpliOS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCVideoPlayerImpliOS.m; sourceTree = "<group>"; };
+		A9D4B0A41C5DC7390084241A /* videoOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = videoOverlayView.h; sourceTree = "<group>"; };
+		A9D4B0A51C5DC7390084241A /* videoOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = videoOverlayView.m; sourceTree = "<group>"; };
 		B71F5907188484E7003F4D28 /* iPad-old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old.png"; path = "Icons/iPad-old.png"; sourceTree = "<group>"; };
 		B71F5908188484E7003F4D28 /* iPad-old@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old@2x.png"; path = "Icons/iPad-old@2x.png"; sourceTree = "<group>"; };
 		B71F5909188484E7003F4D28 /* iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = iPad.png; path = Icons/iPad.png; sourceTree = "<group>"; };
@@ -339,6 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9D4B0861C5DBD0C0084241A /* MediaPlayer.framework in Frameworks */,
 				A93C4A531C4496740097C423 /* CoreData.framework in Frameworks */,
 				7A97911819E631CD001FFC4D /* libcocos2d.a in Frameworks */,
 				8392007A18EE8E3300B6C429 /* GLKit.framework in Frameworks */,
@@ -530,11 +553,28 @@
 			name = "Data Model";
 			sourceTree = "<group>";
 		};
+		A9D4B0A11C5DC6B70084241A /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				A9D4B0A21C5DC7390084241A /* CCVideoPlayerImpliOS.h */,
+				A9D4B0A31C5DC7390084241A /* CCVideoPlayerImpliOS.m */,
+				A9D4B0A41C5DC7390084241A /* videoOverlayView.h */,
+				A9D4B0A51C5DC7390084241A /* videoOverlayView.m */,
+				A9D4B09F1C5DC5470084241A /* intro.mp4 */,
+				A9D4B0871C5DC12B0084241A /* CCVideoPlayer.h */,
+				A9D4B0881C5DC12B0084241A /* CCVideoPlayer.m */,
+			);
+			name = Video;
+			sourceTree = "<group>";
+		};
 		B737893C1807616C0076A88C /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				7A40362019DDEF0D007B6E8F /* Platforms */,
 				D352B48019EC608A00829775 /* MetalShaders */,
+				A9D4B0721C5C48E80084241A /* IntroScene.h */,
+				A9D4B0731C5C48E80084241A /* IntroScene.m */,
+				A9D4B0A11C5DC6B70084241A /* Video */,
 				B7378992180767190076A88C /* MainScene.h */,
 				B7378993180767190076A88C /* MainScene.m */,
 				A96A199D1C34AE510023033F /* Gameplay.h */,
@@ -548,26 +588,30 @@
 				A9A449F71C3740A900E1FA40 /* Chicken.h */,
 				A93C4A4C1C4320BD0097C423 /* GameOver.h */,
 				A93C4A4D1C4320BD0097C423 /* GameOver.m */,
-				A93C4A541C4496870097C423 /* Data Model */,
 				A93C4AB01C47453B0097C423 /* signInScene.h */,
 				A93C4AB11C47453B0097C423 /* signInScene.m */,
-				A93C4A4F1C4477880097C423 /* GameData.h */,
-				A93C4A501C4477880097C423 /* GameData.m */,
 				A9A449F81C3740A900E1FA40 /* Chicken.m */,
-				A93C4A411C3F70060097C423 /* TableView.h */,
-				A93C4A421C3F70060097C423 /* TableView.m */,
 				A9D4B0591C58618B0084241A /* RankTable.h */,
 				A9D4B05A1C58618C0084241A /* RankTable.m */,
 				A9D4B05C1C586ED80084241A /* Ranks.h */,
 				A9D4B05D1C586ED80084241A /* Ranks.m */,
-				A9A44A151C378E9D00E1FA40 /* HighScoresScene.h */,
-				A9A44A161C378E9D00E1FA40 /* HighScoresScene.m */,
+				A9D4B06F1C5AF0200084241A /* UsersTable.h */,
+				A9D4B0701C5AF0200084241A /* UsersTable.m */,
+				A9D4B06B1C5AF0100084241A /* Users.h */,
+				A9D4B06C1C5AF0100084241A /* Users.m */,
+				A93C4A411C3F70060097C423 /* TableView.h */,
+				A93C4A421C3F70060097C423 /* TableView.m */,
 				A9A44A181C378EF800E1FA40 /* MedalsScene.h */,
 				A9A44A191C378EF800E1FA40 /* MedalsScene.m */,
+				A9A44A151C378E9D00E1FA40 /* HighScoresScene.h */,
+				A9A44A161C378E9D00E1FA40 /* HighScoresScene.m */,
 				A9A44A121C378E8400E1FA40 /* SettingsScene.h */,
 				A9A44A131C378E8400E1FA40 /* SettingsScene.m */,
 				A97DB9181C36134900F0F4C2 /* Egg.h */,
 				A97DB9191C36134900F0F4C2 /* Egg.m */,
+				A93C4A4F1C4477880097C423 /* GameData.h */,
+				A93C4A501C4477880097C423 /* GameData.m */,
+				A93C4A541C4496870097C423 /* Data Model */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -575,10 +619,10 @@
 		B73789911807667A0076A88C /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				A9D4B0831C5DA1D90084241A /* iPhone@2x.png */,
 				B71F5907188484E7003F4D28 /* iPad-old.png */,
 				B71F5908188484E7003F4D28 /* iPad-old@2x.png */,
 				B71F5909188484E7003F4D28 /* iPad.png */,
-				A9D4B0511C58380A0084241A /* iPhone@2x.png */,
 				B71F590B188484E7003F4D28 /* iPhone-old.png */,
 				B71F590C188484E7003F4D28 /* iPhone-old@2x.png */,
 				B71F590D188484E7003F4D28 /* iPhone.png */,
@@ -618,6 +662,7 @@
 		B77F1B3017B978D7009739AE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A9D4B0851C5DBD0C0084241A /* MediaPlayer.framework */,
 				A93C4A521C4496740097C423 /* CoreData.framework */,
 				BC5399D31A44DCC90063F482 /* AndroidKit.framework */,
 				BC5399D41A44DCC90063F482 /* CoreJava.framework */,
@@ -877,8 +922,10 @@
 				A9A44A0B1C37469600E1FA40 /* Default-568h@2x.png in Resources */,
 				B71F5919188484E7003F4D28 /* Settings.png in Resources */,
 				B71F5913188484E7003F4D28 /* iPad.png in Resources */,
+				A9D4B0A01C5DC5470084241A /* intro.mp4 in Resources */,
 				B71F5912188484E7003F4D28 /* iPad-old@2x.png in Resources */,
 				B71F5916188484E7003F4D28 /* iPhone-old@2x.png in Resources */,
+				A9D4B0841C5DA1D90084241A /* iPhone@2x.png in Resources */,
 				B737893B180761570076A88C /* Published-iOS in Resources */,
 				B71F591A188484E7003F4D28 /* Settings@2x.png in Resources */,
 				B7378976180762440076A88C /* Default-Landscape~ipad.png in Resources */,
@@ -886,7 +933,6 @@
 				B71F5917188484E7003F4D28 /* iPhone.png in Resources */,
 				B7378977180762440076A88C /* Default.png in Resources */,
 				B71F5911188484E7003F4D28 /* iPad-old.png in Resources */,
-				A9D4B0521C58380A0084241A /* iPhone@2x.png in Resources */,
 				A9A44A031C37454300E1FA40 /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -971,15 +1017,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9A44A141C378E8400E1FA40 /* SettingsScene.m in Sources */,
+				A9D4B0741C5C48E80084241A /* IntroScene.m in Sources */,
 				A9A44A171C378E9D00E1FA40 /* HighScoresScene.m in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 				A96A199F1C34AE520023033F /* Gameplay.m in Sources */,
 				A93C4AB21C47453B0097C423 /* signInScene.m in Sources */,
 				A93C4AAF1C4737A60097C423 /* Person.m in Sources */,
+				A9D4B0711C5AF0200084241A /* UsersTable.m in Sources */,
 				7A046D8C19E8A20E004C4763 /* MainScene.m in Sources */,
 				A9D4B0581C58591D0084241A /* AlertView.m in Sources */,
+				A9D4B0A61C5DC7390084241A /* CCVideoPlayerImpliOS.m in Sources */,
 				A93C4A511C4477880097C423 /* GameData.m in Sources */,
 				A97DB91A1C36134900F0F4C2 /* Egg.m in Sources */,
+				A9D4B0A71C5DC7390084241A /* videoOverlayView.m in Sources */,
+				A9D4B06D1C5AF0110084241A /* Users.m in Sources */,
 				A9D4B05B1C58618C0084241A /* RankTable.m in Sources */,
 				A9A44A201C38732900E1FA40 /* PauseScene.m in Sources */,
 				A9D4B05E1C586ED80084241A /* Ranks.m in Sources */,
@@ -990,6 +1041,7 @@
 				5B121038197487F2004C1E1D /* AppDelegate.m in Sources */,
 				A93C4A431C3F70060097C423 /* TableView.m in Sources */,
 				A9A449F51C3725CA00E1FA40 /* Bullet.m in Sources */,
+				A9D4B08A1C5DC12B0084241A /* CCVideoPlayer.m in Sources */,
 				A9A449F91C3740A900E1FA40 /* Chicken.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1368,7 +1420,7 @@
 					"\"Source/libs/cocos2d-iphone/external/ObjectAL\"/**",
 				);
 				INFOPLIST_FILE = Source/Resources/Platforms/iOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -1402,7 +1454,7 @@
 					"\"Source/libs/cocos2d-iphone/external/ObjectAL\"/**",
 				);
 				INFOPLIST_FILE = Source/Resources/Platforms/iOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"-lz",

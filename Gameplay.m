@@ -58,9 +58,6 @@
     CCSprite *bladeCost2;
     CCLabelTTF *bladeCostLabel;
     
-    //TableView *table;
-    
-    
     CCLabelTTF *rank;
     CCLabelTTF *user;
     CCSprite *icon;
@@ -83,10 +80,10 @@
     
     int exp;
     
-    //alertView vars
-    CCButton *okayButton;
-    CCButton *goToStoreButton;
-    CCLabelTTF *message;
+    //randomization vars
+    float minLaunch;
+    float maxLaunch;
+    float randomLaunch;
 }
 // -----------------------------------------------------------------
 + (instancetype)node
@@ -142,7 +139,7 @@
     _progressNode.positionType = CCPositionTypeNormalized;
     _progressNode.position = ccp(0.12f, 0.05f);
     [self addChild:_progressNode];
-    
+
     
     CCTexture *texture = [CCTexture textureWithFile:@"Back.png"];
     streak = [CCMotionStreak streakWithFade:.5f minSeg:.5f width:10.f color:[CCColor colorWithCcColor3b:ccYELLOW] texture:texture];
@@ -276,7 +273,7 @@
         [self removeChild:timer];
         [self unschedule:@selector(timerUpdate:)];
         [bladeButton setEnabled:true];
-    }
+}
     // update timer here, using numSeconds
 }
 -(void)bladePressed{
@@ -295,7 +292,6 @@
     }else{
         CCLOG(@"NEED MO MONEY");
     }
-
 }
 
 -(void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
@@ -355,10 +351,10 @@
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     if(person.gold.intValue>=1){
-        int newAmount = person.gold.intValue - 1;
-        [_nukes setString:[NSString stringWithFormat:@"%d",person.gold.intValue]];
-        [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
         [GameData sharedGameData].bombCount++;
+        int newAmount = person.gold.intValue - 1;
+        [_nukes setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+        [person setValue:[NSNumber numberWithInt:newAmount] forKey:@"gold"];
         [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
         [_goldCount setString:[NSString stringWithFormat:@"X %d", person.gold.intValue]];
         if (![person.managedObjectContext save:&error2]) {
@@ -490,7 +486,7 @@
         switch (number){
             case 1:{
                 int minTime = .9f * 1000;
-                int maxTime = 2.1f * 1000;
+                int maxTime = 1.2f * 1000;
                 int rangeTime = maxTime - minTime;
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
@@ -501,7 +497,7 @@
 
         case 2:{
             int minTime = .5f * 1000;
-            int maxTime = 1.f * 1000;
+            int maxTime = .8f * 1000;
             int rangeTime = maxTime - minTime;
             int a = (arc4random() % rangeTime) + minTime;
             float randomTime = a/1000.f;
@@ -510,8 +506,8 @@
             break;
         }
             case 3:{
-                int minTime = .9f * 1000;
-                int maxTime = 1.5f * 1000;
+                int minTime = .8f * 1000;
+                int maxTime = 1.2f * 1000;
                 int rangeTime = maxTime - minTime;
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
@@ -892,7 +888,7 @@
         fiveCount++;
         [person setValue:[NSNumber numberWithInt:fiveCount] forKey:@"five"];
     }
-    else if ([input isEqualToString:@"6"]){
+    else if ([input isEqualToString:@"Killpocalypse"]){
         CCLOG(@"6 awarded");
         int fiveCount = person.six.intValue;
         fiveCount++;
@@ -966,6 +962,9 @@
 
 - (void)launchEgg {
     targetsLaunched++;
+    CCLOG(@"%d",targetsLaunched);
+    if (arc4random() % 2 == 1 || arc4random() % 2 == 1) {
+    //targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
     //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
     egg.positionType = CCPositionTypePoints;
@@ -987,6 +986,7 @@
     CGPoint force = ccpMult(launchDirection, randomforce);
     [egg.physicsBody applyForce:force];
     //**
+    }
     if(targetsLaunched == 10){
         [self roundComplete];
     }
@@ -1008,7 +1008,80 @@
     else if(targetsLaunched == 385){
         [self roundComplete];
     }
+    //[self scheduleOnce:@selector(launchEgg) delay:randomLaunch];
 }
+    /*
+     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+     targetsLaunched++;
+     CCNode* egg = [CCBReader load:@"Egg"];
+     //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
+     egg.positionType = CCPositionTypePoints;
+     egg.position = ccp(440.f,160.f);
+     //egg.position =
+     [_physicsNode addChild:egg];
+     egg.scale = 0.6f;
+     egg.rotation = -45.0f;
+     int miny = 5;
+     int maxy = 15;
+     int rangey = maxy - miny;
+     //int randomx = (arc4random() % rangex) + minx;
+     int randomy = (arc4random() % rangey) + miny;
+     CGPoint launchDirection = ccp(-10,randomy);
+     int minforce = 500;
+     int maxforce = 3000;
+     int rangeforce = maxforce - minforce;
+     int randomforce = (arc4random() % rangeforce) + minforce;
+     CGPoint force = ccpMult(launchDirection, randomforce);
+     [egg.physicsBody applyForce:force];
+     }];
+     if(targetsLaunched == 10){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 20){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 40){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 90){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 190){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 290){
+     [self roundComplete];
+     }
+     else if(targetsLaunched == 385){
+     [self roundComplete];
+     }
+     if (roundCount == 0){
+     int minTime = .9f * 1000;
+     int maxTime = 2.1f * 1000;
+     int rangeTime = maxTime - minTime;
+     int a = (arc4random() % rangeTime) + minTime;
+     float randomTime = a/1000.f;
+     CCLOG(@"%f", randomTime);
+    minLaunch = .9f * 1000;
+    maxLaunch = 2.1f*1000;
+}
+else if (roundCount == 1){
+     int minTime = .9f * 1000;
+     int maxTime = 2.1f * 1000;
+     int rangeTime = maxTime - minTime;
+     int a = (arc4random() % rangeTime) + minTime;
+     float randomTime = a/1000.f;
+     CCLOG(@"%f", randomTime);
+    minLaunch = .9f * 1000;
+    maxLaunch = 2.1f*1000;
+}
+int rangeLaunch = maxLaunch-minLaunch;
+int a = (arc4random() % rangeLaunch) + minLaunch;
+float randomLaunch = a/1000.f;
+CCLOG(@"%f",randomLaunch);
+CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
+[self runAction:[CCActionSequence actions:delay,block,nil]];
+     */
 -(void)roundComplete{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -1300,38 +1373,14 @@
     }];
     CCActionCallBlock *awardBlock = [CCActionCallBlock actionWithBlock:^{
         int min = 1;
-        int max = 4;
+        int max = 3;
         int range = max - min;
         int random = (arc4random() % range) + min;
         CCLOG(@"%d",random);
         switch (random){
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:{
-                [GameData sharedGameData].bombCount++;
-                CCSprite *bonus = [CCSprite spriteWithImageNamed:@"Assets/nuke.png"];
-                bonus.positionType = CCPositionTypeNormalized;
-                bonus.position = ccp(.5f,.5f);
-                bonus.opacity = 0.f;
-                [self addChild:bonus];
-                CCActionFadeIn *fadeIn =[CCActionFadeIn actionWithDuration:.5f];
-                CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
-                CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
-                CCActionRemove *actionRemove = [CCActionRemove action];
-                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:28];
-                label.positionType = CCPositionTypeNormalized;
-                label.position = ccp(.6f,.5f);
-                label.opacity = 0.f;
-                [self addChild:label];
-                [label runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
-                [bonus runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
-                
-                break;
-            }
-            case 4:{
+            case 1:{
                 [GameData sharedGameData].bladeCount++;
+                [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
                 CCSprite *bonus = [CCSprite spriteWithImageNamed:@"Assets/blade.png"];
                 bonus.positionType = CCPositionTypeNormalized;
                 bonus.position = ccp(.5f,.5f);
@@ -1341,13 +1390,41 @@
                 CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
                 CCActionRemove *actionRemove = [CCActionRemove action];
                 
-                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:28];
-                label.positionType = CCPositionTypeNormalized;
-                label.position = ccp(.6f,.5f);
+                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:10];
+                label.positionType = CCPositionTypePoints;
+                label.position = ccp(300,208.3f);
                 label.opacity = 0.f;
                 [self addChild: label];
-                [label runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                [label runAction:[CCActionSequence actions:delay,fadeIn, fadeOut, actionRemove, nil]];
                 [bonus runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                break;
+            }
+            case 2:{
+            }
+                break;
+            case 3:{
+                [GameData sharedGameData].bombCount++;
+                [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+                CCSprite *bonus = [CCSprite spriteWithImageNamed:@"Assets/nuke.png"];
+                bonus.positionType = CCPositionTypePoints;
+                bonus.position = ccp(284,191.8f);
+                bonus.opacity = 0.f;
+                [self addChild:bonus];
+                CCActionFadeIn *fadeIn =[CCActionFadeIn actionWithDuration:.5f];
+                CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+                CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
+                CCActionRemove *actionRemove = [CCActionRemove action];
+                CCLabelTTF *label = [CCLabelTTF labelWithString:@"+1" fontName:@"Helvetica" fontSize:10];
+                label.positionType = CCPositionTypePoints;
+                label.position = ccp(300,208.3f);
+                label.opacity = 0.f;
+                [self addChild:label];
+                [label runAction:[CCActionSequence actions:delay,fadeIn, fadeOut, actionRemove, nil]];
+                [bonus runAction:[CCActionSequence actions:fadeIn,delay,fadeOut, actionRemove, nil]];
+                
+                break;
+            }
+            case 4:{
                 break;
             }
         }
