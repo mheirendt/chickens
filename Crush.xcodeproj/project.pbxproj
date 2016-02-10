@@ -78,6 +78,7 @@
 		A9A44A171C378E9D00E1FA40 /* HighScoresScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A161C378E9D00E1FA40 /* HighScoresScene.m */; };
 		A9A44A1A1C378EF800E1FA40 /* MedalsScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A191C378EF800E1FA40 /* MedalsScene.m */; };
 		A9A44A201C38732900E1FA40 /* PauseScene.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A44A1F1C38732900E1FA40 /* PauseScene.m */; };
+		A9C77D001C67CF5100B5FE65 /* LowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A9C77CFF1C67CF5100B5FE65 /* LowAlert.m */; };
 		A9D4B0581C58591D0084241A /* AlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B0571C58591D0084241A /* AlertView.m */; };
 		A9D4B05B1C58618C0084241A /* RankTable.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B05A1C58618C0084241A /* RankTable.m */; };
 		A9D4B05E1C586ED80084241A /* Ranks.m in Sources */ = {isa = PBXBuildFile; fileRef = A9D4B05D1C586ED80084241A /* Ranks.m */; };
@@ -253,6 +254,8 @@
 		A9A44A191C378EF800E1FA40 /* MedalsScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedalsScene.m; sourceTree = "<group>"; };
 		A9A44A1E1C38732900E1FA40 /* PauseScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PauseScene.h; sourceTree = "<group>"; };
 		A9A44A1F1C38732900E1FA40 /* PauseScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PauseScene.m; sourceTree = "<group>"; };
+		A9C77CFE1C67CF5100B5FE65 /* LowAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LowAlert.h; sourceTree = "<group>"; };
+		A9C77CFF1C67CF5100B5FE65 /* LowAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LowAlert.m; sourceTree = "<group>"; };
 		A9D4B0561C58591D0084241A /* AlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertView.h; sourceTree = "<group>"; };
 		A9D4B0571C58591D0084241A /* AlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertView.m; sourceTree = "<group>"; };
 		A9D4B0591C58618B0084241A /* RankTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RankTable.h; sourceTree = "<group>"; };
@@ -577,6 +580,8 @@
 				A9D4B0A11C5DC6B70084241A /* Video */,
 				B7378992180767190076A88C /* MainScene.h */,
 				B7378993180767190076A88C /* MainScene.m */,
+				A9C77CFE1C67CF5100B5FE65 /* LowAlert.h */,
+				A9C77CFF1C67CF5100B5FE65 /* LowAlert.m */,
 				A96A199D1C34AE510023033F /* Gameplay.h */,
 				A96A199E1C34AE520023033F /* Gameplay.m */,
 				A9A449F31C3725CA00E1FA40 /* Bullet.h */,
@@ -1023,6 +1028,7 @@
 				A96A199F1C34AE520023033F /* Gameplay.m in Sources */,
 				A93C4AB21C47453B0097C423 /* signInScene.m in Sources */,
 				A93C4AAF1C4737A60097C423 /* Person.m in Sources */,
+				A9C77D001C67CF5100B5FE65 /* LowAlert.m in Sources */,
 				A9D4B0711C5AF0200084241A /* UsersTable.m in Sources */,
 				7A046D8C19E8A20E004C4763 /* MainScene.m in Sources */,
 				A9D4B0581C58591D0084241A /* AlertView.m in Sources */,

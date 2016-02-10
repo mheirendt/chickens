@@ -15,11 +15,11 @@
 #import "GameData.h"
 #import "TableView.h"
 #import "AlertView.h"
+#import "LowAlert.h"
 // -----------------------------------------------------------------
 
 @implementation Gameplay{
     CCPhysicsNode *_physicsNode;
-    CCNode *_canon;
     CCLabelTTF *_scoreLabel;
     CCNode *_barn;
     //CCNode *chicken;
@@ -84,6 +84,67 @@
     float minLaunch;
     float maxLaunch;
     float randomLaunch;
+    int launchFlag;
+    
+    CCLabelTTF *instructions;
+    CCButton *continueButton;
+    
+    CCNode *_background;
+    
+    CCNode *_background1;
+    CCNode *_background2;
+    
+    CCNode *_backgroundTop1;
+    CCNode *_backgroundTop2;
+    
+    CCNode *_backgroundBack1;
+    CCNode *_backgroundBack2;
+    
+    bool running;
+    bool isLow;
+    bool isSlower;
+    CCSprite *lowGas;
+    CCNode* horse;
+    CCNode* _tractor;
+    CCNode* chicken;
+    CCNode* _ground;
+    
+    int currentSequence;
+    int seq1;
+    int seq2;
+    int seq3;
+    int seq4;
+    int min;
+    int max;
+    int range;
+    int random;
+    
+    CCLabelTTF *upLab;
+    CCLabelTTF *rightLab;
+    CCLabelTTF *downLab;
+    CCLabelTTF *leftLab;
+    
+    CCLabelTTF *upLab1;
+    CCLabelTTF *rightLab1;
+    CCLabelTTF *downLab1;
+    CCLabelTTF *leftLab1;
+    
+    CCLabelTTF *upLab2;
+    CCLabelTTF *rightLab2;
+    CCLabelTTF *downLab2;
+    CCLabelTTF *leftLab2;
+    
+    CCLabelTTF *upLab3;
+    CCLabelTTF *rightLab3;
+    CCLabelTTF *downLab3;
+    CCLabelTTF *leftLab3;
+    
+    CCLabelTTF *upLab4;
+    CCLabelTTF *rightLab4;
+    CCLabelTTF *downLab4;
+    CCLabelTTF *leftLab4;
+    
+    
 }
 // -----------------------------------------------------------------
 + (instancetype)node
@@ -105,23 +166,21 @@
     _physicsNode.collisionDelegate = self;
     _health = 100.f;
     roundCount=1;
-    [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
-    [self initRound:roundCount];
-    [self addChicken:(self.contentSize.width + 150) y:104.f androtation:0.f andMoveToX:self.contentSize.width - 100 andMoveToY:104.f];
+    [self addChicken:(self.contentSize.width + 150) y:87.f androtation:0.f andMoveToX:self.contentSize.width - 100 andMoveToY:87.f];
     //int minTime = 2.0f;
     //int maxTime = 4.0f;
     //int rangeTime = maxTime - minTime;
     //int randomTime = (arc4random() % rangeTime) + minTime;
+    horse.position = ccp(650,94.5f);
+    _tractor.position = ccp(750, _tractor.position.y);
     
     overlay.visible = false;
     
     _physicsNode.positionType=CCPositionTypeNormalized;
     _physicsNode.position = ccp(.5f,.5f);
-    
+    _barn.zOrder = 1000;
     _barn.physicsBody.collisionType=@"Barn";
-    
-    [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
-    [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
+    _ground.physicsBody.collisionType = @"Ground";
     
     CCSprite *sprite = [CCSprite spriteWithImageNamed:@"Assets/progressBarn.png"];
     _progressNode = [CCProgressNode progressWithSprite:sprite];
@@ -140,7 +199,6 @@
     _progressNode.position = ccp(0.12f, 0.05f);
     [self addChild:_progressNode];
 
-    
     CCTexture *texture = [CCTexture textureWithFile:@"Back.png"];
     streak = [CCMotionStreak streakWithFade:.5f minSeg:.5f width:10.f color:[CCColor colorWithCcColor3b:ccYELLOW] texture:texture];
     //CCMotionStreak *streak = [CCMotionStreak streakWithFade:.5f minSeg:5.f width:10.f color: [CCColor colorWithCcColor3b:ccYELLOW] textureFilename:@"Assets/2.png"];
@@ -150,19 +208,303 @@
     blade = [CCBReader load:@"Bullet"];
     blade.visible = false;
     blade.scale = .6;
+    
+    if([GameData sharedGameData].newPlayerFlag){
+        [GameData sharedGameData].bombCount = 1;
+        [GameData sharedGameData].bladeCount = 1;
+        _bomb.visible = false;
+        bladeButton.visible = false;
+        bladeCount.visible = false;
+        _bombCount.visible = false;
+    }
+    _backgroundBack2.anchorPoint = ccp(0, 0);
+    _backgroundBack2.position = ccp([_backgroundBack1 boundingBox].size.width - 1, 0);
+    _backgroundTop2.anchorPoint = ccp(0, 0);
+    _backgroundTop2.position    = ccp([_backgroundTop1 boundingBox].size.width- 15, 0);
+    _background2.anchorPoint = ccp(0, 0);
+    _background2.position    = ccp([_background1 boundingBox].size.width - 5, 0);
+    
+    running = false;
+    currentSequence = 1;
+    
+    [_bombCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bombCount]];
+    [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
+    
+    if(![GameData sharedGameData].newPlayerFlag){
+        [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
+        [self initRound:roundCount];
+    }
+    else{
+        [self scheduleOnce:@selector(launchEgg)delay:4.5f];
+    }
+    
+}
 
+- (void)scrollBackground:(CCTime)dt
+{
+    _background1.position = ccp( _background1.position.x + 1, _background1.position.y );
+    _background2.position = ccp( _background2.position.x + 1, _background2.position.y );
+    
+    if ( _background1.position.x > [_background1 boundingBox].size.width){
+        _background1.position = ccp(_background2.position.x - [_background2 boundingBox].size.width, _background1.position.y );
+    }
+    
+    if ( _background2.position.x > [_background2 boundingBox].size.width ){
+        _background2.position = ccp(_background1.position.x - [_background1 boundingBox].size.width, _background2.position.y );
+    }
+}
+- (void)scrollMid:(CCTime)dt
+{
+    _backgroundTop1.position = ccp( _backgroundTop1.position.x + 1, _backgroundTop1.position.y );
+    _backgroundTop2.position = ccp( _backgroundTop2.position.x + 1, _backgroundTop2.position.y );
+    
+    if ( _backgroundTop1.position.x > [_backgroundTop1 boundingBox].size.width){
+        _backgroundTop1.position = ccp(_backgroundTop2.position.x - [_backgroundTop2 boundingBox].size.width, _backgroundTop1.position.y );
+    }
+    
+    if ( _backgroundTop2.position.x > [_backgroundTop2 boundingBox].size.width ){
+        _backgroundTop2.position = ccp(_backgroundTop1.position.x - [_backgroundTop1 boundingBox].size.width, _backgroundTop2.position.y );
+    }
+}
+- (void) scrollBack:(CCTime)dt
+{
+    _backgroundBack1.position = ccp( _backgroundBack1.position.x + 1, _backgroundBack1.position.y );
+    _backgroundBack2.position = ccp( _backgroundBack2.position.x + 1, _backgroundBack2.position.y );
+    
+    if ( _backgroundBack1.position.x > [_backgroundBack1 boundingBox].size.width){
+        _backgroundBack1.position = ccp(_backgroundBack2.position.x - [_backgroundBack2 boundingBox].size.width, _backgroundBack1.position.y );
+    }
+    
+    if ( _backgroundBack2.position.x > [_backgroundBack2 boundingBox].size.width ){
+        _backgroundBack2.position = ccp(_backgroundBack1.position.x - [_backgroundBack1 boundingBox].size.width, _backgroundBack2.position.y );
+    }
+}
+
+-(void)startRunning{
+    //horse = [CCBReader load:@"Horse"];
+    //horse.positionType = CCPositionTypeNormalized;
+    horse.position = ccp(700,94.5f);
+    horse.scale = .7f;
+    //[self addChild:horse];
+    CCActionMoveTo *move = [CCActionMoveTo actionWithDuration:1.5f position:ccp(382,94.5)];
+    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:.1f position:ccp(700,107)];
+    CCActionDelay *delay = [CCActionDelay actionWithDuration:1.1f];
+    CCActionCallBlock *blockRun = [CCActionCallBlock actionWithBlock:^(void){
+        [self schedule:@selector(scrollBackground:) interval:0.005f];
+        [self schedule:@selector(scrollMid:) interval:.08f];
+        [self schedule:@selector(scrollBack:) interval:.15f];
+        running = true;
+    }];
+    CCActionDelay *globalDelay = [CCActionDelay actionWithDuration:2.f];
+    CCActionMoveTo *passCanon = [CCActionMoveTo actionWithDuration:1.f position:ccp(700,chicken.position.y)];
+    CCActionMoveTo *catchUp = [CCActionMoveTo actionWithDuration: 1.5f position:ccp(self.contentSize.width - 80,107)];
+    [horse runAction:[CCActionSequence actions:globalDelay,blockRun, delay, move, nil]];
+    [chicken runAction:[CCActionSequence actions:globalDelay, passCanon, catchUp,nil]];
+    [_tractor runAction:[CCActionMoveTo actionWithDuration:2.f position:ccp(-20.f,_tractor.position.y)]];
+    CCActionMoveTo *liftBarn = [CCActionMoveTo actionWithDuration:.5f position:ccp(_barn.position.x,_barn.position.y+20)];
+    CCActionDelay *barnDelay = [CCActionDelay actionWithDuration:1.f];
+    [_barn runAction:[CCActionSequence actions:barnDelay, liftBarn,nil]];
+    [chicken runAction:[CCActionSequence actions:globalDelay, passCanon, lift, catchUp, nil]];
+}
+-(void)continuePressed{
+    [self removeChild:continueButton];
+    [self removeChild:instructions];
+    [[CCDirector sharedDirector] resume];
+}
+- (void)swipeLeft {
+    if (currentSequence == 1){
+        if ([GameData sharedGameData].seq1 == 4){
+            [leftLab setColor:[CCColor greenColor]];
+            currentSequence++;
+            CCLOG(@"Left 1");
+        }
+    }
+    else if (currentSequence == 2){
+        if([GameData sharedGameData].seq2 == 4){
+            currentSequence++;
+            [leftLab setColor:[CCColor greenColor]];
+            CCLOG(@"Left 2");
+        }
+    }
+    else if (currentSequence == 3){
+        if([GameData sharedGameData].seq3 == 4){
+            currentSequence++;
+            [leftLab setColor:[CCColor greenColor]];
+            CCLOG(@"Left 3");
+        }
+    }
+    else if (currentSequence == 4){
+        if([GameData sharedGameData].seq4 == 4){
+            [leftLab setColor:[CCColor greenColor]];
+            CCLOG(@"Left 4");
+        }
+    }
+}
+- (void)swipeRight {
+    if (currentSequence == 1){
+        if ([GameData sharedGameData].seq1 == 2){
+            //LowAlert *alert = [[LowAlert alloc]init];
+            currentSequence++;
+            [rightLab setColor:[CCColor greenColor]];
+            CCLOG(@"right 1");
+        }
+    }
+    else if (currentSequence == 2){
+        if([GameData sharedGameData].seq2 == 2){
+            currentSequence++;
+            [rightLab setColor:[CCColor greenColor]];
+            CCLOG(@"right 2");
+        }
+    }
+    else if (currentSequence == 3){
+        if([GameData sharedGameData].seq3 == 2){
+            currentSequence++;
+            [rightLab setColor:[CCColor greenColor]];
+            CCLOG(@"right 3");
+        }
+    }
+    else if (currentSequence == 4){
+        if([GameData sharedGameData].seq4 == 2){
+            [rightLab setColor:[CCColor greenColor]];
+            CCLOG(@"right 4");
+        }
+    }
+}
+- (void)swipeDown {
+    if (currentSequence == 1){
+        if ([GameData sharedGameData].seq1 == 3){
+            currentSequence++;
+            [downLab setColor:[CCColor greenColor]];
+            CCLOG(@"Down 1");
+        }
+    }
+    else if (currentSequence == 2){
+        if([GameData sharedGameData].seq2 == 3){
+            currentSequence++;
+            [downLab setColor:[CCColor greenColor]];
+            CCLOG(@"Down 2");
+        }
+    }
+    else if (currentSequence == 3){
+        if([GameData sharedGameData].seq3 == 3){
+            currentSequence++;
+            [downLab setColor:[CCColor greenColor]];
+            CCLOG(@"Down 3");
+        }
+    }
+    else if (currentSequence == 4){
+        if([GameData sharedGameData].seq4 == 3){
+            [downLab setColor:[CCColor greenColor]];
+            CCLOG(@"Down 4");
+        }
+    }
+}
+- (void)swipeUp {
+    if (currentSequence == 1){
+        if ([GameData sharedGameData].seq1 == 1){
+            currentSequence++;
+            [upLab setColor:[CCColor greenColor]];
+            CCLOG(@"Up 1");
+        }
+    }
+    else if (currentSequence == 2){
+        if([GameData sharedGameData].seq2 == 1){
+            currentSequence++;
+            [upLab setColor:[CCColor greenColor]];
+            CCLOG(@"Up 2");
+        }
+    }
+    else if (currentSequence == 3){
+        if([GameData sharedGameData].seq3 == 1){
+            currentSequence++;
+            [upLab setColor:[CCColor greenColor]];
+            CCLOG(@"Up 3");
+        }
+    }
+    else if (currentSequence == 4){
+        if([GameData sharedGameData].seq4 == 1){
+            [upLab setColor:[CCColor greenColor]];
+            CCLOG(@"Up 4");
+        }
+    }
+}
+
+-(void)onEnter{
+    [super onEnter];
+    //LowAlert *alert = [[LowAlert alloc]init];
+    [self ShowAlertOnLayer:self];
+    if([GameData sharedGameData].newPlayerFlag){
+        bladeButton.visible = false;
+        bladeCount.visible = false;
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn." fontName:@"Helvetica" fontSize:32 dimensions:CGSizeMake(300, 200)];
+            instructions.positionType = CCPositionTypeNormalized;
+            instructions.position = ccp(.5f,.3f);
+            [self addChild:instructions];
+            
+            continueButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
+            continueButton.positionType = CCPositionTypeNormalized;
+            continueButton.position = ccp(.5f, .1f);
+            [continueButton setTarget:self selector:@selector(continuePressed)];
+            [self addChild:continueButton];
+            
+            
+        }];
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
+        
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //CCLabelTTF *instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn" fontName:@"Helvetica" fontSize:32 dimensions:[CGSizeMake(300,200)]];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            _bomb.visible = true;
+            _bombCount.visible = true;
+            _bomb.enabled = false;
+            [instructions setString:@"Nukes blow up all eggs on the screen."];
+        }];
+        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //CCLabelTTF *instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn" fontName:@"Helvetica" fontSize:32 dimensions:[CGSizeMake(300,200)]];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"You can purchase nukes with gold eggs or get rewarded with one after completing a round"];
+        }];
+        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+            [self addChild:instructions];
+            _bomb.enabled = true;
+            [instructions setString:@"Nuke em to continue."];
+            [[CCDirector sharedDirector] pause];
+        }];
+
+
+        
+        [self runAction:[CCActionSequence actions:delay,block, delay, block2, delay1, block3, delay1, block4,  nil]];
+    }
 }
 
 
 -(void)addChicken:(float)x y:(float)y androtation:(float)rotation andMoveToX:(float)movex andMoveToY:(float)movey{
-    CCNode* chicken = [CCBReader load:@"Canon"];
+    if (roundCount == 1){
     CGPoint point =  CGPointMake(x,y);
     chicken.position = point;
     chicken.rotation = rotation;
     id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey)];
     id delay = [CCActionDelay actionWithDuration: .5f];
-    [self addChild:chicken];
+    //[self addChild:chicken];
     [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
+    }
+    else{
+        chicken = [CCBReader load:@"Canon"];
+        CGPoint point =  CGPointMake(x,y);
+        chicken.position = point;
+        chicken.rotation = rotation;
+        id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey)];
+        id delay = [CCActionDelay actionWithDuration: .5f];
+        [self addChild:chicken];
+        [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
+    }
     //int minTime = 2.0f;
     //int maxTime = 4.0f;
     //int rangeTime = maxTime - minTime;
@@ -210,6 +552,35 @@
     CGPoint force = ccpMult(launchDirection, randomforce);
     [_physicsNode addChild:gold];
     [gold.physicsBody applyForce:force];
+    if([GameData sharedGameData].newPlayerFlag){
+
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        //CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //CCLabelTTF *instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn" fontName:@"Helvetica" fontSize:32 dimensions:[CGSizeMake(300,200)]];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            _bomb.visible = true;
+            _bombCount.visible = true;
+            [instructions setString:@"If you are lucky, a chicken will drop you a golden egg."];
+        }];
+        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //CCLabelTTF *instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn" fontName:@"Helvetica" fontSize:32 dimensions:[CGSizeMake(300,200)]];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Golden eggs are your currency, they buy you pitch forks, nukes, and repair your barn."];
+        }];
+        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //CCLabelTTF *instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn" fontName:@"Helvetica" fontSize:32 dimensions:[CGSizeMake(300,200)]];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"collect golden eggs by tapping on them."];
+        }];
+        [self runAction:[CCActionSequence actions:block2, delay1, block3, delay1,block4, nil]];
+    }
 
 }
 -(void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Bullet:(CCNode *)nodeA Gold:(CCNode *)nodeB{
@@ -228,6 +599,37 @@
             if (![person.managedObjectContext save:&error2]) {
                 NSLog(@"Unable to save managed object context.");
                 NSLog(@"%@, %@", error2, error2.localizedDescription);
+            }
+            
+            if([GameData sharedGameData].newPlayerFlag){
+                [[CCDirector sharedDirector] resume];
+
+                CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
+                CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+                CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+                    [[CCDirector sharedDirector] pause];
+
+                    [self addChild:continueButton];
+                    [self addChild:instructions];
+                    bladeButton.visible = true;
+                    bladeCount.visible = true;
+                    bladeButton.enabled = false;
+                    [instructions setString:@"Pitchforks allow you to slice eggs by sliding across the screen."];
+                }];
+                CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+                    [[CCDirector sharedDirector] pause];
+                    [self addChild:continueButton];
+                    [self addChild:instructions];
+                    [instructions setString:@"Pitchforks last for 15 seconds."];
+                }];
+                CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+                    [[CCDirector sharedDirector] pause];
+                    [self addChild:instructions];
+                    bladeButton.enabled = true;
+                    [instructions setString:@"Use your pitchfork to continue"];
+                }];
+                
+                [self runAction:[CCActionSequence actions:delay,block2,delay1,block3,delay1,block4, nil]];
             }
             
             gameCurrency++;
@@ -291,6 +693,29 @@
     [self schedule:@selector(timerUpdate:) interval:1];
     }else{
         CCLOG(@"NEED MO MONEY");
+    }
+    if([GameData sharedGameData].newPlayerFlag){
+        [[CCDirector sharedDirector] resume];
+        [self removeChild:instructions];
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:1.5f];
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+            [self addChild:instructions];
+            [instructions setString:@"You're all caught up, good luck!"];
+            [[CCDirector sharedDirector]pause];
+            [self addChild:continueButton];
+        }];
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:15.f];
+        CCActionCallBlock *block1 = [CCActionCallBlock actionWithBlock:^(void){
+            [self removeChild:instructions];
+            [GameData sharedGameData].score = 0;
+            [_scoreLabel setString:@"0"];
+            [GameData sharedGameData].newPlayerFlag = false;
+            [self unschedule:@selector(launchEgg)];
+            [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
+            [self initRound:roundCount];
+        }];
+
+        [self runAction:[CCActionSequence actions:delay1,block, delay, block1, nil]];
     }
 }
 
@@ -363,7 +788,20 @@
         }
     }
     else{
-        CCLOG(@"NEED MO MONEY");
+        id block = ^(void){
+            buyBlades.enabled = true;
+            _buyBombsButton.enabled = true;
+            _repairButton.enabled = true;
+            _shopping.enabled = true;
+            _nextRoundButton.enabled = true;
+        };
+        buyBlades.enabled = false;
+        _buyBombsButton.enabled = false;
+        _repairButton.enabled = false;
+        _shopping.enabled = false;
+        _nextRoundButton.enabled = false;
+        
+        [AlertView ShowAlert:@"You do not have enough gold!" onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
 }
 -(void)repairPurchased{
@@ -388,7 +826,21 @@
         }
     }
     else{
-        CCLOG(@"NEED MORE MONEY");
+        id block = ^(void){
+            buyBlades.enabled = true;
+            _buyBombsButton.enabled = true;
+            _repairButton.enabled = true;
+            _shopping.enabled = true;
+            _nextRoundButton.enabled = true;
+        };
+        //AlertView *alert = [AlertView ];
+        buyBlades.enabled = false;
+        _buyBombsButton.enabled = false;
+        _repairButton.enabled = false;
+        _shopping.enabled = false;
+        _nextRoundButton.enabled = false;
+        
+        [AlertView ShowAlert:@"You do not have enough gold!" onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
     
 }
@@ -416,9 +868,21 @@
     }
     else{
         id block = ^(void){
-            CCLOG(@"OKAY");
+            buyBlades.enabled = true;
+            _buyBombsButton.enabled = true;
+            _repairButton.enabled = true;
+            _shopping.enabled = true;
+            _nextRoundButton.enabled = true;
         };
         //AlertView *alert = [AlertView ];
+        buyBlades.enabled = false;
+        _buyBombsButton.enabled = false;
+        _repairButton.enabled = false;
+        _shopping.enabled = false;
+        _nextRoundButton.enabled = false;
+        
+        
+        
         [AlertView ShowAlert:@"You do not have enough gold!" onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
     
@@ -460,16 +924,18 @@
     int maxy = 3;
     int rangey = maxy - miny;
     int randomy = (arc4random() % rangey) + miny;
-    if (randomy == 2){
-        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
-            [self flyingChicken];
-        }];
-        int min = 5;
-        int max = 15;
-        int range = max - min;
-        int random = (arc4random() % range) + min;
-        CCActionDelay *delay = [CCActionDelay actionWithDuration:random];
-        [self runAction:[CCActionSequence actions:delay, block, nil]];
+    if(![GameData sharedGameData].newPlayerFlag){
+        if (randomy == 2){
+            CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+                [self flyingChicken];
+            }];
+            int min = 5;
+            int max = 15;
+            int range = max - min;
+            int random = (arc4random() % range) + min;
+            CCActionDelay *delay = [CCActionDelay actionWithDuration:random];
+            [self runAction:[CCActionSequence actions:delay, block, nil]];
+        }
     }
     
     [roundLabel runAction:[CCActionSequence actions:fade,fadeOut,fade,fadeOut, fade, nil]];
@@ -491,7 +957,8 @@
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
         }
         break;
 
@@ -502,7 +969,9 @@
             int a = (arc4random() % rangeTime) + minTime;
             float randomTime = a/1000.f;
             CCLOG(@"%f", randomTime);
-            [self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
+            //[self schedule:@selector(launchEgg) interval:randomTime repeat:9 delay:5.f];
+            [self scheduleOnce:@selector(launchEgg) delay:5.f];
+            [self startRunning];
             break;
         }
             case 3:{
@@ -512,9 +981,11 @@
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:19 delay:5.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:19 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45    andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:19 delay:7.5f];
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:19 delay:7.5f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
             case 4:{
@@ -524,8 +995,10 @@
                 int a = (arc4random() % rangeTime) + minTime;
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:49 delay:5.f];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:49 delay:6.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:49 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:49 delay:6.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
             case 5:{
@@ -536,8 +1009,10 @@
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
             
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:6.5f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:6.5f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
             case 6:{
@@ -548,8 +1023,11 @@
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
                 
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
             case 7:{
@@ -560,8 +1038,11 @@
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
                 
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:99 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:99 delay:7.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
             case 8:{
@@ -572,8 +1053,10 @@
                 float randomTime = a/1000.f;
                 CCLOG(@"%f", randomTime);
                 
-                [self schedule:@selector(launchEgg) interval:randomTime repeat:114 delay:5.f];
-                [self schedule:@selector(launchEggTopRight) interval:randomTime repeat:114 delay:7.f];
+                //[self schedule:@selector(launchEgg) interval:randomTime repeat:114 delay:5.f];
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                //[self schedule:@selector(launchEggTopRight) interval:randomTime repeat:114 delay:7.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
                 break;
             }
     }
@@ -581,67 +1064,58 @@
 - (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Bullet:(CCNode *)nodeB {
     _timeSinceLastCollision = 0.0;
     medalId++;
-    [GameData sharedGameData].score++;
+    if (![GameData sharedGameData].newPlayerFlag){
+        [GameData sharedGameData].score++;
+    }
         [[_physicsNode space] addPostStepBlock:^{
             [self eggRemoved:nodeA];
         } key:nodeA];
-    if(medalId==3){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
-        [self rewardMedal:spree andLabel:@"Double Kill" andExp:5];    }
-    else if(medalId==5){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
-        [self rewardMedal:triple andLabel:@"Triple Kill" andExp:5];
+    if (bladeActive == 0){
+        if (killCount == 19){
+            CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
+            [self rewardMedal:spree andLabel:@"Killing Spree" andExp:5];
+        }
+        else if (killCount == 39){
+            CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
+            [self rewardMedal:spree andLabel:@"Killing Frenzy" andExp:5];
+        }
+        else if (killCount ==59){
+            CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
+            [self rewardMedal:spree andLabel:@"Running Riot" andExp:10];
+        }
+        else if (killCount == 79){
+            CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
+            [self rewardMedal:spree andLabel:@"Psycho" andExp:10];
+        }
+        else if (killCount == 99 || ((killCount%99) == 0 && killCount!= 0)){
+            CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
+            [self rewardMedal:spree andLabel:@"Unstoppable" andExp:10];
+        }
     }
-    else if(medalId==7){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
-        [self rewardMedal:triple andLabel:@"Over Kill" andExp:5];
-    }
-    else if(medalId==9){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
-        [self rewardMedal:triple andLabel:@"KillTacular" andExp:5];
-    }
-    else if(medalId==11){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
-        [self rewardMedal:triple andLabel:@"Killpocalypse" andExp:5];
-    }
-    else if(medalId==13){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
-        [self rewardMedal:triple andLabel:@"7" andExp:10];
-    }
-    else if(medalId==15){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
-        [self rewardMedal:triple andLabel:@"8" andExp:10];
-    }
-    else if(medalId==17){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
-        [self rewardMedal:triple andLabel:@"9" andExp:10];
-    }
-    else if((medalId%19) == 0){
-        CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
-        [self rewardMedal:triple andLabel:@"10" andExp:10];
-    }
-    if (killCount == 19){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
-        [self rewardMedal:spree andLabel:@"Killing Spree" andExp:5];
-    }
-    else if (killCount == 39){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
-        [self rewardMedal:spree andLabel:@"Killing Frenzy" andExp:5];
-    }
-    else if (killCount ==59){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
-        [self rewardMedal:spree andLabel:@"Running Riot" andExp:10];
-    }
-    else if (killCount == 79){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
-        [self rewardMedal:spree andLabel:@"Psycho" andExp:10];
-    }
-    else if (killCount == 99 || ((killCount%19) == 0 && killCount!= 0)){
-        CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
-        [self rewardMedal:spree andLabel:@"Unstoppable" andExp:10];
-    }
-
 }
+
+- (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair Egg:(CCNode *)nodeA Ground:(CCNode *)nodeB {
+    [[_physicsNode space] addPostStepBlock:^{
+        if(running){
+            [self eggReflected:nodeA];
+        }
+    } key:nodeA];
+}
+-(void)eggReflected:(CCNode*)egg{
+    int minforce = 1000;
+    int maxforce = 1500;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint launchDirection = ccp(20,-10);
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    //[_physicsNode addChild:egg];
+    [egg.physicsBody applyForce:force];
+    CCActionDelay *delay = [CCActionDelay actionWithDuration:2.f];
+    CCActionRemove *remove = [CCActionRemove action];
+    //[egg runAction:[CCActionSequence:delay,remove,nil]];
+    [egg runAction:[CCActionSequence actions:delay,remove, nil]];
+}
+
 -(void)bombPressed{
     if ([GameData sharedGameData].bombCount){
         [GameData sharedGameData].bombCount--;
@@ -688,6 +1162,17 @@
         }];
         [show runAction:[CCActionSequence actions:fade,delay2,fadeOut, remove, nil]];
         [bomb runAction:[CCActionSequence actions:disable, delay2, remove, enable, nil]];
+        
+        if([GameData sharedGameData].newPlayerFlag){
+            [[CCDirector sharedDirector] resume];
+            [self removeChild:instructions];
+            CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+                [self flyingChicken];
+            }];
+            CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
+            
+            [self runAction:[CCActionSequence actions:delay,block, nil]];
+        }
     }
 }
 -(void)armoryPressed{
@@ -776,13 +1261,50 @@
         shotCount = 0;
     }
     if ( _timeSinceLastCollision > .21f ) {
-        medalId = 0;
+            if(medalId==3){
+                CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
+                [self rewardMedal:spree andLabel:@"Double Kill" andExp:5];    }
+            else if(medalId==5){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
+                [self rewardMedal:triple andLabel:@"Triple Kill" andExp:5];
+            }
+            else if(medalId==7){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
+                [self rewardMedal:triple andLabel:@"Over Kill" andExp:5];
+            }
+            else if(medalId==9){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
+                [self rewardMedal:triple andLabel:@"KillTacular" andExp:5];
+            }
+            else if(medalId==11){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
+                [self rewardMedal:triple andLabel:@"Killpocalypse" andExp:5];
+            }
+            else if(medalId==13){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
+                [self rewardMedal:triple andLabel:@"7" andExp:10];
+            }
+            else if(medalId==15){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
+                [self rewardMedal:triple andLabel:@"8" andExp:10];
+            }
+            else if(medalId==17){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
+                [self rewardMedal:triple andLabel:@"9" andExp:10];
+            }
+            else if((medalId%19) == 0 && medalId !=0){
+                CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
+                [self rewardMedal:triple andLabel:@"10" andExp:10];
+            }
+            medalId = 0;
     }
 }
 - (void)eggRemoved:(CCNode *)egg {
     CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
     killCount++;
-    [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
+    if(![GameData sharedGameData].newPlayerFlag){
+        [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
+    }
     explosion.scale = 0.6f;
     explosion.position = egg.position;
     explosion.rotation = egg.rotation;
@@ -963,20 +1485,27 @@
 - (void)launchEgg {
     targetsLaunched++;
     CCLOG(@"%d",targetsLaunched);
-    if (arc4random() % 2 == 1 || arc4random() % 2 == 1) {
-    //targetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
-    //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
     egg.positionType = CCPositionTypePoints;
-    egg.position = ccp(440.f,160.f);
-    //egg.position =
-    [_physicsNode addChild:egg];
+    if(!running){
+        egg.position = ccp(440.f,120.f);
+    }else{
+        egg.position = ccp(470.f,150.f);
+        int min = 1;
+        int max = 30;
+        int range = max - min;
+        int random = (arc4random() % range) + min;
+        /*if (random == 2){
+            [self showAlert:1];
+        }
+         */
+        
+    }
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
     int miny = 5;
     int maxy = 15;
     int rangey = maxy - miny;
-    //int randomx = (arc4random() % rangex) + minx;
     int randomy = (arc4random() % rangey) + miny;
     CGPoint launchDirection = ccp(-10,randomy);
     int minforce = 500;
@@ -984,9 +1513,124 @@
     int rangeforce = maxforce - minforce;
     int randomforce = (arc4random() % rangeforce) + minforce;
     CGPoint force = ccpMult(launchDirection, randomforce);
+    [_physicsNode addChild:egg];
     [egg.physicsBody applyForce:force];
-    //**
+    
+    if(roundCount ==1){
+            int minTime = .9f * 1000;
+            int maxTime = 1.2f * 1000;
+            int rangeTime = maxTime - minTime;
+            int a = (arc4random() % rangeTime) + minTime;
+            float randomTime = a/1000.f;
+            CCLOG(@"%f", randomTime);
+            [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        if(![GameData sharedGameData].newPlayerFlag){
+
+        if (targetsLaunched == 10){
+            [self unschedule:@selector(launchEgg)];
+        }
+        }
     }
+    if(roundCount ==2){
+        int minTime = .5f * 1000;
+        int maxTime = .8f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        if (targetsLaunched == 20){
+            [self unschedule:@selector(launchEgg)];
+        }
+    }
+    if (roundCount == 3){
+        int minTime = .8f * 1000;
+        int maxTime = 1.2f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 40){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if (roundCount == 4){
+        int minTime = .5f * 1000;
+        int maxTime = 1.f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 90){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if (roundCount == 5){
+        int minTime = .4f * 1000;
+        int maxTime = .6f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 190){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if (roundCount == 6){
+        int minTime = .3f * 1000;
+        int maxTime = .6f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 290){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if (roundCount == 7){
+        int minTime = .2f * 1000;
+        int maxTime = .5f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 385){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if (roundCount == 8){
+        int minTime = .2f * 1000;
+        int maxTime = .4f * 1000;
+        int rangeTime = maxTime - minTime;
+        int a = (arc4random() % rangeTime) + minTime;
+        float randomTime = a/1000.f;
+        CCLOG(@"%f", randomTime);
+        CCLOG(@"%f", randomTime);
+        CCLOG(@"%f", randomTime);
+        [self scheduleOnce:@selector(launchEgg) delay:randomTime];
+        [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
+        if (targetsLaunched == 385){
+            [self unschedule:@selector(launchEgg)];
+            [self unschedule:@selector(launchEggTopRight)];
+        }
+    }
+    if(![GameData sharedGameData].newPlayerFlag){
     if(targetsLaunched == 10){
         [self roundComplete];
     }
@@ -1008,80 +1652,8 @@
     else if(targetsLaunched == 385){
         [self roundComplete];
     }
-    //[self scheduleOnce:@selector(launchEgg) delay:randomLaunch];
+    }
 }
-    /*
-     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
-     targetsLaunched++;
-     CCNode* egg = [CCBReader load:@"Egg"];
-     //egg.position = ccpAdd(_canon.position, ccp(-27, 50));
-     egg.positionType = CCPositionTypePoints;
-     egg.position = ccp(440.f,160.f);
-     //egg.position =
-     [_physicsNode addChild:egg];
-     egg.scale = 0.6f;
-     egg.rotation = -45.0f;
-     int miny = 5;
-     int maxy = 15;
-     int rangey = maxy - miny;
-     //int randomx = (arc4random() % rangex) + minx;
-     int randomy = (arc4random() % rangey) + miny;
-     CGPoint launchDirection = ccp(-10,randomy);
-     int minforce = 500;
-     int maxforce = 3000;
-     int rangeforce = maxforce - minforce;
-     int randomforce = (arc4random() % rangeforce) + minforce;
-     CGPoint force = ccpMult(launchDirection, randomforce);
-     [egg.physicsBody applyForce:force];
-     }];
-     if(targetsLaunched == 10){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 20){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 40){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 90){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 190){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 290){
-     [self roundComplete];
-     }
-     else if(targetsLaunched == 385){
-     [self roundComplete];
-     }
-     if (roundCount == 0){
-     int minTime = .9f * 1000;
-     int maxTime = 2.1f * 1000;
-     int rangeTime = maxTime - minTime;
-     int a = (arc4random() % rangeTime) + minTime;
-     float randomTime = a/1000.f;
-     CCLOG(@"%f", randomTime);
-    minLaunch = .9f * 1000;
-    maxLaunch = 2.1f*1000;
-}
-else if (roundCount == 1){
-     int minTime = .9f * 1000;
-     int maxTime = 2.1f * 1000;
-     int rangeTime = maxTime - minTime;
-     int a = (arc4random() % rangeTime) + minTime;
-     float randomTime = a/1000.f;
-     CCLOG(@"%f", randomTime);
-    minLaunch = .9f * 1000;
-    maxLaunch = 2.1f*1000;
-}
-int rangeLaunch = maxLaunch-minLaunch;
-int a = (arc4random() % rangeLaunch) + minLaunch;
-float randomLaunch = a/1000.f;
-CCLOG(@"%f",randomLaunch);
-CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
-[self runAction:[CCActionSequence actions:delay,block,nil]];
-     */
 -(void)roundComplete{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -1244,7 +1816,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
             
             
             
-            _nextRoundButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
+            _nextRoundButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"]];
             _nextRoundButton.positionType = CCPositionTypeNormalized;
             _nextRoundButton.position = ccp(.1f,.1f);
             [_nextRoundButton setTarget:self selector:@selector(_continuePressed)];
@@ -1267,7 +1839,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
             [overlay addChild:_costLabel];
             
 
-            _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:nil];
+            _repairButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/RepairPressed.png"] disabledSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Repair.png"]];
             _repairButton.positionType = CCPositionTypeNormalized;
             _repairButton.position = ccp(.65f,.5f);
             [_repairButton setTarget:self selector:@selector(repairPurchased)];
@@ -1279,7 +1851,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
             [overlay addChild:_repairs];
             
             
-            _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nuke.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nukeNil.png"] disabledSpriteFrame:nil];
+            _buyBombsButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nuke.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nukeNil.png"] disabledSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/nuke.png"]];
             _buyBombsButton.positionType = CCPositionTypeNormalized;
             _buyBombsButton.position = ccp(.65f,.3f);
             [_buyBombsButton setTarget:self selector:@selector(bombPurchased)];
@@ -1308,7 +1880,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
             _costRepair2.position = ccp(.867f, .5f);
             [overlay addChild:_costRepair2];
             
-            buyBlades = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/blade.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/bladeNil.png"] disabledSpriteFrame:nil];
+            buyBlades = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/blade.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/bladeNil.png"] disabledSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/blade.png"]];
             buyBlades.positionType = CCPositionTypeNormalized;
             buyBlades.position = ccp(.65f,.1f);
             buyBlades.scale = 1.1f;
@@ -1353,7 +1925,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
             _goldCount.position = ccp(.2f,.4f);
             [overlay addChild:_goldCount];
             
-            _shopping = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Shop.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/ShopPressed.png"] disabledSpriteFrame:nil];
+            _shopping = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Shop.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/ShopPressed.png"] disabledSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Shop.png"]];
             _shopping.positionType = CCPositionTypeNormalized;
             _shopping.position = ccp(.5f,.1f);
             [_shopping setTarget:self selector:@selector(armoryPressed)];
@@ -1373,7 +1945,7 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
     }];
     CCActionCallBlock *awardBlock = [CCActionCallBlock actionWithBlock:^{
         int min = 1;
-        int max = 3;
+        int max = 4;
         int range = max - min;
         int random = (arc4random() % range) + min;
         CCLOG(@"%d",random);
@@ -1471,6 +2043,420 @@ CCActionDelay *delay = [CCActionDelay actionWithDuration:randomLaunch];
     [self initRound:roundCount];
 }
 
+
+
+
+
+
+- (void)ShowAlertOnLayer: (CCNode *) layer{
+    //[self alertStarted];
+    static int one;
+    static int two;
+    static int three;
+    static int four;
+    
+    CCSprite *alert = [CCSprite spriteWithImageNamed:@"Assets/lowGas.png"];
+    alert.name = @"1234";
+    alert.positionType = CCPositionTypeUIPoints;
+    alert.scaleType = CCScaleTypeScaled;
+    alert.anchorPoint  = ccp(.5f,.5f);
+    alert.position = ccp(120,160);
+    
+    float fontSize = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)?30:18;
+    for (int i = 0; i<4; i++){
+        min = 1;
+        max = 5;
+        range = max - min;
+        random = (arc4random() % range) + min;
+        CCLOG(@"random:%d",random);
+        if (i==0){
+            one = random;
+            seq1 = one;
+            [GameData sharedGameData].seq1 = seq1;
+            if (seq1 == 1){
+                
+                NSString *up = [NSString stringWithFormat:@"↑"];
+                upLab = [CCLabelTTF labelWithString:up fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                upLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                upLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                upLab.name = @"up1";
+                //[alert addChild: lab1];
+                [alert addChild:upLab];
+            }
+            if (seq1 == 2){
+                //seq2 = 2;
+                NSString *right = [NSString stringWithFormat:@"→"];
+                rightLab = [CCLabelTTF labelWithString:right fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                rightLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                rightLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab2];
+                [alert addChild:rightLab];
+            }
+            if (seq1 == 3){
+                //seq3 = 3;
+                NSString *down = [NSString stringWithFormat:@"↓"];
+                downLab = [CCLabelTTF labelWithString:down fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                downLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width+ 18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                downLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:downLab];
+            }
+            if (seq1 == 4){
+                //seq4 = 4;
+                NSString *left = [NSString stringWithFormat:@"←"];
+                leftLab = [CCLabelTTF labelWithString:left fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                leftLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +50, alert.contentSize.height * 0.35f);
+                }
+                leftLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:leftLab];
+            }
+            
+            NSString *log = [NSString stringWithFormat:@"%d%d%d%d",seq1,seq2,seq3,seq4];
+            CCLOG(@"Data Sequence%d: %@",i, log);
+        }
+        else if (i == 1){
+            two = random;
+            seq2 = two;
+            [GameData sharedGameData].seq2 = seq2;
+            if (seq2 == 1){
+                NSString *up = [NSString stringWithFormat:@"↑"];
+                upLab = [CCLabelTTF labelWithString:up fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                upLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                upLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab1];
+                [alert addChild:upLab];
+            }
+            if (seq2 == 2){
+                //seq2 = 2;
+                NSString *right = [NSString stringWithFormat:@"→"];
+                rightLab = [CCLabelTTF labelWithString:right fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                rightLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                rightLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab2];
+                [alert addChild:rightLab];
+            }
+            if (seq2 == 3){
+                //seq3 = 3;
+                NSString *down = [NSString stringWithFormat:@"↓"];
+                downLab = [CCLabelTTF labelWithString:down fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                downLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width+ 18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                downLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:downLab];
+            }
+            if (seq2 == 4){
+                //seq4 = 4;
+                NSString *left = [NSString stringWithFormat:@"←"];
+                leftLab = [CCLabelTTF labelWithString:left fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                leftLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +50, alert.contentSize.height * 0.35f);
+                }
+                leftLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:leftLab];
+            }
+            
+            NSString *log = [NSString stringWithFormat:@"%d%d%d%d",seq1,seq2,seq3,seq4];
+            CCLOG(@"Data Sequence%d: %@",i, log);
+        }
+        else if (i==2){
+            three = random;
+            seq3 = three;
+            [GameData sharedGameData].seq3 = seq3;
+            if (seq3 == 1){
+                
+                NSString *up = [NSString stringWithFormat:@"↑"];
+                upLab = [CCLabelTTF labelWithString:up fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                upLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                upLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab1];
+                [alert addChild:upLab];
+            }
+            if (seq3 == 2){
+                //seq2 = 2;
+                NSString *right = [NSString stringWithFormat:@"→"];
+                rightLab = [CCLabelTTF labelWithString:right fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                rightLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                rightLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab2];
+                [alert addChild:rightLab];
+            }
+            if (seq3 == 3){
+                //seq3 = 3;
+                NSString *down = [NSString stringWithFormat:@"↓"];
+                downLab = [CCLabelTTF labelWithString:down fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                downLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width+ 18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                downLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:downLab];
+            }
+            if (seq3 == 4){
+                //seq4 = 4;
+                NSString *left = [NSString stringWithFormat:@"←"];
+                leftLab = [CCLabelTTF labelWithString:left fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                leftLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +50, alert.contentSize.height * 0.35f);
+                }
+                leftLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:leftLab];
+            }
+            
+            NSString *log = [NSString stringWithFormat:@"%d%d%d%d",seq1,seq2,seq3,seq4];
+            CCLOG(@"Data Sequence%d: %@",i, log);
+        }
+        if (i==3){
+            four = random;
+            seq4 = four;
+            [GameData sharedGameData].seq4 = seq4;
+            if (seq4 == 1){
+                
+                NSString *up = [NSString stringWithFormat:@"↑"];
+                upLab = [CCLabelTTF labelWithString:up fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                upLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                upLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab1];
+                [alert addChild:upLab];
+            }
+            if (seq4 == 2){
+                //seq2 = 2;
+                NSString *right = [NSString stringWithFormat:@"→"];
+                rightLab = [CCLabelTTF labelWithString:right fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                rightLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    rightLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                rightLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                //[alert addChild: lab2];
+                [alert addChild:rightLab];
+            }
+            if (seq4 == 3){
+                //seq3 = 3;
+                NSString *down = [NSString stringWithFormat:@"↓"];
+                downLab = [CCLabelTTF labelWithString:down fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                downLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width+ 18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 4){
+                    downLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
+                }
+                downLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:downLab];
+            }
+            if (seq4 == 4){
+                //seq4 = 4;
+                NSString *left = [NSString stringWithFormat:@"←"];
+                leftLab = [CCLabelTTF labelWithString:left fontName:@"Helvetica" fontSize:fontSize dimensions:CGSizeMake(300,100)];
+                leftLab.anchorPoint = ccp(0, 0);
+                if(i == 0){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 1){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +18, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 2){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +36, alert.contentSize.height * 0.35f);
+                }
+                else if(i == 3){
+                    leftLab.position = ccp(alert.contentSize.width - alert.contentSize.width +50, alert.contentSize.height * 0.35f);
+                }
+                leftLab.color = [CCColor colorWithCcColor3b:ccBLACK];
+                [alert addChild:leftLab];
+            }
+            
+            NSString *log = [NSString stringWithFormat:@"%d%d%d%d",seq1,seq2,seq3,seq4];
+            CCLOG(@"Data Sequence%d: %@",i, log);
+        }
+    }
+    NSString *log = [NSString stringWithFormat:@"%d%d%d%d",seq1,seq2,seq3,seq4];
+    CCLOG(@"Data Sequence: %@",log);
+    [layer addChild:alert];
+    
+    UISwipeGestureRecognizer * swipeLeft= [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeLeft)];
+    swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeLeft];
+    // listen for swipes to the right
+    UISwipeGestureRecognizer * swipeRight= [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeRight)];
+    swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeRight];
+    // listen for swipes up
+    UISwipeGestureRecognizer * swipeUp= [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeUp)];
+    swipeUp.direction = UISwipeGestureRecognizerDirectionUp;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeUp];
+    // listen for swipes down
+    UISwipeGestureRecognizer * swipeDown= [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeDown)];
+    swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
+    [[[CCDirector sharedDirector] view] addGestureRecognizer:swipeDown];
+    
+    
+    alert.opacity = 0;
+    CCActionFadeIn *fadeIn = [CCActionFadeIn actionWithDuration:.5f];
+    CCActionFadeOut *fadeOut = [CCActionFadeOut actionWithDuration:.5f];
+    [alert runAction:[CCActionSequence actions: fadeIn,fadeOut,fadeIn,fadeOut,nil]];
+    
+}
 
 
 // -----------------------------------------------------------------

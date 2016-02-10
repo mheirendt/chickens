@@ -45,6 +45,7 @@
 -(void)pauseScene;
 -(void)bombPressed;
 -(void)armoryPressed;
+-(void)eggRemoved:(CCNode*)egg;
 -(void)bombPurchased;
 -(void)repairPurchased;
 -(void)bladePressed;

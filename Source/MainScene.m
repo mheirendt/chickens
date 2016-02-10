@@ -23,4 +23,9 @@
 -(void)gameCenterPressed{
     CCLOG(@"Game Center");
 }
+-(void)tutorialPressed{
+    [GameData sharedGameData].newPlayerFlag = true;
+    CCScene *gameplayScene = [CCBReader loadAsScene:@"Gameplay"];
+    [[CCDirector sharedDirector] pushScene:gameplayScene];
+}
 @end

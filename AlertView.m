@@ -95,7 +95,7 @@
     [coverLayer runAction:[CCActionFadeTo actionWithDuration:kAnimationTime opacity:80]]; // smooth fade-in to dim with semi-transparency
     
     // open the dialog
-    CCSprite *dialog = [CCSprite spriteWithImageNamed:@"Assets/Dialog.png"];
+    CCSprite *dialog = [CCSprite spriteWithImageNamed:@"Assets/notificationBox.png"];
     dialog.name = @"1234";
     dialog.positionType = CCPositionTypeUIPoints;
     dialog.scaleType = CCScaleTypeScaled;
@@ -112,7 +112,7 @@
     
     //CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message dimensions: msgSize alignment:UITextAlignmentCenter
                                                //fontName:kFontName fontSize:fontSize];
-    CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message fontName:kFontName fontSize:fontSize dimensions:CGSizeMake(200,100)];
+    CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message fontName:kFontName fontSize:fontSize dimensions:CGSizeMake(300,100)];
     dialogMsg.anchorPoint = ccp(0, 0);
     dialogMsg.position = ccp(dialog.contentSize.width*.1f, dialog.contentSize.height * 0.35f);
     dialogMsg.color = [CCColor colorWithCcColor3b:ccBLACK];

@@ -38,6 +38,7 @@
 @property (assign,nonatomic) int bladeCount;
 
 @property (assign, nonatomic) int tableID;
+@property (assign, nonatomic) bool newPlayerFlag;
 
 @property (retain,nonatomic,readonly) NSManagedObjectModel *managedObjectModel;
 @property (retain,nonatomic,readonly) NSManagedObjectContext *managedObjectContext;
@@ -68,6 +69,11 @@
 @property (retain, nonatomic) NSNumber *rank22;
 @property (retain, nonatomic) NSNumber *rank23;
 @property (retain, nonatomic) NSNumber *rank24;
+
+@property (nonatomic) int seq1;
+@property (nonatomic) int seq2;
+@property (nonatomic) int seq3;
+@property (nonatomic) int seq4;
 
 // -----------------------------------------------------------------
 // methods

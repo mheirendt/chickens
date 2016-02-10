@@ -12,11 +12,13 @@
 
 #import "signInScene.h"
 #import "GameData.h"
+#import "AlertView.h"
 
 // -----------------------------------------------------------------
 
 @implementation signInScene{
     CCTextField *_profileText;
+    CCButton *back;
 }
 
 // -----------------------------------------------------------------
@@ -56,7 +58,7 @@
     [super onEnter];
     CCLOG(@"%d", [GameData sharedGameData].tableID);
     if([GameData sharedGameData].tableID == 3){
-        CCButton *back = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Back.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BackPressed.png"] disabledSpriteFrame:nil];
+        back = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Back.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BackPressed.png"] disabledSpriteFrame:nil];
         back.positionType = CCPositionTypeNormalized;
         back.position = ccp(.065f, .13f);
         [back setTarget:self selector:@selector(backPressed)];
@@ -78,10 +80,24 @@
     NSString* userName = [NSString stringWithString:[self buttonText:_profileText]];
     CCLOG(@"%@",userName);
     if (userName.length == 0){
-        CCLOG(@"fail");
+        id block = ^(void){
+            _profileText.enabled = true;
+            back.enabled = true;
+        };
+        _profileText.enabled = false;
+        back.enabled = false;
+        
+        [AlertView ShowAlert:@"You must enter a profile name." onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
-    else if (userName.length > 16){
-        CCLOG(@"too long");
+    else if (userName.length > 12){
+        id block = ^(void){
+            _profileText.enabled = true;
+            back.enabled = true;
+        };
+        _profileText.enabled = false;
+        back.enabled = false;
+        
+        [AlertView ShowAlert:@"Your name can't be longer than 11 characters." onLayer:self withOpt1:@"Okay" withOpt1Block:block andOpt2:nil withOpt2Block:nil];
     }
     else{
     
@@ -135,6 +151,7 @@
         
         CCScene *mainScene = [CCBReader loadAsScene:@"MainScene"];
         [[CCDirector sharedDirector] replaceScene: mainScene];
+        [GameData sharedGameData].newPlayerFlag = true;
             CCScene *gameplayScene = [CCBReader loadAsScene:@"Gameplay"];
             [[CCDirector sharedDirector] pushScene:gameplayScene];
          

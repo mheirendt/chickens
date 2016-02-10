@@ -89,19 +89,19 @@
 		</dict>
 		<key>Assets/_100.png</key>
 		<dict/>
+		<key>Horse</key>
+		<dict>
+			<key>isSmartSpriteSheet</key>
+			<true/>
+			<key>trimSprites</key>
+			<true/>
+		</dict>
 		<key>Rank</key>
 		<dict>
 			<key>isSmartSpriteSheet</key>
 			<true/>
 		</dict>
 		<key>Sprites</key>
-		<dict/>
-		<key>Text</key>
-		<dict>
-			<key>isSmartSpriteSheet</key>
-			<true/>
-		</dict>
-		<key>Text/PlayPressed.png</key>
 		<dict/>
 		<key>ccbButtonHighlighted.png</key>
 		<dict>

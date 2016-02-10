@@ -29,6 +29,7 @@
 @synthesize bladeCount;
 
 @synthesize tableID;
+@synthesize newPlayerFlag;
 
 @synthesize rank1;
 @synthesize rank2;
@@ -54,6 +55,12 @@
 @synthesize rank22;
 @synthesize rank23;
 @synthesize rank24;
+
+@synthesize seq1;
+@synthesize seq2;
+@synthesize seq3;
+@synthesize seq4;
+
 // -----------------------------------------------------------------
 
 + (instancetype)node
