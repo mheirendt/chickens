@@ -28,7 +28,6 @@
 + (instancetype)sharedGameData;
 -(void)retryPressed;
 -(void)backPressed;
--(void)addHighScore;
 // -----------------------------------------------------------------
 
 @end

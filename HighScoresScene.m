@@ -162,8 +162,10 @@
         NSLog(@"%@, %@", error2, error2.localizedDescription);
         
     } else {
-        NSString *doubles = [NSString stringWithFormat:@"%@", [person valueForKey:@"highscore"]];
-        [scoreLabel setString:doubles];
+        NSString *highScore = [NSString stringWithFormat:@"%@", [person valueForKey:@"highscore"]];
+        [scoreLabel setString:highScore];
+        NSString *highRound = [NSString stringWithFormat:@"%@", [person valueForKey:@"highround"]];
+        [roundLabel setString:highRound];
     }
     if (result.count > 0) {
         NSManagedObject *person = (NSManagedObject *)[result objectAtIndex:0];

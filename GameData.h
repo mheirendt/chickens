@@ -29,6 +29,7 @@
 // properties
 
 @property (assign, nonatomic) long highScore;
+@property (assign, nonatomic) int round;
 @property (assign, nonatomic) long score;
 @property(assign, nonatomic) int rank;
 @property (assign, nonatomic) long doubleKills;
@@ -69,6 +70,7 @@
 @property (retain, nonatomic) NSNumber *rank22;
 @property (retain, nonatomic) NSNumber *rank23;
 @property (retain, nonatomic) NSNumber *rank24;
+@property (retain, nonatomic) NSNumber *rank25;
 
 @property (nonatomic) int seq1;
 @property (nonatomic) int seq2;

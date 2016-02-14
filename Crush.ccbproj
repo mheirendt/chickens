@@ -80,15 +80,11 @@
 		</dict>
 		<key>Assets</key>
 		<dict>
-			<key>isDirty</key>
-			<true/>
 			<key>isSmartSpriteSheet</key>
 			<true/>
 			<key>trimSprites</key>
 			<true/>
 		</dict>
-		<key>Assets/_100.png</key>
-		<dict/>
 		<key>Horse</key>
 		<dict>
 			<key>isSmartSpriteSheet</key>

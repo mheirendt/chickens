@@ -29,18 +29,6 @@
 - (id)init {
     self = [super init];
     if (self) {
-        /*
-        CCSprite *overlay = [CCSprite spriteWithImageNamed:@"Assets/overlay.png"];
-        overlay.scale = 6.5f;
-        overlay.positionType = CCPositionTypeNormalized;
-        overlay.anchorPoint = ccp(.5f,.5f);
-        overlay.position = ccp(0.5f,0.5f);
-        [self addChild:overlay];
-        //[self initWithColor:ccc4(0,0,0,0)
-                      //width:[CCDirector sharedDirector].viewSize.width
-                     //height:[CCDirector sharedDirector].viewSize.height];
-        
-         */
         CCNode *overlay = [CCBReader load:@"overlay"];
         overlay.anchorPoint = ccp(.5f,.5f);
         overlay.positionType = CCPositionTypeNormalized;
@@ -52,18 +40,10 @@
 }
 
 - (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-    //CGPoint touchLocation = [self convertTouchToNodeSpace: touch];
-    //CCNode *dialogBox = [self getChildByTag: kDialogTag];
     CGPoint touchLocation = [touch locationInView:touch.view];
     CCNode *dialogBox = [self getChildByName:@"kDialogTag" recursively:NO];
     // eat all touches outside of dialog box
     return !CGRectContainsPoint(dialogBox.boundingBox, touchLocation);
-}
-
-- (void) registerWithTouchDispatcher {
-    //[[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:INT_MIN+1 swallowsTouches:YES];
-    //[[CCTouch]]
-    //[[CCDirector sharedDirector] ]
 }
 @end
 
@@ -82,9 +62,8 @@
         [coverLayer removeFromParentAndCleanup:YES];
         if (block) block();
     }],
-                           nil]];
+    nil]];
 }
-
 + (void)ShowAlert: (NSString*) message onLayer: (CCNode *) layer
           withOpt1: (NSString*) opt1 withOpt1Block: (void(^)())opt1Block
            andOpt2: (NSString*) opt2 withOpt2Block: (void(^)())opt2Block {
@@ -99,67 +78,34 @@
     dialog.name = @"1234";
     dialog.positionType = CCPositionTypeUIPoints;
     dialog.scaleType = CCScaleTypeScaled;
-    //dialog.scale = dialog.scale*2.5f;
     dialog.anchorPoint  = ccp(.5f,.5f);
     dialog.position = ccp(280,160);
     dialog.exclusiveTouch = true;
-    //dialog.position = ccp(coverLayer.contentSize.width/2, coverLayer.contentSize.height/2);
     dialog.opacity = 220; // make it a bit transparent for a cooler look
-    
-    // add the alert text
-    //CGSize msgSize = CGSizeMake(dialog.contentSize.width * 0.9, dialog.contentSize.height * 0.55);
     float fontSize = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)?42:30;
-    
-    //CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message dimensions: msgSize alignment:UITextAlignmentCenter
-                                               //fontName:kFontName fontSize:fontSize];
     CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message fontName:kFontName fontSize:fontSize dimensions:CGSizeMake(300,100)];
     dialogMsg.anchorPoint = ccp(0, 0);
     dialogMsg.position = ccp(dialog.contentSize.width*.1f, dialog.contentSize.height * 0.35f);
     dialogMsg.color = [CCColor colorWithCcColor3b:ccBLACK];
     [dialog addChild: dialogMsg];
     
-    // add one or two buttons, as needed
-    //CCMenuItemSprite *opt1Button = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile: kButtonImg]
-                                                           //selectedSprite:[CCSprite spriteWithFile: kButtonImg]
-                                                                    //block:^(id sender){
-                                                                        // close alert and call opt1block when first button is pressed
-                                                                        //[self CloseAlert:dialog onCoverLayer: coverLayer executingBlock:opt1Block];
-                                                                    //} ];
-    
     CCButton *opt1Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
     [opt1Button setBlock:^(id sender){
         ////close alert and call opt1block when first button is pressed
         [self CloseAlert:dialog onCoverLayer: coverLayer executingBlock:opt1Block];
     }];
-    opt1Button.position = ccp(dialog.textureRect.size.width * (opt2 ? 0.27f:0.5f), opt1Button.contentSize.height * 0.8f);
-    
-    //CCLabelTTF *opt1Label = [CCLabelTTF labelWithString:opt1 dimensions:opt1Button.contentSize alignment:UITextAlignmentCenter
-                                               //fontName:kFontName fontSize:fontSize];
+    opt1Button.position = ccp(dialog.textureRect.size.width * (opt2 ? 0.27f:0.5f), opt1Button.contentSize.height * 0.8f);                                         //fontName:kFontName fontSize:fontSize];
     CCLabelTTF *opt1Label = [CCLabelTTF labelWithString:opt1 fontName:@"Helvetica" fontSize:18 dimensions:CGSizeMake(200.f, 0.f)];
     opt1Label.anchorPoint = ccp(0, 1);
     opt1Label.color = [CCColor colorWithCcColor3b:ccBLACK];
     [opt1Button addChild: opt1Label];
     
     // create second button, if requested
-    
-    //CCMenuItemSprite *opt2Button = nil;
     CCButton *opt2Button = nil;
     if (opt2) {
-        /*
-        opt2Button = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile: kButtonImg]
-                                             selectedSprite:[CCSprite spriteWithFile: kButtonImg]
-                                                      block:^(id sender){
-                                                          // close alert and call opt2block when second button is pressed
-                                                          [self CloseAlert:dialog onCoverLayer: coverLayer executingBlock:opt2Block];
-                                                      } ];
-         */
         opt2Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Back.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BackPressed.png"] disabledSpriteFrame:nil];
         
         opt2Button.position = ccp(dialog.textureRect.size.width * 0.73f, opt1Button.contentSize.height * 0.8f);
-        /*
-        CCLabelTTF *opt2Label = [CCLabelTTF labelWithString:opt2 dimensions:opt2Button.contentSize alignment:UITextAlignmentCenter
-                                                   fontName:kFontName fontSize:fontSize];
-         */
         CCLabelTTF *opt2Label = [CCLabelTTF labelWithString:opt2 fontName:@"Helvetica" fontSize:18];
         opt2Label.anchorPoint = ccp(0, 0.1);
                             
@@ -167,8 +113,6 @@
         [opt2Button addChild: opt2Label];
     }
     
-    //CCMenu *menu = [CCMenu menuWithItems:opt1Button, opt2Button, nil];
-    //menu.position = CGPointZero;
     opt1Button.positionType = CCPositionTypeNormalized;
     opt2Button.positionType = CCPositionTypeNormalized;
     opt1Button.position = ccp(.3f,.3f);

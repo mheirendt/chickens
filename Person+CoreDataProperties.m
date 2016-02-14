@@ -34,5 +34,8 @@
 @dynamic hundred;
 @dynamic perfect;
 @dynamic gold;
+@dynamic highround;
+@dynamic blades;
+@dynamic nukes;
 
 @end

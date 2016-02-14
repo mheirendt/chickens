@@ -36,6 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSNumber *hundred;
 @property (nullable, nonatomic, retain) NSNumber *perfect;
 @property (nullable, nonatomic, retain) NSNumber *gold;
+@property (nullable, nonatomic, retain) NSNumber *highround;
+@property (nullable, nonatomic, retain) NSNumber *blades;
+@property (nullable, nonatomic, retain) NSNumber *nukes;
 
 
 @end

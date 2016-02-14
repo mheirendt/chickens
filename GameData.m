@@ -24,6 +24,7 @@
 }
 @synthesize hiScores;
 @synthesize rank = _rank;
+@synthesize round;
 
 @synthesize bombCount;
 @synthesize bladeCount;
@@ -55,6 +56,7 @@
 @synthesize rank22;
 @synthesize rank23;
 @synthesize rank24;
+@synthesize rank25;
 
 @synthesize seq1;
 @synthesize seq2;
@@ -111,7 +113,7 @@
     icon.scale = .8f;
     icon.position=(ccp(.1f,.81f));
     
-  /*
+
     self.rank1 = [NSNumber numberWithInt:300];
     self.rank2 = [NSNumber numberWithInt:600];
     self.rank3 = [NSNumber numberWithInt:1000];
@@ -136,7 +138,8 @@
     self.rank22 = [NSNumber numberWithInt:1000000];
     self.rank23 = [NSNumber numberWithInt:1500000];
     self.rank24 = [NSNumber numberWithInt:2000000];
-   */
+    self.rank25 = [NSNumber numberWithInt:5000000];
+    /*
     self.rank1 = [NSNumber numberWithInt:1];
     self.rank2 = [NSNumber numberWithInt:2];
     self.rank3 = [NSNumber numberWithInt:3];
@@ -161,6 +164,7 @@
     self.rank22 = [NSNumber numberWithInt:22];
     self.rank23 = [NSNumber numberWithInt:23];
     self.rank24 = [NSNumber numberWithInt:24];
+     */
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
