@@ -15,10 +15,25 @@
 #import "GameData.h"
 #import "TableView.h"
 #import "AlertView.h"
-#import "LowAlert.h"
 // -----------------------------------------------------------------
 
 @implementation Gameplay{
+    /*
+     *******TODO
+     
+     * In app Purchases
+        -Set up links to armory in overlay and profile scenes
+        -set up iTunes Connect account and App ID
+        -set up variable for flags with if/else statement for when the user buys upgrades
+    * Create wallet for blades
+    * Create setttings page
+    * Disallow profile creation after 10 profiles have been made.
+    * Tutorial how to process
+    * Multiple Touch
+    * Prevent Gas alert during blade session
+    * Fix gas alert up and right arrows in first position
+     
+     */
     CCPhysicsNode *_physicsNode;//Physics node for all objects to be included to be added to
     CCLabelTTF *_scoreLabel;    //Label to store the score during gameplay
     CCLabelTTF *roundLabel;     //Top left label that flashes during the start of a new round showing the current round number
@@ -129,7 +144,8 @@
     
     CCSprite *alert;
     
-    
+    CCParticleSystem *emitter;
+    int failedOnce;
 }
 // -----------------------------------------------------------------
 + (instancetype)node
@@ -154,6 +170,7 @@
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     self.userInteractionEnabled = TRUE;
+    self.multipleTouchEnabled = YES;
     _physicsNode.collisionDelegate = self;
     _health = 100.f;
     roundCount=1;
@@ -186,8 +203,15 @@
     blade = [CCBReader load:@"Bullet"];
     blade.visible = false;
     blade.scale = .6;
-    if([GameData sharedGameData].newPlayerFlag){
-        [GameData sharedGameData].bombCount = 1;
+    if([GameData sharedGameData].newPlayerFlag == true){
+        if (person.nukes.intValue == 0)
+        {
+            [person setValue:[NSNumber numberWithInt:1] forKey:@"nukes"];
+            if (![person.managedObjectContext save:&error2]) {
+                NSLog(@"Unable to save managed object context.");
+                NSLog(@"%@, %@", error2, error2.localizedDescription);
+            }
+        }
         [GameData sharedGameData].bladeCount = 1;
         _bomb.visible = false;
         bladeButton.visible = false;
@@ -204,13 +228,55 @@
     currentSequence = 1;
     [_bombCount setString:[NSString stringWithFormat:@"%@",[person valueForKey:@"nukes"]]];
     [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
-    if(![GameData sharedGameData].newPlayerFlag){
+    if(![GameData sharedGameData].newPlayerFlag == true){
         [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
         [self initRound:roundCount];
     }
     else{
         [self scheduleOnce:@selector(launchEgg)delay:4.5f];
     }
+    if([GameData sharedGameData].newPlayerFlag == true){
+        bladeButton.visible = false;
+        bladeCount.visible = false;
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn." fontName:@"Helvetica" fontSize:32 dimensions:CGSizeMake(300, 200)];
+            instructions.positionType = CCPositionTypeNormalized;
+            instructions.position = ccp(.5f,.3f);
+            [self addChild:instructions];
+            continueButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
+            continueButton.positionType = CCPositionTypeNormalized;
+            continueButton.position = ccp(.5f, .1f);
+            [continueButton setTarget:self selector:@selector(continuePressed)];
+            [self addChild:continueButton];
+        }];
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:4.5f];
+        
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            _bomb.visible = true;
+            _bombCount.visible = true;
+            _bomb.enabled = false;
+            [instructions setString:@"Nukes blow up all eggs on the screen."];
+        }];
+        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"You can purchase nukes with gold eggs or get rewarded with one after completing a round"];
+        }];
+        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+            [self addChild:instructions];
+            _bomb.enabled = true;
+            [instructions setString:@"Nuke em to continue."];
+            [[CCDirector sharedDirector] pause];
+        }];
+        [self runAction:[CCActionSequence actions:delay,block, delay, block2, delay1, block3, delay1, block4,  nil]];
+    }
+
 }
 
 - (void)scrollBackground:(CCTime)dt
@@ -251,7 +317,7 @@
     horse.position = ccp(700,94.5f);
     horse.scale = .7f;
     CCActionMoveTo *move = [CCActionMoveTo actionWithDuration:1.5f position:ccp(382,94.5)];
-    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:.1f position:ccp(700,107)];
+    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.f position:ccp(700,107)];
     CCActionDelay *delay = [CCActionDelay actionWithDuration:1.1f];
     CCActionCallBlock *blockRun = [CCActionCallBlock actionWithBlock:^(void){
         [self schedule:@selector(scrollBackground:) interval:0.005f];
@@ -261,14 +327,14 @@
     }];
     CCActionDelay *globalDelay = [CCActionDelay actionWithDuration:2.f];
     CCActionMoveTo *passCanon = [CCActionMoveTo actionWithDuration:1.f position:ccp(700,chicken.position.y)];
-    CCActionMoveTo *catchUp = [CCActionMoveTo actionWithDuration: 1.5f position:ccp(self.contentSize.width - 80,107)];
+    CCActionMoveTo *catchUp = [CCActionMoveTo actionWithDuration: .9f position:ccp(self.contentSize.width - 80,107)];
     [horse runAction:[CCActionSequence actions:globalDelay,blockRun, delay, move, nil]];
-    [chicken runAction:[CCActionSequence actions:globalDelay, passCanon, catchUp,nil]];
+    [chicken runAction:[CCActionSequence actions:globalDelay, passCanon, lift, catchUp,nil]];
     [_tractor runAction:[CCActionMoveTo actionWithDuration:2.f position:ccp(-20.f,_tractor.position.y)]];
     CCActionMoveTo *liftBarn = [CCActionMoveTo actionWithDuration:.5f position:ccp(_barn.position.x,_barn.position.y+20)];
     CCActionDelay *barnDelay = [CCActionDelay actionWithDuration:1.f];
     [_barn runAction:[CCActionSequence actions:barnDelay, liftBarn,nil]];
-    [chicken runAction:[CCActionSequence actions:globalDelay, passCanon, lift, catchUp, nil]];
+
 }
 -(void)continuePressed{
     [self removeChild:continueButton];
@@ -438,51 +504,6 @@
     }
 }
 
--(void)onEnter{
-    [super onEnter];
-    [self ShowAlertOnLayer:self];
-    if([GameData sharedGameData].newPlayerFlag){
-        bladeButton.visible = false;
-        bladeCount.visible = false;
-        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
-            [[CCDirector sharedDirector] pause];
-            instructions = [CCLabelTTF labelWithString:@"Tap on an egg to crack it before it hits the barn." fontName:@"Helvetica" fontSize:32 dimensions:CGSizeMake(300, 200)];
-            instructions.positionType = CCPositionTypeNormalized;
-            instructions.position = ccp(.5f,.3f);
-            [self addChild:instructions];
-            continueButton = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
-            continueButton.positionType = CCPositionTypeNormalized;
-            continueButton.position = ccp(.5f, .1f);
-            [continueButton setTarget:self selector:@selector(continuePressed)];
-            [self addChild:continueButton];
-        }];
-        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
-        CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
-        
-        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
-            [[CCDirector sharedDirector] pause];
-            [self addChild:continueButton];
-            [self addChild:instructions];
-            _bomb.visible = true;
-            _bombCount.visible = true;
-            _bomb.enabled = false;
-            [instructions setString:@"Nukes blow up all eggs on the screen."];
-        }];
-        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
-            [[CCDirector sharedDirector] pause];
-            [self addChild:continueButton];
-            [self addChild:instructions];
-            [instructions setString:@"You can purchase nukes with gold eggs or get rewarded with one after completing a round"];
-        }];
-        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
-            [self addChild:instructions];
-            _bomb.enabled = true;
-            [instructions setString:@"Nuke em to continue."];
-            [[CCDirector sharedDirector] pause];
-        }];
-        [self runAction:[CCActionSequence actions:delay,block, delay, block2, delay1, block3, delay1, block4,  nil]];
-    }
-}
 -(void)addChicken:(float)x y:(float)y androtation:(float)rotation andMoveToX:(float)movex andMoveToY:(float)movey{
     if (roundCount == 1){
     CGPoint point =  CGPointMake(x,y);
@@ -492,15 +513,36 @@
     id delay = [CCActionDelay actionWithDuration: .5f];
     [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
     }
-    else{
-        chicken = [CCBReader load:@"Canon"];
+    else if (roundCount == 3){
+        CCNode *chicken2 = [CCBReader load:@"Canon"];
         CGPoint point =  CGPointMake(x,y);
-        chicken.position = point;
-        chicken.rotation = rotation;
+        chicken2.position = point;
+        chicken2.rotation = rotation;
         id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey)];
         id delay = [CCActionDelay actionWithDuration: .5f];
-        [self addChild:chicken];
-        [chicken runAction:[CCActionSequence actions: delay, moveCk, nil]];
+        [self addChild:chicken2];
+        [chicken2 runAction:[CCActionSequence actions: delay, moveCk, nil]];
+    }
+    else{
+        CCNode *chicken3 = [CCBReader load:@"Canon"];
+        CGPoint point =  CGPointMake(x,y);
+        chicken3.position = point;
+        chicken3.rotation = rotation;
+        chicken3.scaleX *= -1;
+        id moveCk=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey)];
+        id delay = [CCActionDelay actionWithDuration: .5f];
+        [self addChild:chicken3];
+        [chicken3 runAction:[CCActionSequence actions: delay, moveCk, nil]];
+        
+        CCNode *chicken4 = [CCBReader load:@"Canon"];
+        CGPoint point4 =  CGPointMake(x,y+190);
+        chicken4.position = point4;
+        chicken4.rotation = 50.f;
+        chicken4.scaleX *=-1;
+        id moveCk4=[CCActionMoveTo actionWithDuration:2.0f position:ccp(movex,movey+190)];
+        id delay4 = [CCActionDelay actionWithDuration: .5f];
+        [self addChild:chicken4];
+        [chicken4 runAction:[CCActionSequence actions: delay4, moveCk4, nil]];
     }
 }
 -(void)flyingChicken{
@@ -539,7 +581,7 @@
     CGPoint force = ccpMult(launchDirection, randomforce);
     [_physicsNode addChild:gold];
     [gold.physicsBody applyForce:force];
-    if([GameData sharedGameData].newPlayerFlag){
+    if([GameData sharedGameData].newPlayerFlag == true){
         CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
         CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
             [[CCDirector sharedDirector] pause];
@@ -581,7 +623,7 @@
                 NSLog(@"Unable to save managed object context.");
                 NSLog(@"%@, %@", error2, error2.localizedDescription);
             }
-            if([GameData sharedGameData].newPlayerFlag){
+            if([GameData sharedGameData].newPlayerFlag == true){
                 [[CCDirector sharedDirector] resume];
                 CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
                 CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
@@ -629,7 +671,7 @@
         CCActionRemove *actionRemove = [CCActionRemove action];
         id delay = [CCActionDelay actionWithDuration:.000001f];
         [bullet runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
-        [_physicsNode addChild:blade];
+        //[_physicsNode addChild:blade];
     }
 }
 -(void)timerUpdate:(CCTime)delta
@@ -644,6 +686,7 @@
     }
     if(timeRemain == 0){
         bladeActive = 0;
+        [_physicsNode removeChild:blade];
         [self removeChild:timer];
         [self unschedule:@selector(timerUpdate:)];
         [bladeButton setEnabled:true];
@@ -652,6 +695,7 @@
 -(void)bladePressed{
     if([GameData sharedGameData].bladeCount >=1){
     bladeActive = 1;
+        [_physicsNode addChild:blade];
     [bladeButton setEnabled:false];
     timeRemain = 15;
     timer = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d",timeRemain] fontName:@"Helvetica" fontSize:14];
@@ -662,13 +706,14 @@
     [bladeCount setString:[NSString stringWithFormat:@"%d",[GameData sharedGameData].bladeCount]];
     [self schedule:@selector(timerUpdate:) interval:1];
     }
-    if([GameData sharedGameData].newPlayerFlag){
+    if([GameData sharedGameData].newPlayerFlag == true){
         [[CCDirector sharedDirector] resume];
         [self removeChild:instructions];
+        /*
         CCActionDelay *delay = [CCActionDelay actionWithDuration:1.5f];
         CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
             [self addChild:instructions];
-            [instructions setString:@"You're all caught up, good luck!"];
+            [instructions setString:@"Eventually you will be mobile. Still, protect the barn at all cost."];
             [[CCDirector sharedDirector]pause];
             [self addChild:continueButton];
         }];
@@ -677,12 +722,107 @@
             [self removeChild:instructions];
             [GameData sharedGameData].score = 0;
             [_scoreLabel setString:@"0"];
-            [GameData sharedGameData].newPlayerFlag = false;
+            [GameData sharedGameData].newPlayerFlag == true = false;
             [self unschedule:@selector(launchEgg)];
             [self newRound:[NSString stringWithFormat:@"%d",roundCount]];
             [self initRound:roundCount];
         }];
         [self runAction:[CCActionSequence actions:delay1,block, delay, block1, nil]];
+         */
+        /*
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:5.f];
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Eventually you will be mobile. Still, protect the barn at all cost."];
+        }];
+        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"While you are being towed, you will have to refuel on occation."];
+        }];
+        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //[self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Swipe in the direction of the command prompts in order to gas up."];
+        }];
+        CCActionCallBlock *block5 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //[self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"If you fail, your tractor will slow down and start smoking."];
+        }];
+        CCActionCallBlock *block6 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //[self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Fail again, you're tractor runs off without you. Prevent this at all costs."];
+        }];
+        CCActionCallBlock *block7 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //[self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"The round after you lose your tractor, two more chickens appear."];
+        }];
+        CCActionCallBlock *block8 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            //[self addChild:continueButton];
+            [self addChild:instructions];
+            [self showGasAlert];
+            [instructions setString:@"At this point, you'd better hope you stocked up on nukes and pitchforks!"];
+        }];
+        */
+        CCActionDelay *delay1 = [CCActionDelay actionWithDuration:.01f];
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:4.5f];
+        
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Eventually you will be mobile. Still, protect the barn at all cost."];
+        }];
+        CCActionCallBlock *block3 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"While you are being towed, you will have to refuel on occation."];
+        }];
+        CCActionCallBlock *block4 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Swipe in the direction of the command prompts in order to gas up."];
+        }];
+        CCActionCallBlock *block5 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"If you fail, your tractor will slow down and start smoking."];
+        }];
+        CCActionCallBlock *block6 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"Fail again, you're tractor runs off without you. Prevent this at all costs."];
+        }];
+        CCActionCallBlock *block7 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [instructions setString:@"The round after you lose your tractor, two more chickens appear."];
+        }];
+        CCActionCallBlock *block8 = [CCActionCallBlock actionWithBlock:^(void){
+            [[CCDirector sharedDirector] pause];
+            [self addChild:continueButton];
+            [self addChild:instructions];
+            [self showGasAlert];
+            [instructions setString:@"At this point, you'd better hope you stocked up on nukes and pitchforks!"];
+        }];
+        [self runAction:[CCActionSequence actions:delay,block2,delay1,block3,delay1,block4,block5,delay1,block6,delay1,block7, delay1, block8, nil]];
     }
 }
 -(void)touchMoved:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
@@ -692,23 +832,14 @@
         [self doStep:.001f];
     }
 }
--(void)touchEnded:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
-    if (blade){
-        [_physicsNode removeChild:blade];
-    }
-}
--(void)touchCancelled:(CCTouch *)touch withEvent:(CCTouchEvent *)event{
-    if (blade){
-        [_physicsNode removeChild:blade];
-    }
-}
 - (void)doStep:(CCTime)delta
 {
     //update the blades position
     blade.position = _endPoint;
     [streak setPosition:_endPoint];
 }
--(void)bombPurchased{
+-(void)bombPurchased
+{
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
@@ -834,7 +965,7 @@
     totalTargetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
     egg.positionType = CCPositionTypePoints;
-    egg.position = ccp(540.f,300.f);
+    egg.position = ccp(555.f,300.f);
     [_physicsNode addChild:egg];
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
@@ -843,6 +974,42 @@
     int rangey = maxy - miny;
     int randomy = (arc4random() % rangey) + miny;
     CGPoint launchDirection = ccp(-10,randomy);
+    int minforce = 3000;
+    int maxforce = 5000;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    [egg.physicsBody applyForce:force];
+}
+- (void)launchEggBottomLeft {
+    totalTargetsLaunched++;
+    CCNode* egg = [CCBReader load:@"Egg"];
+    egg.positionType = CCPositionTypePoints;
+    egg.position = ccp(25.f,120.f);
+    [_physicsNode addChild:egg];
+    egg.scale = 0.6f;
+    egg.rotation = 45.0f;
+    int miny = 7;
+    int maxy = 15;
+    int rangey = maxy - miny;
+    int randomy = (arc4random() % rangey) + miny;
+    CGPoint launchDirection = ccp(10,randomy);
+    int minforce = 2000;
+    int maxforce = 5000;
+    int rangeforce = maxforce - minforce;
+    int randomforce = (arc4random() % rangeforce) + minforce;
+    CGPoint force = ccpMult(launchDirection, randomforce);
+    [egg.physicsBody applyForce:force];
+}
+- (void)launchEggTopLeft {
+    totalTargetsLaunched++;
+    CCNode* egg = [CCBReader load:@"Egg"];
+    egg.positionType = CCPositionTypePoints;
+    egg.position = ccp(25.f,270.f);
+    [_physicsNode addChild:egg];
+    egg.scale = 0.6f;
+    egg.rotation = 45.0f;
+    CGPoint launchDirection = ccp(10,-1);
     int minforce = 3000;
     int maxforce = 5000;
     int rangeforce = maxforce - minforce;
@@ -863,7 +1030,7 @@
     int maxy = 3;
     int rangey = maxy - miny;
     int randomy = (arc4random() % rangey) + miny;
-    if(![GameData sharedGameData].newPlayerFlag){
+    if(![GameData sharedGameData].newPlayerFlag == true){
         if (randomy == 2){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 [self flyingChicken];
@@ -886,6 +1053,32 @@
     }
 }
 -(void)initRound:(int)number{
+    if (number >=3){
+        if (failedOnce == 0){
+            [horse setPaused:false];
+            [_tractor setPaused:false];
+            [self schedule:@selector(scrollBackground:) interval:0.005f];
+            [self schedule:@selector(scrollMid:) interval:.08f];
+            [self schedule:@selector(scrollBack:) interval:.15f];
+        } else if(failedOnce == 1){
+            [horse setPaused:false];
+            [_tractor setPaused:false];
+            [self schedule:@selector(scrollBackground:) interval:0.005f];
+            [self schedule:@selector(scrollMid:) interval:.08f];
+            [self schedule:@selector(scrollBack:) interval:.15f];
+            emitter = [CCParticleSystem particleWithFile:@"exhaust.plist"];
+            [self addChild:emitter];
+            emitter.position = ccp(_barn.position.x-80,_barn.position.y);
+            emitter.zOrder = 2;
+            running = true;
+        } else{
+            //Barn is crashed and we need to schedule two chickens
+            if (failedOnce!=3){
+                failedOnce++;
+                [self addChicken:-50 y:80 androtation:0.f andMoveToX:-22 andMoveToY:80];
+            }
+        }
+    }
         switch (number){
             case 1:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
@@ -894,37 +1087,300 @@
             case 2:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self startRunning];
+                [self scheduleOnce:@selector(showGasAlert)delay:(10.f)];
                 break;
             }
             case 3:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
-                [self addChicken:self.contentSize.width+50 y:self.contentSize.height-100 androtation:-45 andMoveToX:self.contentSize.width andMoveToY:self.contentSize.height-100];
-                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                [self addChicken:self.contentSize.width+80 y:self.contentSize.height-100 androtation:-45 andMoveToX:self.contentSize.width + 15 andMoveToY:self.contentSize.height-100];
+                int miny = 4;
+                int maxy = 6;
+                int rangey = maxy - miny;
+                int randomy = (arc4random() % rangey) + miny;
+                [self scheduleOnce:@selector(launchEggTopRight) delay:randomy];
+                if (running){
+                    [self scheduleOnce:@selector(showGasAlert)delay:(randomy)];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
             case 4:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if (running){
+                    [self scheduleOnce:@selector(showGasAlert)delay:(10.f)];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
             case 5:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if (running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:3 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
             case 6:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if (running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
             case 7:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
             case 8:{
                 [self scheduleOnce:@selector(launchEgg) delay:5.f];
                 [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:6 delay:15.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 9:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 10:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 11:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 12:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 13:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 14:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 15:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 16:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 17:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 18:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 19:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
+                break;
+            }
+            case 20:{
+                [self scheduleOnce:@selector(launchEgg) delay:5.f];
+                [self scheduleOnce:@selector(launchEggTopRight) delay:7.f];
+                if(running){
+                    [self schedule:@selector(showGasAlert) interval:10.f repeat:4 delay:5.f];
+                }
+                if (failedOnce == 3){
+                    int miny = 4;
+                    int maxy = 6;
+                    int rangey = maxy - miny;
+                    int randomy = (arc4random() % rangey) + miny;
+                    [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomy];
+                    [self scheduleOnce:@selector(launchEggTopLeft) delay:randomy];
+                }
                 break;
             }
     }
@@ -933,7 +1389,7 @@
     _timeSinceLastCollision = 0.0;
     medalId++;
     targetsDestroyed++;
-    if (![GameData sharedGameData].newPlayerFlag){
+    if (![GameData sharedGameData].newPlayerFlag == true){
         [GameData sharedGameData].score++;
     }
         [[_physicsNode space] addPostStepBlock:^{
@@ -971,8 +1427,8 @@
     } key:nodeA];
 }
 -(void)eggReflected:(CCNode*)egg{
-    int minforce = 1000;
-    int maxforce = 1500;
+    int minforce = 300;
+    int maxforce = 700;
     int rangeforce = maxforce - minforce;
     int randomforce = (arc4random() % rangeforce) + minforce;
     CGPoint launchDirection = ccp(20,-10);
@@ -1045,7 +1501,7 @@
         }];
         [show runAction:[CCActionSequence actions:fade,delay2,fadeOut, remove, nil]];
         [bomb runAction:[CCActionSequence actions:disable, delay2, remove, enable, nil]];
-        if([GameData sharedGameData].newPlayerFlag){
+        if([GameData sharedGameData].newPlayerFlag == true){
             [[CCDirector sharedDirector] resume];
             [self removeChild:instructions];
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
@@ -1119,7 +1575,6 @@
     [self addChild:explosion];
     [barn removeFromParent];
 }
-
 - (void)update:(CCTime)delta {
     _timeSinceLastCollision += delta;
     if (killCount < shotCount){
@@ -1127,38 +1582,35 @@
         shotCount = 0;
     }
     if ( _timeSinceLastCollision > .21f ) {
-            if(medalId==2){
-                CCSprite *spree = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
-                [self rewardMedal:spree andLabel:@"Double Kill" andExp:5];    }
-            else if(medalId==4){
+            if(medalId==3){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
                 [self rewardMedal:triple andLabel:@"Triple Kill" andExp:5];
             }
-            else if(medalId==6){
+            else if(medalId==4){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
                 [self rewardMedal:triple andLabel:@"Over Kill" andExp:5];
             }
-            else if(medalId==8){
+            else if(medalId==5){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
                 [self rewardMedal:triple andLabel:@"KillTacular" andExp:5];
             }
-            else if(medalId==10){
+            else if(medalId==6){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
                 [self rewardMedal:triple andLabel:@"Killpocalypse" andExp:5];
             }
-            else if(medalId==12){
+            else if(medalId==7){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
                 [self rewardMedal:triple andLabel:@"7" andExp:10];
             }
-            else if(medalId==14){
+            else if(medalId==8){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
                 [self rewardMedal:triple andLabel:@"8" andExp:10];
             }
-            else if(medalId==16){
+            else if(medalId==9){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
                 [self rewardMedal:triple andLabel:@"9" andExp:10];
             }
-            else if((medalId%18) == 0 && medalId !=0){
+            else if((medalId%10) == 0 && medalId !=0){
                 CCSprite *triple = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
                 [self rewardMedal:triple andLabel:@"10" andExp:10];
             }
@@ -1168,7 +1620,7 @@
 - (void)eggRemoved:(CCNode *)egg {
     CCNode *explosion = (CCNode *)[CCBReader load:@"LeftShot"];
     killCount++;
-    if(![GameData sharedGameData].newPlayerFlag){
+    if(![GameData sharedGameData].newPlayerFlag == true){
         [_scoreLabel setString:[NSString stringWithFormat:@"%li", [GameData sharedGameData].score]];
     }
     explosion.scale = 0.6f;
@@ -1179,12 +1631,12 @@
     id delay = [CCActionDelay actionWithDuration:0.3f];
     [explosion runAction:[CCActionSequence actionWithArray:@[delay, actionRemove]]];
     [egg removeFromParent];
+    CCLOG(@"%d", medalId);
 }
 
 
 -(void)rewardMedal:(CCSprite *)medalType andLabel:(NSString*)input andExp:(int)points {
     medalCount+=1;
-    [GameData sharedGameData].doubleKills += 1;
     [GameData sharedGameData].score+=points;
     medalType.positionType = CCPositionTypeNormalized;
     if(medalCount == 1){
@@ -1231,6 +1683,7 @@
     CCActionDelay *delay =  [CCActionDelay actionWithDuration:.6f];
     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
         [self removeChild:medalType];
+        [_scoreLabel setString:[NSString stringWithFormat:@"%ld",[GameData sharedGameData].score]];
         [self removeChild:label];
         medalCount-=1;
     }];
@@ -1244,12 +1697,8 @@
     [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
-    if([input isEqualToString:@"Double Kill"]){
-        int doubleCount = person.two.intValue;
-        doubleCount++;
-        [person setValue:[NSNumber numberWithInt:doubleCount] forKey:@"two"];
-    }
-    else if ([input isEqualToString:@"Triple Kill"]){
+
+    if ([input isEqualToString:@"Triple Kill"]){
         int tripleCount = person.three.intValue;
         tripleCount++;
         [person setValue:[NSNumber numberWithInt:tripleCount] forKey:@"three"];
@@ -1334,10 +1783,13 @@
     totalTargetsLaunched++;
     CCNode* egg = [CCBReader load:@"Egg"];
     egg.positionType = CCPositionTypePoints;
-    if(!running){
+    if(roundCount == 1){
         egg.position = ccp(440.f,120.f);
-    }else{
-        egg.position = ccp(470.f,150.f);
+    }else if (running){
+        egg.position = ccp(470.f,135.f);
+    }
+    else{
+        egg.position = ccp(self.contentSize.width-25.f,120.f);
     }
     egg.scale = 0.6f;
     egg.rotation = -45.0f;
@@ -1361,7 +1813,7 @@
             float randomTime = a/1000.f;
             [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         //Check if tutorial is running. If it isnt, finish round 1. Only needed for round 1
-        if(![GameData sharedGameData].newPlayerFlag){
+        if(![GameData sharedGameData].newPlayerFlag == true){
         if (targetsLaunched == 10){
                 CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                     if (totalTargetsLaunched == targetsDestroyed){
@@ -1388,7 +1840,6 @@
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
                     targetsDestroyed = 0;
-                    CCLOG(@"PERFECT");
                     [self rewardMedal:[CCSprite spriteWithImageNamed:@"Assets/Perfect.png"] andLabel:@"Perfect Round" andExp:10];
                 }
             }];
@@ -1405,7 +1856,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 40){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 50){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1417,6 +1872,10 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
     if (roundCount == 4){
@@ -1427,7 +1886,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 90){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 150){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1439,6 +1902,10 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
     if (roundCount == 5){
@@ -1449,7 +1916,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 190){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 300){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1461,6 +1932,10 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
     if (roundCount == 6){
@@ -1471,7 +1946,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 290){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 500){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1483,6 +1962,10 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
     if (roundCount == 7){
@@ -1493,7 +1976,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 385){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 750){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1505,6 +1992,10 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
     if (roundCount == 8){
@@ -1515,7 +2006,11 @@
         float randomTime = a/1000.f;
         [self scheduleOnce:@selector(launchEgg) delay:randomTime];
         [self scheduleOnce:@selector(launchEggTopRight) delay:randomTime];
-        if (targetsLaunched == 385){
+        if (failedOnce == 3){
+            [self scheduleOnce:@selector(launchEggTopLeft) delay:randomTime];
+            [self scheduleOnce:@selector(launchEggBottomLeft) delay:randomTime];
+        }
+        if (targetsLaunched == 1000){
             CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
                 if (totalTargetsLaunched == targetsDestroyed){
                     totalTargetsLaunched = 0;
@@ -1527,28 +2022,83 @@
             [self runAction:[CCActionSequence actions:delay,block,nil]];
             [self unschedule:@selector(launchEgg)];
             [self unschedule:@selector(launchEggTopRight)];
+            if (failedOnce == 3){
+                [self unschedule:@selector(launchEggTopLeft)];
+                [self unschedule:@selector(launchEggBottomLeft)];
+            }
         }
     }
-    if(![GameData sharedGameData].newPlayerFlag){
-    if(targetsLaunched == 10){
+    if(![GameData sharedGameData].newPlayerFlag == true){
+    if(targetsLaunched == 10){  //round 1 over
+        if (failedOnce == 1){
+            emitter.emissionRate = 20.f;
+        }
         [self roundComplete];
     }
-    else if(targetsLaunched == 20){
+    else if(targetsLaunched == 20){ //round 2 over
+        if (failedOnce == 1){
+            emitter.emissionRate = 20.f;
+        }
         [self roundComplete];
     }
-    else if(targetsLaunched == 40){
+    else if(targetsLaunched == 50){ //round 3 over
+        if (failedOnce == 1){
+            emitter.emissionRate = 20.f;
+        }
         [self roundComplete];
     }
-    else if(targetsLaunched == 90){
+    else if(targetsLaunched == 150){    //round 4 over
+        if (failedOnce == 1){
+            emitter.emissionRate = 20.f;
+        }
         [self roundComplete];
     }
-    else if(targetsLaunched == 190){
+    else if(targetsLaunched == 300){    //round 5 over
         [self roundComplete];
     }
-    else if(targetsLaunched == 290){
+    else if(targetsLaunched == 500){    //round 6 over
         [self roundComplete];
     }
-    else if(targetsLaunched == 385){
+    else if(targetsLaunched == 750){    //round 7 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 8 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 9 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 10 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 11 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 12 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 13 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 14 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 15 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 16 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 17 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 18 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 19 over
+        [self roundComplete];
+    }
+    else if(targetsLaunched == 1000){   //round 20 over
         [self roundComplete];
     }
     }
@@ -1571,62 +2121,72 @@
     }
     CCActionDelay *delay =  [CCActionDelay actionWithDuration:6.f];
     CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
-    overlay = [CCBReader load:@"overlay"];
-    overlay.anchorPoint = ccp(.5f,.5f);
-    overlay.positionType = CCPositionTypeNormalized;
-    overlay.position = ccp(.5f,.5f);
-    [self addChild:overlay];
-    self.userInteractionEnabled = FALSE;
-    _pauseButton.visible = false;
-    _bomb.visible = false;
-    roundLabel.visible = false;
-    _bombCount.visible = false;
-    bladeCount.visible = false;
-    timer.visible = false;
-    bladeButton.visible = false;
-    NSString *string = [NSString stringWithFormat:@"Round %d Complete!", roundCount];
-    complete = [CCLabelTTF labelWithString:string fontName:nil fontSize:48];
-    complete.positionType = CCPositionTypeNormalized;
-    complete.position = ccp(.5f,.5f);
-    [overlay addChild:complete];
-    CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
-    CCActionDelay *delay2 = [CCActionDelay actionWithDuration:1.2f];
-    CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
-    CCActionRemove *remove = [CCActionRemove action];
-    [complete runAction:[CCActionSequence actions:fade, delay2, lift,remove,nil]];
-    CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
-        [_bombCount setString:[NSString stringWithFormat:@"%@",[person valueForKey:@"nukes"]]];
-        [_nukes setString:[NSString stringWithFormat:@"%@",[person valueForKey:@"nukes"]]];
-        rank = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:18];
-        [overlay addChild:rank];
-        user = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:22];
-        [overlay addChild:user];
-        icon = [CCSprite spriteWithImageNamed:@"Rank/a_Recruit.png"];
-        icon.scale = .8f;
-        [overlay addChild:icon];
-        [[GameData sharedGameData] summarizeRank:rank andUser:user andRankIcon:icon];
-        base = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
-        base.anchorPoint = ccp(0,1);
-        base.positionType = CCPositionTypeNormalized;
-        base.position = ccp(.2f,.65f);
-        [overlay addChild:base];
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        [request setEntity:entity];
-        NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+        overlay = [CCBReader load:@"overlay"];
+        overlay.anchorPoint = ccp(.5f,.5f);
+        overlay.positionType = CCPositionTypeNormalized;
+        overlay.position = ccp(.5f,.5f);
+        [self addChild:overlay];
+        if (running){
+            [self unschedule:@selector(scrollBackground:)];
+            [self unschedule:@selector(scrollMid:)];
+            [self unschedule:@selector(scrollBack:)];
+            [_tractor setPaused:true];
+            [horse setPaused:true];
+        }
+        running = false;
+        emitter.duration = .01f;
+        emitter.autoRemoveOnFinish = true;
+        self.userInteractionEnabled = FALSE;
+        _pauseButton.visible = false;
+        _bomb.visible = false;
+        roundLabel.visible = false;
+        _bombCount.visible = false;
+        bladeCount.visible = false;
+        timer.visible = false;
+        bladeButton.visible = false;
+        NSString *string = [NSString stringWithFormat:@"Round %d Complete!", roundCount];
+        complete = [CCLabelTTF labelWithString:string fontName:nil fontSize:48];
+        complete.positionType = CCPositionTypeNormalized;
+        complete.position = ccp(.5f,.5f);
+        [overlay addChild:complete];
+        CCActionFadeIn *fade = [CCActionFadeIn actionWithDuration:.4f];
+        CCActionDelay *delay2 = [CCActionDelay actionWithDuration:1.2f];
+        CCActionMoveTo *lift = [CCActionMoveTo actionWithDuration:1.2f position:ccp(.5f,1.5f)];
+        CCActionRemove *remove = [CCActionRemove action];
+        [complete runAction:[CCActionSequence actions:fade, delay2, lift,remove,nil]];
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^{
+            [_bombCount setString:[NSString stringWithFormat:@"%@",[person valueForKey:@"nukes"]]];
+            [_nukes setString:[NSString stringWithFormat:@"%@",[person valueForKey:@"nukes"]]];
+            rank = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:18];
+            [overlay addChild:rank];
+            user = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"temp"] fontName:@"Helvetica" fontSize:22];
+            [overlay addChild:user];
+            icon = [CCSprite spriteWithImageNamed:@"Rank/a_Recruit.png"];
+            icon.scale = .8f;
+            [overlay addChild:icon];
+            [[GameData sharedGameData] summarizeRank:rank andUser:user andRankIcon:icon];
+            base = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
+            base.anchorPoint = ccp(0,1);
+            base.positionType = CCPositionTypeNormalized;
+            base.position = ccp(.2f,.65f);
+            [overlay addChild:base];
+            NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
+            NSFetchRequest *request = [[NSFetchRequest alloc] init];
+            [request setEntity:entity];
+            NSString *currentUser = [[NSUserDefaults standardUserDefaults]
                                      stringForKey:@"defaultUser"];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
-        [request setPredicate:predicate];
-        NSError *error2 = nil;
-        Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
-        CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
-        _progress = [CCProgressNode progressWithSprite:progress];
-        _progress.type = CCProgressNodeTypeBar;
-        _progress.midpoint = ccp(0.0f, 0.0f);
-        _progress.anchorPoint = ccp(0,1);
-        _progress.barChangeRate = ccp(1.0f, 0.5f);
-        _progress.zOrder = 2500000;
-        int rank1 = person.rank.intValue;
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+            [request setPredicate:predicate];
+            NSError *error2 = nil;
+            Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+            CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
+            _progress = [CCProgressNode progressWithSprite:progress];
+            _progress.type = CCProgressNodeTypeBar;
+            _progress.midpoint = ccp(0.0f, 0.0f);
+            _progress.anchorPoint = ccp(0,1);
+            _progress.barChangeRate = ccp(1.0f, 0.5f);
+            _progress.zOrder = 2500000;
+            int rank1 = person.rank.intValue;
         if(rank1 ==0){
             int experience = person.experience.intValue;
             int currentRank = [GameData sharedGameData].rank1.intValue;
@@ -1872,6 +2432,7 @@
         _nukes.positionType = CCPositionTypeNormalized;
         _nukes.position = ccp(.679f,.343f);
         [overlay addChild:_nukes];
+            
         _costBomb = [CCSprite spriteWithImageNamed:@"Assets/GoldEgg.png"];
         _costBomb.scale = .65f;
         _costBomb.positionType = CCPositionTypeNormalized;
@@ -2053,8 +2614,7 @@
 
 
 
-- (void)ShowAlertOnLayer: (CCNode *) layer{
-    //[self alertStarted];
+- (void)showGasAlert{
     static int one;
     static int two;
     static int three;
@@ -2588,7 +3148,7 @@
             }
         }
     }
-    [layer addChild:alert];
+    [self addChild:alert];
     
     swipeLeft= [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(swipeLeft)];
     swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
@@ -2618,10 +3178,62 @@
         [[[CCDirector sharedDirector] view] removeGestureRecognizer:swipeLeft];
         currentSequence = 1;
         [alert setSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/lowGasFail.png"]];
+        if ([GameData sharedGameData].newPlayerFlag == true){
+            CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
+            CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+                [self showGasAlert];
+            }];
+            [self runAction:[CCActionSequence actions: delay, block, nil]];
+        }
     }];
     CCActionDelay *shortDelay = [CCActionDelay actionWithDuration:.05f];
-    [alert runAction:[CCActionSequence actions: fadeIn,fadeOut,fadeIn,fadeOut, fadeIn, fadeOut, block, shortDelay, remove, nil]];
+    CCActionCallBlock *failBlock = [CCActionCallBlock actionWithBlock:^(void){
+        [self gasAlertFailed];
+    }];
+    [alert runAction:[CCActionSequence actions: fadeIn,fadeOut,fadeIn,fadeOut, fadeIn, fadeOut, block, shortDelay, remove, failBlock, nil]];
     
+}
+-(void)gasAlertFailed{
+    if (failedOnce == 0){
+        CCActionCallBlock *block = [CCActionCallBlock actionWithBlock:^(void){
+            emitter = [CCParticleSystem particleWithFile:@"exhaust.plist"];
+            [self addChild:emitter];
+            emitter.position = ccp(_barn.position.x-75,_barn.position.y);
+            emitter.duration = .5;
+            emitter.zOrder = 2;
+            emitter.autoRemoveOnFinish = true;
+        }];
+        CCActionCallBlock *block2 = [CCActionCallBlock actionWithBlock:^(void){
+            emitter = [CCParticleSystem particleWithFile:@"exhaust.plist"];
+            [self addChild:emitter];
+            emitter.zOrder = 2;
+            emitter.position = ccp(_barn.position.x-70,_barn.position.y);
+        }];
+        CCActionDelay *delay = [CCActionDelay actionWithDuration:.5f];
+        [self runAction:[CCActionSequence actions:block,delay,block,delay, delay, delay, block2,nil]];
+        failedOnce++;
+        CCActionMoveTo *moveTractor = [CCActionMoveTo actionWithDuration:1.5f position:ccp(_tractor.position.x+210,_tractor.position.y)];
+        CCActionMoveTo *moveBarn = [CCActionMoveTo actionWithDuration:1.5f position:ccp(_barn.position.x+210,_barn.position.y)];
+        [_tractor runAction:moveTractor];
+        [_barn runAction:moveBarn];
+    }
+    else{
+        failedOnce++;
+        running = false;
+        emitter.duration = .1f;
+        emitter.autoRemoveOnFinish = true;
+        CCActionMoveTo *moveTractor = [CCActionMoveTo actionWithDuration:1.5f position:ccp(_tractor.position.x-500,_tractor.position.y)];
+        CCActionMoveTo *moveBarn = [CCActionMoveTo actionWithDuration:1.5f position:ccp(_barn.position.x,_barn.position.y-20)];
+        CCActionMoveTo *moveHorse = [CCActionMoveTo actionWithDuration:1.5f position:ccp(horse.position.x-1000,horse.position.y)];
+        CCActionMoveTo *moveChicken = [CCActionMoveTo actionWithDuration:1.5f position:ccp(self.contentSize.width+10,chicken.position.y-30)];
+        [_tractor runAction:moveTractor];
+        [_barn runAction:moveBarn];
+        [horse runAction:moveHorse];
+        [chicken runAction:moveChicken];
+        [self unschedule:@selector(scrollBackground:)];
+        [self unschedule:@selector(scrollMid:)];
+        [self unschedule:@selector(scrollBack:)];
+    }
 }
 
 // -----------------------------------------------------------------

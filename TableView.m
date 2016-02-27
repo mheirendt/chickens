@@ -88,40 +88,6 @@
     if([GameData sharedGameData].tableID ==1){
         amount = 16;
     if (index == 1){
-        CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/2.png"];
-        icon.anchorPoint = CGPointZero;
-        cell.contentSize = icon.contentSize;
-        _rowHeight = cell.contentSize.height;
-        [cell addChild:icon];
-        
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Double Kill"] fontName:@"HelveticaNeue" fontSize:18];
-        lbl.anchorPoint = CGPointZero;
-        lbl.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
-        lbl.position = ccp(1.3f,.5f);
-        
-        [cell addChild:lbl];
-        
-        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 2 instantaneous kills"] fontName:@"HelveticaNeue" fontSize:14];
-        desc.anchorPoint = CGPointZero;
-        desc.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
-        desc.position = ccp(1.3f,.1f);
-        
-        [cell addChild:desc];
-        
-        doubles = [NSString stringWithFormat:@"X %@", [person1 valueForKey:@"two"]];
-        CCLabelTTF* count = [CCLabelTTF labelWithString:doubles fontName:@"HelveticaNeue" fontSize:22];
-        //CCLabelTTF * count = [CCLabelTTF labelWithString:@"X %li", [[GameData sharedGameData].doubleKills]; fontName:[@"HelveticaNeue" fontSize:30];
-        //fontName:@"HelveticaNeue" fontSize:30];
-        count.anchorPoint = CGPointZero;
-        count.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
-        count.position = ccp(7.f,.2f);
-        
-        [cell addChild:count];
-    }
-    else if (index == 2){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/3.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -154,7 +120,7 @@
         [cell addChild:count];
     }
     
-    else if (index == 3){
+    else if (index == 2){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/4.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -187,7 +153,7 @@
         [cell addChild:count];
         
     }
-    else if (index == 4){
+    else if (index == 3){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/5.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -219,7 +185,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 5){
+    else if (index == 4){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/6.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -251,7 +217,7 @@
         [cell addChild:count];
         
     }
-    else if (index == 6){
+    else if (index == 5){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/7.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -283,7 +249,7 @@
         [cell addChild:count];
         
     }
-    else if (index == 7){
+    else if (index == 6){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/8.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -314,7 +280,7 @@
         [cell addChild:count];
         
     }
-    else if (index == 8){
+    else if (index == 7){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/9.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -345,7 +311,7 @@
         [cell addChild:count];
         
     }
-    else if (index == 9){
+    else if (index == 8){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/10.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -375,7 +341,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 10){
+    else if (index == 9){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/20.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -405,7 +371,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 11){
+    else if (index == 10){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/40.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -435,7 +401,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 12){
+    else if (index == 11){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/60.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -465,7 +431,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 13){
+    else if (index == 12){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/80.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -495,7 +461,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 14){
+    else if (index == 13){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/100.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -525,7 +491,7 @@
         
         [cell addChild:count];
     }
-    else if (index == 15){
+    else if (index == 14){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/CloseCall.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -534,7 +500,6 @@
         CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Close Call"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
         lbl.position = ccp(1.3f,.5f);
         
         [cell addChild:lbl];
@@ -542,7 +507,6 @@
         CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Crush an egg just before it hits the barn"] fontName:@"HelveticaNeue" fontSize:14];
         desc.anchorPoint = CGPointZero;
         desc.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
         desc.position = ccp(1.3f,.1f);
         
         [cell addChild:desc];
@@ -555,7 +519,7 @@
         
         [cell addChild:count];
         }
-    else if (index == 16){
+    else if (index == 15){
         CCSprite* icon = [CCSprite spriteWithImageNamed:@"Assets/Perfect.png"];
         icon.anchorPoint = CGPointZero;
         cell.contentSize = icon.contentSize;
@@ -564,7 +528,6 @@
         CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Perfect Round"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
         lbl.position = ccp(1.3f,.5f);
         
         [cell addChild:lbl];
@@ -572,7 +535,6 @@
         CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Don't miss a single egg"] fontName:@"HelveticaNeue" fontSize:14];
         desc.anchorPoint = CGPointZero;
         desc.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
         desc.position = ccp(1.3f,.1f);
         
         [cell addChild:desc];
@@ -580,7 +542,6 @@
         CCLabelTTF* count = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"X %@", [person1 valueForKey:@"perfect"]] fontName:@"HelveticaNeue" fontSize:22];
         count.anchorPoint = CGPointZero;
         count.positionType = CCPositionTypeNormalized;
-        //lbl.position = ccp(70, 20);
         count.position = ccp(7.f,.2f);
         
         [cell addChild:count];
@@ -597,25 +558,7 @@
 
 - (NSUInteger) tableViewNumberOfRows:(CCTableView*) tableView
 {
-    /*
-    if([GameData sharedGameData].tableID==2){
-    return 25;
-    }
-    
-    else if ([GameData sharedGameData].tableID==1){
     return 16;
-    }
-    else{
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        [request setEntity:entity];
-        NSError *error = nil;
-        NSUInteger count = [[GameData sharedGameData].managedObjectContext countForFetchRequest: request error: &error];
-        CCLOG(@"%lu",(unsigned long)count);
-        return count+1;
-    }
-     */
-    return 17;
 }
 
 // -----------------------------------------------------------------

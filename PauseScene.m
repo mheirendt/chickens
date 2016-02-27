@@ -35,11 +35,6 @@
 {
     self = [super init];
     NSAssert(self, @"Unable to create class %@", [self class]);
-    // class initalization goes here
-    
-    
-    
-    
     return self;
 }
 -(void)onEnter{
@@ -61,8 +56,9 @@
     [[GameData sharedGameData]reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];
-    //CCScene *mainMenu = [CCBReader loadAsScene:@"MainScene"];
-    //[[CCDirector sharedDirector] replaceScene:mainMenu];
+    if ([GameData sharedGameData].newPlayerFlag){
+        [GameData sharedGameData].newPlayerFlag = false;
+    }
 }
 // -----------------------------------------------------------------
 

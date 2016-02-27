@@ -46,35 +46,22 @@
 {
     [super onEnter];
     [self addHighScore];
-    
     CCSprite *progress = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
-    /*
-    _progressNode1.type = CCProgressNodeTypeBar;
-    _progressNode1.midpoint = ccp(0.0f, 0.0f);
-    _progressNode1.anchorPoint = ccp(0,1);
-    _progressNode1.barChangeRate = ccp(1.0f, 0.5f);
-    
-    _progressNode1.zOrder = 2500000;
-    
-    _progressNode1.positionType = CCPositionTypeNormalized;
-    _progressNode1.position = ccp(.2f,.65f);
-     */
-
-    
     CCSprite *base = [CCSprite spriteWithImageNamed:@"Assets/base.png"];
-    //sprite = [CCSprite spriteWithImageNamed:@"Assets/progress.png"];
     base.anchorPoint = ccp(0,1);
     base.positionType = CCPositionTypeNormalized;
     base.position = ccp(.2f,.65f);
     [self addChild:base];
 
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
-    [fetchRequest setEntity:entity];
-    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
-    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:fetchRequest error:&error2] objectAtIndex:0];
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     [[GameData sharedGameData]summarizeRank:_rankLabel andUser:_userName andRankIcon:_rankIcon];
     
     
@@ -108,20 +95,183 @@
         int currentRank = [GameData sharedGameData].rank3.intValue;
         int nextRank = [GameData sharedGameData].rank2.intValue;
         int currentRankExp = experience - nextRank;
-        
-        float temp = (float)currentRankExp/(float)currentRank *100;
-        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
-        _progress.percentage=temp;
-    }
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;            }
     else if (rank == 3){
         int experience = person.experience.intValue;
         int currentRank = [GameData sharedGameData].rank4.intValue;
         int nextRank = [GameData sharedGameData].rank3.intValue;
         int currentRankExp = experience - nextRank;
-        
-        float temp = (float)currentRankExp/(float)currentRank *100;
-        CCLOG(@"temp: %f experience %d currentRankExp %d", temp, experience, currentRankExp);
-        _progress.percentage=temp;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 4){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank5.intValue;
+        int nextRank = [GameData sharedGameData].rank4.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 5){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank6.intValue;
+        int nextRank = [GameData sharedGameData].rank5.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 6){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank7.intValue;
+        int nextRank = [GameData sharedGameData].rank6.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 7){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank8.intValue;
+        int nextRank = [GameData sharedGameData].rank7.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 8){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank9.intValue;
+        int nextRank = [GameData sharedGameData].rank8.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 9){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank10.intValue;
+        int nextRank = [GameData sharedGameData].rank9.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 10){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank11.intValue;
+        int nextRank = [GameData sharedGameData].rank10.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 11){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank12.intValue;
+        int nextRank = [GameData sharedGameData].rank11.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 12){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank13.intValue;
+        int nextRank = [GameData sharedGameData].rank12.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 13){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank14.intValue;
+        int nextRank = [GameData sharedGameData].rank13.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 14){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank15.intValue;
+        int nextRank = [GameData sharedGameData].rank14.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 15){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank16.intValue;
+        int nextRank = [GameData sharedGameData].rank15.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 16){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank17.intValue;
+        int nextRank = [GameData sharedGameData].rank16.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 17){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank18.intValue;
+        int nextRank = [GameData sharedGameData].rank17.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 18){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank19.intValue;
+        int nextRank = [GameData sharedGameData].rank18.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 19){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank20.intValue;
+        int nextRank = [GameData sharedGameData].rank19.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 20){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank21.intValue;
+        int nextRank = [GameData sharedGameData].rank20.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 21){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank22.intValue;
+        int nextRank = [GameData sharedGameData].rank21.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 22){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank23.intValue;
+        int nextRank = [GameData sharedGameData].rank22.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 23){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank24.intValue;
+        int nextRank = [GameData sharedGameData].rank23.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
+    }
+    else if (rank == 24){
+        int experience = person.experience.intValue;
+        int currentRank = [GameData sharedGameData].rank25.intValue;
+        int nextRank = [GameData sharedGameData].rank24.intValue;
+        int currentRankExp = experience - nextRank;
+        float preTemp = (float)currentRankExp/(float)currentRank *100;
+        _progress.percentage=preTemp;
     }
     _progress.positionType = CCPositionTypeNormalized;
     _progress.position = ccp(.2f,.65f);
@@ -148,14 +298,15 @@
 }
 
 -(void)addHighScore{
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
-    [fetchRequest setEntity:entity];
-    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entity];
+    NSString *currentUser = [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"defaultUser"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name = %@", currentUser];
+    [request setPredicate:predicate];
     NSError *error2 = nil;
-    NSArray *result = [[GameData sharedGameData].managedObjectContext executeFetchRequest:fetchRequest error:&error2];
-    Person *person = [result objectAtIndex:0];
+    Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
     
     if (error2) {
         NSLog(@"Unable to execute fetch request.");
@@ -166,14 +317,6 @@
         [scoreLabel setString:highScore];
         NSString *highRound = [NSString stringWithFormat:@"%@", [person valueForKey:@"highround"]];
         [roundLabel setString:highRound];
-    }
-    if (result.count > 0) {
-        NSManagedObject *person = (NSManagedObject *)[result objectAtIndex:0];
-        NSLog(@"1 - %@", person);
-        
-        NSLog(@"%@ %@", [person valueForKey:@"name"], [person valueForKey:@"highscore"]);
-        
-        NSLog(@"2 - %@", person);
     }
 }
 

@@ -28,6 +28,7 @@
     CCLabelTTF *rightLab;
     CCLabelTTF *downLab;
     CCLabelTTF *leftLab;
+    
 }
 
 // -----------------------------------------------------------------
@@ -99,7 +100,6 @@
                     upLab.position = ccp(alert.contentSize.width - alert.contentSize.width +54, alert.contentSize.height * 0.35f);
                 }
                 upLab.color = [CCColor colorWithCcColor3b:ccBLACK];
-                //[alert addChild: lab1];
                 [alert addChild:upLab];
             }
             if (seq1 == 2){
@@ -473,7 +473,6 @@
         [upLab setColor:[CCColor greenColor]];
         [downLab setColor:[CCColor greenColor]];
         [leftLab setColor:[CCColor greenColor]];
-        //rightLab.color = [CCColor greenColor];
     }
     else{
         CCLOG(@"FAIL");
