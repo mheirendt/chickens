@@ -88,6 +88,7 @@
 		A9E5FCBC1C72B26500DF2A28 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A9E5FCBB1C72B26500DF2A28 /* Default@2x.png */; };
 		A9E5FCBE1C72B2E800DF2A28 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A9E5FCBD1C72B2E800DF2A28 /* Default-568h@2x.png */; };
 		A9E5FCCB1C7FCC0900DF2A28 /* exhaust.plist in Resources */ = {isa = PBXBuildFile; fileRef = A9E5FCCA1C7FCC0900DF2A28 /* exhaust.plist */; };
+		A9E5FCE81C82A8D200DF2A28 /* Store.m in Sources */ = {isa = PBXBuildFile; fileRef = A9E5FCE71C82A8D200DF2A28 /* Store.m */; };
 		B71F5911188484E7003F4D28 /* iPad-old.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5907188484E7003F4D28 /* iPad-old.png */; };
 		B71F5912188484E7003F4D28 /* iPad-old@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5908188484E7003F4D28 /* iPad-old@2x.png */; };
 		B71F5913188484E7003F4D28 /* iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = B71F5909188484E7003F4D28 /* iPad.png */; };
@@ -275,6 +276,8 @@
 		A9E5FCBB1C72B26500DF2A28 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		A9E5FCBD1C72B2E800DF2A28 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		A9E5FCCA1C7FCC0900DF2A28 /* exhaust.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = exhaust.plist; sourceTree = "<group>"; };
+		A9E5FCE61C82A8D200DF2A28 /* Store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Store.h; sourceTree = "<group>"; };
+		A9E5FCE71C82A8D200DF2A28 /* Store.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Store.m; sourceTree = "<group>"; };
 		B71F5907188484E7003F4D28 /* iPad-old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old.png"; path = "Icons/iPad-old.png"; sourceTree = "<group>"; };
 		B71F5908188484E7003F4D28 /* iPad-old@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "iPad-old@2x.png"; path = "Icons/iPad-old@2x.png"; sourceTree = "<group>"; };
 		B71F5909188484E7003F4D28 /* iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = iPad.png; path = Icons/iPad.png; sourceTree = "<group>"; };
@@ -593,6 +596,8 @@
 				A93C4A4D1C4320BD0097C423 /* GameOver.m */,
 				A93C4AB01C47453B0097C423 /* signInScene.h */,
 				A93C4AB11C47453B0097C423 /* signInScene.m */,
+				A9E5FCE61C82A8D200DF2A28 /* Store.h */,
+				A9E5FCE71C82A8D200DF2A28 /* Store.m */,
 				A9A449F81C3740A900E1FA40 /* Chicken.m */,
 				A9D4B0591C58618B0084241A /* RankTable.h */,
 				A9D4B05A1C58618C0084241A /* RankTable.m */,
@@ -1023,6 +1028,7 @@
 				B73789871807631A0076A88C /* main.m in Sources */,
 				A96A199F1C34AE520023033F /* Gameplay.m in Sources */,
 				A93C4AB21C47453B0097C423 /* signInScene.m in Sources */,
+				A9E5FCE81C82A8D200DF2A28 /* Store.m in Sources */,
 				A93C4AAF1C4737A60097C423 /* Person.m in Sources */,
 				A9C77D001C67CF5100B5FE65 /* LowAlert.m in Sources */,
 				A9D4B0711C5AF0200084241A /* UsersTable.m in Sources */,

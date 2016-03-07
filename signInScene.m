@@ -106,6 +106,8 @@
     [newPerson setValue:@0 forKey:@"highround"];
     [newPerson setValue:@0 forKey:@"nukes"];
     [newPerson setValue:@0 forKey:@"blades"];
+    [newPerson setValue:FALSE forKey:@"nukes"];
+    [newPerson setValue:FALSE forKey:@"blades"];
     NSError *error = nil;
     if (![newPerson.managedObjectContext save:&error]) {
         NSLog(@"Unable to save managed object context.");
@@ -116,6 +118,7 @@
         if([GameData sharedGameData].tableID){
             [[CCDirector sharedDirector] popScene];
             [[CCDirector sharedDirector] popScene];
+            [[CCDirector sharedDirector] replaceScene:[CCBReader loadAsScene:@"HighScores"]];
         }
     else{
         CCScene *mainScene = [CCBReader loadAsScene:@"MainScene"];

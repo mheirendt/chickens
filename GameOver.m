@@ -65,6 +65,10 @@
     [request setPredicate:predicate];
     NSError *error2 = nil;
     Person *person = [[[GameData sharedGameData].managedObjectContext executeFetchRequest:request error:&error2] objectAtIndex:0];
+    int score = [GameData sharedGameData].roundScore;
+    score +=person.experience.intValue;
+    [person setValue:[NSNumber numberWithInt:score] forKey:@"experience"];
+    [GameData sharedGameData].roundScore = 0;
     NSNumber *highScore = [NSNumber numberWithLong:[GameData sharedGameData].score];
     NSNumber *highRound = [NSNumber numberWithInt:[GameData sharedGameData].round];
     if (![person.managedObjectContext save:&error2]) {

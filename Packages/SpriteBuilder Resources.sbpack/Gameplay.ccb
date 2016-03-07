@@ -1583,8 +1583,6 @@
 						<array/>
 					</dict>
 				</array>
-				<key>selected</key>
-				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -1944,9 +1942,9 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>127.98025512695312</real>
-							<real>365</real>
-							<integer>1</integer>
+							<real>66.980255126953125</real>
+							<real>285</real>
+							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
 						</array>
@@ -2118,6 +2116,8 @@
 						</array>
 					</dict>
 				</array>
+				<key>selected</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>UUID</key>
@@ -2151,8 +2151,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>127.98025512695312</real>
-							<real>323</real>
+							<real>66.980255126953125</real>
+							<real>65</real>
 							<integer>1</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -2685,7 +2685,7 @@
 						<key>value</key>
 						<array>
 							<real>419.6356201171875</real>
-							<real>31</real>
+							<real>28</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -3010,8 +3010,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>432.61093139648438</real>
-							<real>47</real>
+							<real>435.87899780273438</real>
+							<real>44</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -3024,7 +3024,7 @@
 						<string>Point</string>
 						<key>value</key>
 						<array>
-							<real>0.0</real>
+							<real>0.5</real>
 							<real>0.5</real>
 						</array>
 					</dict>
@@ -3217,8 +3217,8 @@
 						<string>Position</string>
 						<key>value</key>
 						<array>
-							<real>320.5</real>
-							<real>44.5</real>
+							<real>322.66226196289062</real>
+							<real>44</real>
 							<integer>0</integer>
 							<integer>0</integer>
 							<integer>0</integer>
@@ -3231,7 +3231,7 @@
 						<string>Point</string>
 						<key>value</key>
 						<array>
-							<real>0.0</real>
+							<real>0.5</real>
 							<real>0.5</real>
 						</array>
 					</dict>

@@ -82,8 +82,8 @@
     dialog.position = ccp(280,160);
     dialog.exclusiveTouch = true;
     dialog.opacity = 220; // make it a bit transparent for a cooler look
-    float fontSize = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)?42:30;
-    CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message fontName:kFontName fontSize:fontSize dimensions:CGSizeMake(300,100)];
+    float fontSize = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)?36:24;
+    CCLabelTTF *dialogMsg = [CCLabelTTF labelWithString:message fontName:kFontName fontSize:fontSize dimensions:CGSizeMake(300,130)];
     dialogMsg.anchorPoint = ccp(0, 0);
     dialogMsg.position = ccp(dialog.contentSize.width*.1f, dialog.contentSize.height * 0.35f);
     dialogMsg.color = [CCColor colorWithCcColor3b:ccBLACK];
@@ -97,7 +97,7 @@
     opt1Button.position = ccp(dialog.textureRect.size.width * (opt2 ? 0.27f:0.5f), opt1Button.contentSize.height * 0.8f);                                         //fontName:kFontName fontSize:fontSize];
     CCLabelTTF *opt1Label = [CCLabelTTF labelWithString:opt1 fontName:@"Helvetica" fontSize:18 dimensions:CGSizeMake(200.f, 0.f)];
     opt1Label.anchorPoint = ccp(0, 1);
-    opt1Label.color = [CCColor colorWithCcColor3b:ccBLACK];
+    //opt1Label.color = [CCColor colorWithCcColor3b:ccBLACK];
     [opt1Button addChild: opt1Label];
     
     // create second button, if requested
@@ -107,10 +107,12 @@
         
         opt2Button.position = ccp(dialog.textureRect.size.width * 0.73f, opt1Button.contentSize.height * 0.8f);
         CCLabelTTF *opt2Label = [CCLabelTTF labelWithString:opt2 fontName:@"Helvetica" fontSize:18];
-        opt2Label.anchorPoint = ccp(0, 0.1);
+        opt2Label.anchorPoint = ccp(0, 1);
                             
-        opt2Label.color = [CCColor colorWithCcColor3b:ccBLACK];
+        //opt2Label.color = [CCColor colorWithCcColor3b:ccBLACK];
         [opt2Button addChild: opt2Label];
+        
+        [dialog addChild:opt2Button];
     }
     
     opt1Button.positionType = CCPositionTypeNormalized;
@@ -119,7 +121,6 @@
     opt2Button.position = ccp(.7f,.3f);
     
     [dialog addChild:opt1Button];
-    //[dialog addChild:opt2Button];
     [coverLayer addChild:dialog];
     
     // open the dialog with a nice popup-effect

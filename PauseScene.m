@@ -46,6 +46,7 @@
     [[CCDirector sharedDirector] popScene];
 }
 -(void)restartPressed{
+    [GameData sharedGameData].roundScore = 0;
     [[GameData sharedGameData] reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];
@@ -53,6 +54,7 @@
     [[CCDirector sharedDirector] pushScene:game];
 }
 -(void)quitPressed{
+    [GameData sharedGameData].roundScore = 0;
     [[GameData sharedGameData]reset];
     [[CCDirector sharedDirector] popScene];
     [[CCDirector sharedDirector] popScene];

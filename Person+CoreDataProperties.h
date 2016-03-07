@@ -39,6 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, retain) NSNumber *highround;
 @property (nullable, nonatomic, retain) NSNumber *blades;
 @property (nullable, nonatomic, retain) NSNumber *nukes;
+@property (nonatomic) BOOL bladewallet;
+@property (nonatomic) BOOL nukewallet;
+@property (nullable, nonatomic, retain) NSNumber *betterodds;
+@property (nullable, nonatomic, retain) NSNumber *frequentflyer;
 
 
 @end

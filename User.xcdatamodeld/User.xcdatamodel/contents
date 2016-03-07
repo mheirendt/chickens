@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15B42" minimumToolsVersion="Xcode 7.0">
     <entity name="Person" representedClassName="Person" syncable="YES">
+        <attribute name="betterodds" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="blades" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="bladewallet" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="closecall" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="eight" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="eighty" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -9,6 +11,7 @@
         <attribute name="five" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="forty" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="four" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="frequentflyer" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="gold" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="highround" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="highscore" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -16,6 +19,7 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="nine" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="nukes" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="nukewallet" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="perfect" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="rank" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="seven" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -27,6 +31,6 @@
         <attribute name="two" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Person" positionX="-54" positionY="-9" width="128" height="405"/>
+        <element name="Person" positionX="-54" positionY="-9" width="128" height="465"/>
     </elements>
 </model>

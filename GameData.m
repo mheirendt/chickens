@@ -63,6 +63,7 @@
 @synthesize seq3;
 @synthesize seq4;
 
+
 // -----------------------------------------------------------------
 
 + (instancetype)node
@@ -113,7 +114,6 @@
     icon.scale = .8f;
     icon.position=(ccp(.1f,.81f));
     
-
     self.rank1 = [NSNumber numberWithInt:300];
     self.rank2 = [NSNumber numberWithInt:600];
     self.rank3 = [NSNumber numberWithInt:1000];
@@ -164,7 +164,8 @@
     self.rank22 = [NSNumber numberWithInt:22];
     self.rank23 = [NSNumber numberWithInt:23];
     self.rank24 = [NSNumber numberWithInt:24];
-     */
+    */
+
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:[GameData sharedGameData].managedObjectContext];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];

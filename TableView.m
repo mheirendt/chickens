@@ -94,7 +94,7 @@
          _rowHeight = cell.contentSize.height;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Triple Kill"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Tri Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -127,7 +127,7 @@
          _rowHeight = cell.contentSize.height;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Over Kill"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Tetra Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -159,7 +159,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Killtacular"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Penta Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -191,7 +191,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Killpocalypse"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Hexa Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -223,7 +223,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"7 Kills"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Hepta Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -255,7 +255,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"8 kills"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Octa Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -286,7 +286,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"9 Kills"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Ennea Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -317,7 +317,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"10 kills"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Deca Crush"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -347,7 +347,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Killing Spree"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Icosi"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -377,7 +377,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Killing Frenzy"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Triaconta"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -385,7 +385,7 @@
         
         [cell addChild:lbl];
         
-        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 40 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
+        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 30 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
         desc.anchorPoint = CGPointZero;
         desc.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -407,7 +407,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Running Riot"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Tetraconta"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -415,7 +415,7 @@
         
         [cell addChild:lbl];
         
-        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 60 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
+        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 40 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
         desc.anchorPoint = CGPointZero;
         desc.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -437,7 +437,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"80 Spree"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Pentaconta"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -445,7 +445,7 @@
         
         [cell addChild:lbl];
         
-        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 80 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
+        CCLabelTTF* desc = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Get 50 kills without missing a shot"] fontName:@"HelveticaNeue" fontSize:14];
         desc.anchorPoint = CGPointZero;
         desc.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);
@@ -467,7 +467,7 @@
         cell.contentSize = icon.contentSize;
         [cell addChild:icon];
         
-        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"100 Spree"] fontName:@"HelveticaNeue" fontSize:18];
+        CCLabelTTF* lbl = [CCLabelTTF labelWithString:[NSString stringWithFormat:@"Hecto"] fontName:@"HelveticaNeue" fontSize:18];
         lbl.anchorPoint = CGPointZero;
         lbl.positionType = CCPositionTypeNormalized;
         //lbl.position = ccp(70, 20);

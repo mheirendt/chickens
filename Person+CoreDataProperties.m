@@ -37,5 +37,9 @@
 @dynamic highround;
 @dynamic blades;
 @dynamic nukes;
+@dynamic bladewallet;
+@dynamic nukewallet;
+@dynamic betterodds;
+@dynamic frequentflyer;
 
 @end

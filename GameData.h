@@ -31,6 +31,7 @@
 @property (assign, nonatomic) long highScore;
 @property (assign, nonatomic) int round;
 @property (assign, nonatomic) long score;
+@property (nonatomic) int roundScore;
 @property(assign, nonatomic) int rank;
 @property (assign, nonatomic) long doubleKills;
 @property (assign, nonatomic) NSMutableArray *hiScores;
@@ -76,6 +77,7 @@
 @property (nonatomic) int seq2;
 @property (nonatomic) int seq3;
 @property (nonatomic) int seq4;
+
 
 // -----------------------------------------------------------------
 // methods

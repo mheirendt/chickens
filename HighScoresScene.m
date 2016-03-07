@@ -73,7 +73,7 @@
     _progress.zOrder = 2500000;
     
     int rank = person.rank.intValue;
-    if(rank ==0){
+    if(rank == 0){
         int experience = person.experience.intValue;
         int currentRankExp = [GameData sharedGameData].rank1.intValue;
         float temp = (float)experience/(float)currentRankExp *100;
@@ -295,6 +295,9 @@
     [GameData sharedGameData].tableID = 3;
     CCScene *gameplayScene = [CCBReader loadAsScene:@"UsersTable"];
     [[CCDirector sharedDirector] pushScene:gameplayScene];
+}
+-(void)armoryPressed{
+    [[CCDirector sharedDirector]pushScene:[CCBReader loadAsScene:@"Store"]];
 }
 
 -(void)addHighScore{
