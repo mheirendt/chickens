@@ -89,7 +89,7 @@
     dialogMsg.color = [CCColor colorWithCcColor3b:ccBLACK];
     [dialog addChild: dialogMsg];
     
-    CCButton *opt1Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forward.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/forwardPressed.png"] disabledSpriteFrame:nil];
+    CCButton *opt1Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/yes.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/yesPressed.png"] disabledSpriteFrame:nil];
     [opt1Button setBlock:^(id sender){
         ////close alert and call opt1block when first button is pressed
         [self CloseAlert:dialog onCoverLayer: coverLayer executingBlock:opt1Block];
@@ -103,8 +103,11 @@
     // create second button, if requested
     CCButton *opt2Button = nil;
     if (opt2) {
-        opt2Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Back.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/BackPressed.png"] disabledSpriteFrame:nil];
-        
+        opt2Button = [CCButton buttonWithTitle:nil spriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/Quit.png"] highlightedSpriteFrame:[CCSpriteFrame frameWithImageNamed:@"Assets/QuitPressed.png"] disabledSpriteFrame:nil];
+        [opt2Button setBlock:^(id sender){
+            ////close alert and call opt1block when first button is pressed
+            [self CloseAlert:dialog onCoverLayer: coverLayer executingBlock:opt2Block];
+        }];
         opt2Button.position = ccp(dialog.textureRect.size.width * 0.73f, opt1Button.contentSize.height * 0.8f);
         CCLabelTTF *opt2Label = [CCLabelTTF labelWithString:opt2 fontName:@"Helvetica" fontSize:18];
         opt2Label.anchorPoint = ccp(0, 1);

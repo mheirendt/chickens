@@ -54,7 +54,7 @@
     NSError *error = nil;
     NSUInteger count = [[GameData sharedGameData].managedObjectContext countForFetchRequest:request1 error:&error];
     CCLOG(@"count:%d",(int)count);
-    
+     
     if (count + 1 <= 10){
         [GameData sharedGameData].tableID = 3;
         CCScene *gameplayScene = [CCBReader loadAsScene:@"SignIn"];

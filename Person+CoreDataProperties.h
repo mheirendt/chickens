@@ -43,8 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL nukewallet;
 @property (nullable, nonatomic, retain) NSNumber *betterodds;
 @property (nullable, nonatomic, retain) NSNumber *frequentflyer;
-
-
+@property (nullable, nonatomic, retain) NSNumber *gascomplete;
 @end
 
 NS_ASSUME_NONNULL_END

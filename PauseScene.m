@@ -12,6 +12,7 @@
 
 #import "PauseScene.h"
 #import "GameData.h"
+#import "AlertView.h"
 
 // -----------------------------------------------------------------
 
@@ -22,6 +23,10 @@
     CCSprite *icon;
     CCProgressNode *_progressNode;
     CCSprite *progress;
+    id block;
+    CCButton *play;
+    CCButton *restart;
+    CCButton *quit;
 }
 
 // -----------------------------------------------------------------
@@ -46,22 +51,41 @@
     [[CCDirector sharedDirector] popScene];
 }
 -(void)restartPressed{
-    [GameData sharedGameData].roundScore = 0;
-    [[GameData sharedGameData] reset];
-    [[CCDirector sharedDirector] popScene];
-    [[CCDirector sharedDirector] popScene];
-    CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
-    [[CCDirector sharedDirector] pushScene:game];
+    play.enabled = false;
+    restart.enabled = false;
+    quit.enabled = false;
+    [AlertView ShowAlert:@"Are you sure you want to restart? All progress will be lost." onLayer:self withOpt1:@"Yes" withOpt1Block:^(void){
+        [GameData sharedGameData].roundScore = 0;
+        [[GameData sharedGameData] reset];
+        [[CCDirector sharedDirector] popScene];
+        [[CCDirector sharedDirector] popScene];
+        CCScene *game = [CCBReader loadAsScene:@"Gameplay"];
+        [[CCDirector sharedDirector] pushScene:game];
+    } andOpt2:@"Cancel" withOpt2Block:^(void){
+        play.enabled = true;
+        restart.enabled = true;
+        quit.enabled = true;
+    }];
 }
 -(void)quitPressed{
-    [GameData sharedGameData].roundScore = 0;
-    [[GameData sharedGameData]reset];
-    [[CCDirector sharedDirector] popScene];
-    [[CCDirector sharedDirector] popScene];
-    if ([GameData sharedGameData].newPlayerFlag){
-        [GameData sharedGameData].newPlayerFlag = false;
-    }
+    play.enabled = false;
+    restart.enabled = false;
+    quit.enabled = false;
+    [AlertView ShowAlert:@"Are you sure you want to quit? All progress will be lost." onLayer:self withOpt1:@"Yes" withOpt1Block:^(void){
+        [GameData sharedGameData].roundScore = 0;
+        [[GameData sharedGameData]reset];
+        [[CCDirector sharedDirector] popScene];
+        [[CCDirector sharedDirector] popScene];
+        if ([GameData sharedGameData].newPlayerFlag){
+            [GameData sharedGameData].newPlayerFlag = false;
+        }
+    } andOpt2:@"Cancel" withOpt2Block:^(void){
+        play.enabled = true;
+        restart.enabled = true;
+        quit.enabled = true;
+    }];
 }
+
 // -----------------------------------------------------------------
 
 @end
